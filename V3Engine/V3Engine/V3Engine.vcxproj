@@ -71,19 +71,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\lib;$(SolutionDir)SDK_Source\SDL\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x86\lib;$(SolutionDir)SDK_Source\SDL\x86\lib;$(LibraryPath);$(SolutionDir)SDK_Source\SDL_image\x86\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\lib;$(SolutionDir)SDK_Source\SDL\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x86\lib;$(SolutionDir)SDK_Source\SDL\x86\lib;$(SolutionDir)SDK_Source\SDL\dll;$(LibraryPath);$(SolutionDir)SDK_Source\SDL_image\x86\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\lib;$(SolutionDir)SDK_Source\SDL\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x64\lib;$(SolutionDir)SDK_Source\SDL\x64\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\lib;$(SolutionDir)SDK_Source\SDL\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x64\lib;$(SolutionDir)SDK_Source\SDL\x64\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

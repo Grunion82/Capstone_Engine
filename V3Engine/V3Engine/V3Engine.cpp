@@ -23,5 +23,5 @@ V3Engine* V3Engine::GetInstance() {
 
 void V3Engine::speak() {
 	
-	printf("Hello from the engine\n");
+	printf("Engine speaketh\n");
 }
