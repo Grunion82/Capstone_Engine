@@ -142,7 +142,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="NoahGitTest.h" />
     <ClInclude Include="V3Engine.h" />
   </ItemGroup>
   <ItemGroup>
