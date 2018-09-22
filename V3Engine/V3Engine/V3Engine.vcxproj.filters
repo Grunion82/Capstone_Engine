@@ -18,7 +18,7 @@
     <ClInclude Include="V3Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test.h">
+    <ClInclude Include="NoahGitTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
