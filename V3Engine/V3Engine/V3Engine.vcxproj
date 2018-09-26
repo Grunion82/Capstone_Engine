@@ -142,15 +142,14 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="NoahGitTest.h" />
-    <ClInclude Include="test.h" />
-    <ClInclude Include="V3Engine.h" />
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
+    <ClInclude Include="Engine\Core\Systems\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\V3Engine.cpp" />
     <ClCompile Include="Engine\Core\Systems\Timer.cpp" />
+    <ClCompile Include="Engine\Core\Systems\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
