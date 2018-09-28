@@ -142,10 +142,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Debug.h" />
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Debug.cpp" />
     <ClCompile Include="Engine\V3Engine.cpp" />
     <ClCompile Include="Engine\Core\Systems\Timer.cpp" />
   </ItemGroup>
