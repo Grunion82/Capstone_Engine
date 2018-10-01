@@ -4,7 +4,6 @@
 #include <memory>
 #include <stdio.h>
 #include <SDL.h>
-
 class V3Engine {
 private:
 	V3Engine();
