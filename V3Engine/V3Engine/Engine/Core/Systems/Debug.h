@@ -40,7 +40,5 @@ private:
 
 
 };
-#endif DEBUG_H
-
-
+#endif
 

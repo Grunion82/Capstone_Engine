@@ -142,26 +142,20 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ClInclude Include="Engine\Core\Systems\Camera.h" />
+    <ClInclude Include="Engine\Core\Systems\Debug.h" />
     <ClInclude Include="Engine\Core\Systems\Input.h" />
     <ClInclude Include="Engine\Rendering\2D\Image.h" />
     <ClInclude Include="Engine\Rendering\2D\stb_image.h" />
-=======
-    <ClInclude Include="Engine\Core\Debug.h" />
->>>>>>> 132c75c12babc8988df42d0a2fd0d48eb99edc37
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
     <ClInclude Include="Engine\Core\Systems\Window.h" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ClCompile Include="Engine\Core\Systems\Camera.cpp" />
+    <ClCompile Include="Engine\Core\Systems\Debug.cpp" />
     <ClCompile Include="Engine\Core\Systems\Input.cpp" />
     <ClCompile Include="Engine\Rendering\2D\Image.cpp" />
-=======
-    <ClCompile Include="Engine\Core\Debug.cpp" />
->>>>>>> 132c75c12babc8988df42d0a2fd0d48eb99edc37
     <ClCompile Include="Engine\V3Engine.cpp" />
     <ClCompile Include="Engine\Core\Systems\Timer.cpp" />
     <ClCompile Include="Engine\Core\Systems\Window.cpp" />
