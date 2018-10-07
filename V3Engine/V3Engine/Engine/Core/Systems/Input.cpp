@@ -17,6 +17,9 @@ Input::Input() : requestedQuit(false)
 	joystickLeftAxisY = 0;
 	joystickRightAxisX = 0;
 	joystickRightAxisY = 0;
+
+	joystickLeftTrigger = 0;
+	joystickRightTrigger = 0;
 }
 
 Input::~Input()
@@ -52,7 +55,7 @@ bool Input::Init() {
 }
 void Input::Update() {
 	oldkeys = keys;
-	oldJoyButtons = joyButton;
+	oldJoyButtons = joyButtons;
 
 	mouseMotionX = 0;
 	mouseMotionY = 0;
@@ -75,6 +78,20 @@ void Input::Update() {
 			mouseMotionX = e.motion.xrel;
 			mouseMotionY = e.motion.yrel;
 			break;
+		//For mouse button down
+		case(SDL_MOUSEBUTTONDOWN):
+			//1 - Left click
+			//2 - Middle click
+			//3 - Right click
+			//4 - Back button
+			//5 - Front button
+			mouseButtons[e.button.button] = true;
+			clicks = e.button.clicks;
+			break;
+			//For mouse button up
+		case(SDL_MOUSEBUTTONUP):
+			mouseButtons[e.button.button] = false;
+			break;
 		//For mouse wheel
 		case(SDL_MOUSEWHEEL):
 			mouseWheelY = e.wheel.y;
@@ -87,6 +104,14 @@ void Input::Update() {
 		case(SDL_JOYAXISMOTION):
 			//Value for axis ranges form -32768 to 32767
 			//Some joy sticks use 2 and 3 for extra buttons
+			//Set axis values
+			if (e.jaxis.axis == 0) {
+				leftXAxis = e.jaxis.value;
+			}
+			if (e.jaxis.axis == 1) {
+				leftYAxis = e.jaxis.value;
+			}
+
 			//Left x
 			if (e.jaxis.axis == 0 && e.jaxis.value > JOYSTICK_DEAD_ZONE) {
 				joystickLeftAxisX = 1;
@@ -94,7 +119,7 @@ void Input::Update() {
 			else if (e.jaxis.axis == 0 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
 				joystickLeftAxisX = -1;
 			}
-			else if (e.jaxis.axis == 0 && e.jaxis.value == 0) {
+			else if (leftXAxis < JOYSTICK_DEAD_ZONE && leftXAxis > -JOYSTICK_DEAD_ZONE) {
 				joystickLeftAxisX = 0;
 			}
 
@@ -105,8 +130,16 @@ void Input::Update() {
 			else if (e.jaxis.axis == 1 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
 				joystickLeftAxisY = -1;
 			}
-			else if (e.jaxis.axis == 1 && e.jaxis.value == 0) {
+			else if (leftYAxis < JOYSTICK_DEAD_ZONE && leftYAxis > -JOYSTICK_DEAD_ZONE) {
 				joystickLeftAxisY = 0;
+			}
+
+			//Set axis values
+			if (e.jaxis.axis == 3) {
+				rightXAxis = e.jaxis.value;
+			}
+			if (e.jaxis.axis == 4) {
+				rightYAxis = e.jaxis.value;
 			}
 
 			//Right x
@@ -116,7 +149,7 @@ void Input::Update() {
 			else if (e.jaxis.axis == 3 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
 				joystickRightAxisX = -1;
 			}
-			else if (e.jaxis.axis == 3 && e.jaxis.value == 0) {
+			else if (rightXAxis < JOYSTICK_DEAD_ZONE && rightXAxis > -JOYSTICK_DEAD_ZONE) {
 				joystickRightAxisX = 0;
 			}
 
@@ -127,7 +160,7 @@ void Input::Update() {
 			else if (e.jaxis.axis == 4 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
 				joystickRightAxisY = -1;
 			}
-			else if (e.jaxis.axis == 4 && e.jaxis.value == 0) {
+			else if (rightYAxis < JOYSTICK_DEAD_ZONE && rightYAxis > -JOYSTICK_DEAD_ZONE) {
 				joystickRightAxisY = 0;
 			}
 
@@ -226,6 +259,7 @@ bool Input::IsKeyDown(unsigned int key)
 	return false;
 }
 
+//KEYBOARD===================================================
 bool Input::IsKeyUp(unsigned int key)
 {
 	auto it = keys.find(key);
@@ -264,6 +298,7 @@ bool Input::WasKeyReleased(unsigned int key)
 	return false;
 }
 
+//JOYSTICK=========================================================
 bool Input::IsJoyStickButtonDown(unsigned int key)
 {
 	auto it = joyButtons.find(key);
@@ -313,5 +348,57 @@ bool Input::WasJoyStickButtonReleased(unsigned int key)
 	}
 
 	return false;
+}
+
+//MOUSE=====================================================================
+bool Input::IsMouseButtonDown(unsigned int key)
+{
+	auto it = mouseButtons.find(key);
+
+	if (it != mouseButtons.end()) {
+		//Return true or false based on the state of the map
+		return mouseButtons[key];
+	}
+
+	//The button was never pressed
+	return false;
+}
+bool Input::IsMouseButtonUp(unsigned int key)
+{
+	auto it = mouseButtons.find(key);
+
+	if (it != mouseButtons.end()) {
+		//Return true or false based on the state of the map
+		return !mouseButtons[key];
+	}
+
+	//The button was never pressed
+	return true;
+}
+bool Input::WasMouseButtonPressed(unsigned int key)
+{
+	auto it = oldMouseButtons.find(key);
+
+	//If button in old array
+	if (it != oldMouseButtons.end()) {
+		//If false and true
+		return !oldMouseButtons[key] && mouseButtons[key];
+	}
+
+	//Return from current array
+	return mouseButtons[key];
+}
+bool Input::WasMouseButtonReleased(unsigned int key)
+{
+	auto it = oldMouseButtons.find(key);
+
+	//If button in old array
+	if (it != oldMouseButtons.end()) {
+		//If true and false
+		return oldMouseButtons[key] && !mouseButtons[key];
+	}
+
+	//Return from current array
+	return mouseButtons[key];
 }
 
