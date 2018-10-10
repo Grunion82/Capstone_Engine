@@ -150,6 +150,7 @@
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
     <ClInclude Include="Engine\Core\Systems\Window.h" />
+    <ClInclude Include="Engine\Core\Systems\GameInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Core\Systems\Camera.cpp" />

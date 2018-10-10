@@ -19,7 +19,6 @@
     <ClInclude Include="Engine\Core\Systems\Input.h" />
     <ClInclude Include="Engine\Rendering\2D\Image.h" />
     <ClInclude Include="Engine\Rendering\2D\stb_image.h" />
-    <ClInclude Include="Engine\Core\Debug.h" />
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
     <ClInclude Include="Engine\Core\Systems\Window.h" />
@@ -45,6 +44,9 @@
     <ClCompile Include="Engine\Core\Systems\Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClInclude Include="Engine\Core\Systems\GameInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\V3Engine.h">
