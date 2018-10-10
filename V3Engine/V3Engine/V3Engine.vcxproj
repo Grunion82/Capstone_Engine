@@ -142,6 +142,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Game\GameInterface.h" />
     <ClInclude Include="Engine\Core\Systems\Camera.h" />
     <ClInclude Include="Engine\Core\Systems\Debug.h" />
     <ClInclude Include="Engine\Core\Systems\Input.h" />
