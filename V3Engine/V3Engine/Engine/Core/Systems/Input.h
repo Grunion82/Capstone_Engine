@@ -21,9 +21,6 @@ class Input
 	bool requestedQuit;
 	DirectionInput dr;
 
-	const int JOYSTICK_DEAD_ZONE = 8000;
-	SDL_Joystick* joy;
-
 	//Map is a dictionary that has a key and a value
 	//Current key state
 	std::map<unsigned int, bool> keys;
@@ -57,12 +54,6 @@ class Input
 	int mouseButtonLeftPress;
 	int mouseButtonRightPress;
 	int mouseButtonMiddlePress;
-	//Joystick left axis
-	int joystickLeftAxisX;
-	int joystickLeftAxisY;
-	//Joystick right axis
-	int joystickRightAxisX;
-	int joystickRightAxisY;
 	//Joystick triggers
 	int joystickLeftTrigger;
 	int joystickRightTrigger;
