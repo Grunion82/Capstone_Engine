@@ -151,6 +151,8 @@
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
     <ClInclude Include="Engine\Core\Systems\Window.h" />
+    <ClInclude Include="Engine\Core\Systems\GameInterface.h" />
+    <ClInclude Include="Engine\Core\Game\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Core\Systems\Camera.cpp" />
@@ -160,6 +162,7 @@
     <ClCompile Include="Engine\V3Engine.cpp" />
     <ClCompile Include="Engine\Core\Systems\Timer.cpp" />
     <ClCompile Include="Engine\Core\Systems\Window.cpp" />
+    <ClCompile Include="Engine\Core\Game\Scene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

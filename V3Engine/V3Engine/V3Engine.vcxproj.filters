@@ -44,7 +44,13 @@
     <ClCompile Include="Engine\Core\Systems\Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClInclude Include="Engine\Core\Systems\GameInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Core\Game\GameInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Game\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -73,5 +79,10 @@
     <ClInclude Include="Engine\Core\Systems\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Engine\Core\Game\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
