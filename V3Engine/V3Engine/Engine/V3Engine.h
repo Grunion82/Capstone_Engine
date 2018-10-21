@@ -8,6 +8,8 @@ class V3Engine {
 private:
 	V3Engine();
 	~V3Engine();
+	class Input* engineInput;
+	class Window* engineWindow;
 
 	static std::unique_ptr<V3Engine> engineInstance;
 public:
