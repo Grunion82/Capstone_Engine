@@ -5,22 +5,22 @@
 #include <iostream>
 #include <glew.h>
 
-Image::Image(const char* filepath) : filepath(filepath)
+Texture::Texture(const char* filepath) : filepath(filepath)
 {
 
 }
 
-Image::Image(std::vector<const char*> faces)
+Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 {
-	int w, h, nr;
-
 	GLenum format;
+
+	int w, h, nr;
 
 	unsigned char* data;
 
-	glGenTextures(1, &textureID);
+	glGenTextures(1, &cubemapID);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
 	
 	stbi_set_flip_vertically_on_load(true);
 
@@ -62,14 +62,19 @@ Image::Image(std::vector<const char*> faces)
 }
 
 
-Image::~Image()
+Texture::~Texture()
 {
 }
-void Image::Use()
+
+void Cubemap::Use() {
+	glBindTexture(GL_TEXTURE_CUBE_MAP,cubemapID);
+}
+
+void Texture::Use()
 {
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
-bool Image::Init()
+bool Texture::Init()
 {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -109,7 +114,7 @@ bool Image::Init()
 
 	}
 	else {
-		printf("FAILED TO LOAD IMAGE\n");
+		std::cout << "FAILED TO LOAD TEXTURE::" << filepath << std::endl;
 		return false;
 	}
 
@@ -117,13 +122,13 @@ bool Image::Init()
 
 	return true;
 }
-void Image::Update()
+void Texture::Update()
 {
 }
-void Image::Render()
+void Texture::Render()
 {
 }
-bool Image::Shutdown()
+bool Texture::Shutdown()
 {
 	return true;
 }

@@ -5,7 +5,18 @@
 
 #include <vector>
 
-class Image
+class Cubemap {
+	std::vector<const char*> faces;
+	unsigned int cubemapID;
+public:
+	Cubemap(std::vector<const char*> f);
+	~Cubemap();
+
+	void Use();
+	inline unsigned int ID() { return cubemapID; }
+};
+
+class Texture
 {
 	unsigned int textureID;
 
@@ -13,11 +24,8 @@ class Image
 
 	const char* filepath;
 public:
-	Image(const char* filepath);
-	//For cube map
-	Image(std::vector<const char*> faces);
-
-	~Image();
+	Texture(const char* filepath);
+	~Texture();
 
 	void Use();
 

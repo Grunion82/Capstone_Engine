@@ -13,53 +13,62 @@
 
 Input::Input() : requestedQuit(false)
 {
-	joystickLeftAxisX = 0;
-	joystickLeftAxisY = 0;
-	joystickRightAxisX = 0;
-	joystickRightAxisY = 0;
 
-	joystickLeftTrigger = 0;
-	joystickRightTrigger = 0;
+}
+
+Joystick::Joystick(SDL_Joystick * j, int deadzone) : joy(j), JOYSTICK_DEAD_ZONE(deadzone), id(SDL_JoystickInstanceID(j)), hats(SDL_JoystickNumHats(j)), axes(SDL_JoystickNumAxes(j)), buttons(SDL_JoystickNumButtons(j)), balls(SDL_JoystickNumBalls(j))
+{
 }
 
 Input::~Input()
 {
 }
 
+Joystick::~Joystick() {
+
+}
+
 bool Input::Init() {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
-	//Check for joysticks
-	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-		joy = SDL_JoystickOpen(i);
-
-		if (joy) {
-			std::cout << "Opened joystick " << i << std::endl;
-			std::cout << "Name: " << SDL_JoystickNameForIndex(i) << std::endl;
-			std::cout << "Id: " << SDL_JoystickInstanceID(joy) << std::endl;
-			std::cout << "Number of hats: " << SDL_JoystickNumHats(joy) << std::endl;
-			std::cout << "Number of axes: " << SDL_JoystickNumAxes(joy) << std::endl;
-			std::cout << "Number of buttons: " << SDL_JoystickNumButtons(joy) << std::endl;
-			std::cout << "Number of balls: " << SDL_JoystickNumBalls(joy) << std::endl;
-		}
-		else {
-			std::cout << "Failed to open joystick " << i << std::endl;
-			std::cout << SDL_GetError() << std::endl;
-			//***************Remove later!!
-			return false;
+	if (SDL_NumJoysticks() > 0) {
+		joysticks.reserve(SDL_NumJoysticks());
+		//Check for joysticks
+		for (int i = 0; i < SDL_NumJoysticks(); i++) {
+			SDL_Joystick* j = SDL_JoystickOpen(i);
+			if (j) {
+				joysticks.push_back(Joystick(j, 8000));
+				std::cout << "Opened joystick " << i << std::endl;
+				std::cout << "Name: " << SDL_JoystickNameForIndex(i) << std::endl;
+				std::cout << "Id: " << SDL_JoystickInstanceID(j) << std::endl;
+				std::cout << "Number of hats: " << SDL_JoystickNumHats(j) << std::endl;
+				std::cout << "Number of axes: " << SDL_JoystickNumAxes(j) << std::endl;
+				std::cout << "Number of buttons: " << SDL_JoystickNumButtons(j) << std::endl;
+				std::cout << "Number of balls: " << SDL_JoystickNumBalls(j) << std::endl;
+				std::cout << std::endl;
+			}
+			else {
+				std::cout << "Failed to open joystick " << i << std::endl;
+				std::cout << SDL_GetError() << std::endl;
+				//***************Remove later!!
+				return false;
+			}
 		}
 	}
-
 
 	return true;
 }
 void Input::Update() {
 	oldkeys = keys;
-	oldJoyButtons = joyButtons;
+
+	for (unsigned int i = 0; i < joysticks.size(); i++){
+		joysticks.at(i).oldJoyButtons = joysticks.at(i).joyButtons;
+	}
 
 	mouseMotionX = 0;
 	mouseMotionY = 0;
 	mouseWheelY = 0;
+
 
 	SDL_Event e;
 
@@ -71,6 +80,7 @@ void Input::Update() {
 		//Is key down
 		case(SDL_KEYDOWN):
 			//Check for key
+			//oldkeys = keys;
 			keys[e.key.keysym.sym] = true;
 			break;
 		//For mouse movement
@@ -98,6 +108,7 @@ void Input::Update() {
 			break;
 		//Is key up
 		case(SDL_KEYUP):
+			//oldkeys = keys;
 			keys[e.key.keysym.sym] = false;
 			break;
 		//For controller axis
@@ -106,92 +117,92 @@ void Input::Update() {
 			//Some joy sticks use 2 and 3 for extra buttons
 			//Set axis values
 			if (e.jaxis.axis == 0) {
-				leftXAxis = e.jaxis.value;
+				joysticks.at(e.jaxis.which).leftXAxis = e.jaxis.value;
 			}
 			if (e.jaxis.axis == 1) {
-				leftYAxis = e.jaxis.value;
+				joysticks.at(e.jaxis.which).leftYAxis = e.jaxis.value;
 			}
 
 			//Left x
-			if (e.jaxis.axis == 0 && e.jaxis.value > JOYSTICK_DEAD_ZONE) {
-				joystickLeftAxisX = 1;
+			if (e.jaxis.axis == 0 && e.jaxis.value > joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickLeftAxisX = 1;
 			}
-			else if (e.jaxis.axis == 0 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
-				joystickLeftAxisX = -1;
+			else if (e.jaxis.axis == 0 && e.jaxis.value < -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickLeftAxisX = -1;
 			}
-			else if (leftXAxis < JOYSTICK_DEAD_ZONE && leftXAxis > -JOYSTICK_DEAD_ZONE) {
-				joystickLeftAxisX = 0;
+			else if (joysticks.at(e.jaxis.which).leftXAxis < joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE && joysticks.at(e.jaxis.which).leftXAxis > -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickLeftAxisX = 0;
 			}
 
 			//Left y
-			if (e.jaxis.axis == 1 && e.jaxis.value > JOYSTICK_DEAD_ZONE) {
-				joystickLeftAxisY = 1;
+			if (e.jaxis.axis == 1 && e.jaxis.value > joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickLeftAxisY = 1;
 			}
-			else if (e.jaxis.axis == 1 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
-				joystickLeftAxisY = -1;
+			else if (e.jaxis.axis == 1 && e.jaxis.value < -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickLeftAxisY = -1;
 			}
-			else if (leftYAxis < JOYSTICK_DEAD_ZONE && leftYAxis > -JOYSTICK_DEAD_ZONE) {
-				joystickLeftAxisY = 0;
+			else if (joysticks.at(e.jaxis.which).leftYAxis < joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE && joysticks.at(e.jaxis.which).leftYAxis > -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickLeftAxisY = 0;
 			}
 
 			//Set axis values
 			if (e.jaxis.axis == 3) {
-				rightXAxis = e.jaxis.value;
+				joysticks.at(e.jaxis.which).rightXAxis = e.jaxis.value;
 			}
 			if (e.jaxis.axis == 4) {
-				rightYAxis = e.jaxis.value;
+				joysticks.at(e.jaxis.which).rightYAxis = e.jaxis.value;
 			}
 
 			//Right x
-			if (e.jaxis.axis == 3 && e.jaxis.value > JOYSTICK_DEAD_ZONE) {
-				joystickRightAxisX = 1;
+			if (e.jaxis.axis == 3 && e.jaxis.value > joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickRightAxisX = 1;
 			}
-			else if (e.jaxis.axis == 3 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
-				joystickRightAxisX = -1;
+			else if (e.jaxis.axis == 3 && e.jaxis.value < -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickRightAxisX = -1;
 			}
-			else if (rightXAxis < JOYSTICK_DEAD_ZONE && rightXAxis > -JOYSTICK_DEAD_ZONE) {
-				joystickRightAxisX = 0;
+			else if (joysticks.at(e.jaxis.which).rightXAxis < joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE && joysticks.at(e.jaxis.which).rightXAxis > -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickRightAxisX = 0;
 			}
 
 			//Right y
-			if (e.jaxis.axis == 4 && e.jaxis.value > JOYSTICK_DEAD_ZONE) {
-				joystickRightAxisY = 1;
+			if (e.jaxis.axis == 4 && e.jaxis.value > joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickRightAxisY = 1;
 			}
-			else if (e.jaxis.axis == 4 && e.jaxis.value < -JOYSTICK_DEAD_ZONE) {
-				joystickRightAxisY = -1;
+			else if (e.jaxis.axis == 4 && e.jaxis.value < -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickRightAxisY = -1;
 			}
-			else if (rightYAxis < JOYSTICK_DEAD_ZONE && rightYAxis > -JOYSTICK_DEAD_ZONE) {
-				joystickRightAxisY = 0;
+			else if (joysticks.at(e.jaxis.which).rightYAxis < joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE && joysticks.at(e.jaxis.which).rightYAxis > -joysticks.at(e.jaxis.which).JOYSTICK_DEAD_ZONE) {
+				joysticks.at(e.jaxis.which).joystickRightAxisY = 0;
 			}
 
 			//Triggers start at -32768; a half pull is around the negatives and anything beyond that is positive up to 32767
 			//Left trigger
 			if (e.jaxis.axis == 2 && e.jaxis.value > 0) {
-				joystickLeftTrigger = 1;
+				joysticks.at(e.jaxis.which).joystickLeftTrigger = 1;
 			}
 			else if (e.jaxis.axis == 2 && e.jaxis.value < 0 && e.jaxis.value > -32768) {
-				joystickLeftTrigger = -1;
+				joysticks.at(e.jaxis.which).joystickLeftTrigger = -1;
 			}
 			else if (e.jaxis.axis == 2 && e.jaxis.value == -32768) {
-				joystickLeftTrigger = 0;
+				joysticks.at(e.jaxis.which).joystickLeftTrigger = 0;
 			}
 
 			//Right trigger
 			if (e.jaxis.axis == 5 && e.jaxis.value > 0) {
-				joystickRightTrigger = 1;
+				joysticks.at(e.jaxis.which).joystickRightTrigger = 1;
 			}
 			else if (e.jaxis.axis == 5 && e.jaxis.value < 0 && e.jaxis.value > -32768) {
-				joystickRightTrigger = -1;
+				joysticks.at(e.jaxis.which).joystickRightTrigger = -1;
 			}
 			else if (e.jaxis.axis == 5 && e.jaxis.value == -32768) {
-				joystickRightTrigger = 0;
+				joysticks.at(e.jaxis.which).joystickRightTrigger = 0;
 			}
 			break;
 		case(SDL_JOYBUTTONDOWN):
-			joyButtons[e.jbutton.button] = true;
+			joysticks.at(e.jbutton.which).joyButtons[e.jbutton.button] = true;
 			break;
 		case(SDL_JOYBUTTONUP):
-			joyButtons[e.jbutton.button] = false;
+			joysticks.at(e.jbutton.which).joyButtons[e.jbutton.button] = false;
 			break;
 		//For joy hat motion(NOT IMPLEMENTED)
 		/*case(SDL_JOYHATMOTION):
@@ -229,21 +240,31 @@ void Input::Render(){
 
 bool Input::Shutdown() {
 	//Close if open
-	if (SDL_JoystickGetAttached(joy)) {
-		SDL_JoystickClose(joy);
+	if (joysticks.size() > 0) {
+		for (unsigned int i = 0; i < joysticks.size(); i++) {
+			SDL_Joystick* joy = joysticks.at(i).GetJoyStick();
+			if (SDL_JoystickGetAttached(joy)) {
+				SDL_JoystickClose(joy);
+			}
+
+			joysticks.at(i).joyButtons.clear();
+			joysticks.at(i).oldJoyButtons.clear();
+		}
+		joysticks.clear();
 	}
-	//delete joy;
 
 	keys.clear();
 	oldkeys.clear();
-	joyButtons.clear();
-	oldJoyButtons.clear();
 
 	return true;
 }
 
-DirectionInput Input::getDirectionInput() {
-	return dr;
+Joystick* Input::GetJoystick(unsigned int which)
+{
+	if (&joysticks[which]) {
+		return &joysticks[which];
+	}
+	return nullptr;
 }
 
 bool Input::IsKeyDown(unsigned int key)
@@ -299,7 +320,7 @@ bool Input::WasKeyReleased(unsigned int key)
 }
 
 //JOYSTICK=========================================================
-bool Input::IsJoyStickButtonDown(unsigned int key)
+bool Joystick::IsJoyStickButtonDown(unsigned int key)
 {
 	auto it = joyButtons.find(key);
 
@@ -312,7 +333,7 @@ bool Input::IsJoyStickButtonDown(unsigned int key)
 	return false;
 }
 
-bool Input::IsJoyStickButtonUp(unsigned int key)
+bool Joystick::IsJoyStickButtonUp(unsigned int key)
 {
 	auto it = joyButtons.find(key);
 
@@ -324,7 +345,7 @@ bool Input::IsJoyStickButtonUp(unsigned int key)
 	return true;
 }
 
-bool Input::WasJoyStickButtonPressed(unsigned int key)
+bool Joystick::WasJoyStickButtonPressed(unsigned int key)
 {
 	auto it = oldJoyButtons.find(key);
 
@@ -337,7 +358,7 @@ bool Input::WasJoyStickButtonPressed(unsigned int key)
 	return joyButtons[key];
 }
 
-bool Input::WasJoyStickButtonReleased(unsigned int key)
+bool Joystick::WasJoyStickButtonReleased(unsigned int key)
 {
 	auto it = oldJoyButtons.find(key);
 

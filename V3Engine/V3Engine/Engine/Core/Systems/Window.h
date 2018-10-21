@@ -8,7 +8,7 @@ class Window
 {
 public:
 	Window();
-	Window(char* name, unsigned int width, unsigned int height);
+	Window(const char* name, unsigned int width, unsigned int height);
 	~Window();
 
 	SDL_Window* window;
@@ -33,8 +33,8 @@ public:
 
 	inline SDL_Surface* GetScreenSurface() { return screenSurface; }
 	inline SDL_Window* GetWindow() { return window; }
-	inline float GetWidth();
-	inline float GetHeight();
+	inline int GetWidth();
+	inline int GetHeight();
 
 	void Fullscreen();
 };

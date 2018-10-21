@@ -7,7 +7,7 @@ Window::Window() : windowName("V3Engine") , windowWidth(800), windowHeight(600)
 {
 }
 
-Window::Window(char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height)
+Window::Window(const char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height)
 {
 }
 
@@ -28,7 +28,6 @@ bool Window::Init()
 	if (!window) {
 		return false;
 	}
-
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
 	//Creating a double buffer
@@ -45,7 +44,6 @@ bool Window::Init()
 	/*SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetWindowGrab(window, SDL_TRUE);
 	SDL_SetRelativeMouseMode(SDL_TRUE);*/
-
 	return true;
 }
 
@@ -77,12 +75,12 @@ bool Window::Shutdown()
 	return success;
 }
 
-float Window::GetWidth()
+int Window::GetWidth()
 {
 	return GetScreenSurface()->w;
 }
 
-float Window::GetHeight()
+int Window::GetHeight()
 {
 	return GetScreenSurface()->h;
 }
@@ -106,13 +104,13 @@ bool Window::CloseSDL()
 void Window::Fullscreen() {
 	if (!fullscreen) {
 		windowParameters = windowParameters | SDL_WINDOW_FULLSCREEN_DESKTOP;
-		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
+		//window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
 		fullscreen = true;
 	}
 	else {
 		windowParameters = windowParameters ^ SDL_WINDOW_FULLSCREEN_DESKTOP;
-		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
+		//window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
 		fullscreen = false;
 	}
-
+	SDL_SetWindowFullscreen(window, windowParameters);
 }
