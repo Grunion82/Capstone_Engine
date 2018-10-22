@@ -15,7 +15,6 @@ Input::Input() : requestedQuit(false)
 {
 
 }
-
 Joystick::Joystick(SDL_Joystick * j, int deadzone) : joy(j), JOYSTICK_DEAD_ZONE(deadzone), id(SDL_JoystickInstanceID(j)), hats(SDL_JoystickNumHats(j)), axes(SDL_JoystickNumAxes(j)), buttons(SDL_JoystickNumButtons(j)), balls(SDL_JoystickNumBalls(j))
 {
 }
@@ -37,7 +36,8 @@ bool Input::Init() {
 		for (int i = 0; i < SDL_NumJoysticks(); i++) {
 			SDL_Joystick* j = SDL_JoystickOpen(i);
 			if (j) {
-				joysticks.insert(joysticks.begin() + i, Joystick(j,8000));
+				joysticks.push_back(Joystick(j, 8000));
+				//joysticks.insert(joysticks.begin() + i, Joystick(j,8000));
 				std::cout << "Opened joystick: " << i << std::endl;
 				std::cout << "Name: " << SDL_JoystickNameForIndex(i) << std::endl;
 				std::cout << "Id: " << SDL_JoystickInstanceID(j) << std::endl;

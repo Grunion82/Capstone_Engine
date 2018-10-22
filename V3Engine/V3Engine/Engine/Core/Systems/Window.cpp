@@ -104,12 +104,10 @@ bool Window::CloseSDL()
 void Window::Fullscreen() {
 	if (!fullscreen) {
 		windowParameters = windowParameters | SDL_WINDOW_FULLSCREEN_DESKTOP;
-		//window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
 		fullscreen = true;
 	}
 	else {
 		windowParameters = windowParameters ^ SDL_WINDOW_FULLSCREEN_DESKTOP;
-		//window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
 		fullscreen = false;
 	}
 	SDL_SetWindowFullscreen(window, windowParameters);
