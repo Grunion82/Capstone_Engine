@@ -37,8 +37,8 @@ bool Input::Init() {
 		for (int i = 0; i < SDL_NumJoysticks(); i++) {
 			SDL_Joystick* j = SDL_JoystickOpen(i);
 			if (j) {
-				joysticks.push_back(Joystick(j, 8000));
-				std::cout << "Opened joystick " << i << std::endl;
+				joysticks.insert(joysticks.begin() + i, Joystick(j,8000));
+				std::cout << "Opened joystick: " << i << std::endl;
 				std::cout << "Name: " << SDL_JoystickNameForIndex(i) << std::endl;
 				std::cout << "Id: " << SDL_JoystickInstanceID(j) << std::endl;
 				std::cout << "Number of hats: " << SDL_JoystickNumHats(j) << std::endl;
@@ -60,6 +60,7 @@ bool Input::Init() {
 }
 void Input::Update() {
 	oldkeys = keys;
+	oldMouseButtons = mouseButtons;
 
 	for (unsigned int i = 0; i < joysticks.size(); i++){
 		joysticks.at(i).oldJoyButtons = joysticks.at(i).joyButtons;

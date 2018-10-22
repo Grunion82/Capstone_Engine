@@ -38,6 +38,7 @@ public:
 	const int JOYSTICK_DEAD_ZONE = 8000;
 
 	//JOYSTICK AXIS===================================================
+
 	//Get joystick axis in X direction
 	inline int GetJoyStickLeftAxisX() { return joystickLeftAxisX; }
 	//Get joystick axis in Y direction
@@ -77,9 +78,9 @@ public:
 	bool IsJoyStickButtonDown(unsigned int key);
 	//Check if button is not down
 	bool IsJoyStickButtonUp(unsigned int key);
-	//Check if key was pressed this frame (Button pressed)
+	//Check if button was pressed this frame (Button pressed)
 	bool WasJoyStickButtonPressed(unsigned int key);
-	//Check if key was released this frame
+	//Check if button was released this frame
 	bool WasJoyStickButtonReleased(unsigned int key);
 };
 
