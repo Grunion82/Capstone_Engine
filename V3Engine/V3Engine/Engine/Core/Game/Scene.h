@@ -19,8 +19,10 @@ public:
 	virtual void Shutdown();
 
 	//Adds, removes, and finds game objects within our vector
-	void AddGameObject(class GameObject* object);
+	void AddGameObject(GameObject* object);
+	void AddGameObject(unsigned int index, GameObject* object);
 	void RemoveGameObject(const unsigned int index);
+
 	class GameObject* Find(const unsigned int index);
 	
 };

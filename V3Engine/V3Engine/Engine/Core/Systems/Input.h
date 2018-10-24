@@ -11,7 +11,7 @@ class Joystick {
 public:
 	Joystick(SDL_Joystick* j, int deadzone);
 	~Joystick();
-
+	
 	//Current joystick button state
 	std::map<unsigned int, bool> joyButtons;
 	//Old joystick button state
@@ -85,7 +85,11 @@ public:
 };
 
 class Input
-{
+{	
+	//Make private for singleton
+	Input();
+	~Input();
+
 	std::vector<Joystick> joysticks;
 
 	//Map is a dictionary that has a key and a value
@@ -97,6 +101,8 @@ class Input
 	std::map<unsigned int, bool>oldMouseButtons;
 	//Current mouse button
 	std::map<unsigned int, bool>mouseButtons;
+
+	static Input* instance;
 
 	//Mouse motion
 	int mouseMotionX;
@@ -112,10 +118,9 @@ class Input
 	//For number of click
 	unsigned int clicks;
 	bool requestedQuit;
-
 public:
-	Input();
-	~Input();
+	//Get instance for singleton
+	static Input* GetInstance();
 
 	bool Init();
 	void Update();
@@ -159,6 +164,5 @@ public:
 	//Get number of clicks
 	inline unsigned int GetMouseClicks() { return clicks; }
 };
-
 #endif // !INPUT_H
 

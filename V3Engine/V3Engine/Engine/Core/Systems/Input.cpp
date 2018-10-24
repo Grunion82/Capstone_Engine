@@ -10,13 +10,25 @@
 #define MIN(a,b) a < b ? a : b
 #define CLAMP(x,upper,lower) MIN(upper,MAX(x,lower))
 
+Input* Input::instance;
 
 Input::Input() : requestedQuit(false)
 {
-
 }
+
 Joystick::Joystick(SDL_Joystick * j, int deadzone) : joy(j), JOYSTICK_DEAD_ZONE(deadzone), id(SDL_JoystickInstanceID(j)), hats(SDL_JoystickNumHats(j)), axes(SDL_JoystickNumAxes(j)), buttons(SDL_JoystickNumButtons(j)), balls(SDL_JoystickNumBalls(j))
 {
+}
+
+Input * Input::GetInstance()
+{
+	if (instance != nullptr) {
+		return instance;
+	}
+	else {
+		instance = new Input();
+		return instance;
+	}
 }
 
 Input::~Input()

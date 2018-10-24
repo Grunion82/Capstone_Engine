@@ -46,6 +46,11 @@ void Scene::AddGameObject(class GameObject* object) {
 	gameObjects.push_back(object);
 }
 
+void Scene::AddGameObject(unsigned int index, GameObject * object)
+{
+	gameObjects.insert(gameObjects.begin() + index, object);
+}
+
 void Scene::RemoveGameObject(const unsigned int index) {
 
 	gameObjects.erase(gameObjects.begin() + index);
