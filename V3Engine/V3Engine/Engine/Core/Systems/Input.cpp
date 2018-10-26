@@ -190,6 +190,10 @@ void Input::Update() {
 
 			//Triggers start at -32768; a half pull is around the negatives and anything beyond that is positive up to 32767
 			//Left trigger
+			if (e.jaxis.axis == 2) {
+				joysticks.at(e.jaxis.which).leftTrigger = e.jaxis.value;
+			}
+
 			if (e.jaxis.axis == 2 && e.jaxis.value > 0) {
 				joysticks.at(e.jaxis.which).joystickLeftTrigger = 1;
 			}
@@ -201,6 +205,10 @@ void Input::Update() {
 			}
 
 			//Right trigger
+			if (e.jaxis.axis == 5) {
+				joysticks.at(e.jaxis.which).rightTrigger = e.jaxis.value;
+			}
+
 			if (e.jaxis.axis == 5 && e.jaxis.value > 0) {
 				joysticks.at(e.jaxis.which).joystickRightTrigger = 1;
 			}

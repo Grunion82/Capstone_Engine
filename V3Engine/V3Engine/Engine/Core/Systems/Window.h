@@ -6,9 +6,6 @@ struct SDL_Surface;
 
 class Window
 {
-public:
-	Window();
-	Window(const char* name, unsigned int width, unsigned int height);
 	~Window();
 
 	SDL_Window* window;
@@ -17,15 +14,20 @@ public:
 	const char* windowName;
 	const unsigned int windowWidth;
 	const unsigned int windowHeight;
-	bool fullscreen = false;
-	bool borderless = false;
 
 	unsigned int windowParameters;
+
+	bool fullscreen = false;
+	bool borderless = false;
+	bool vsync = true;
 
 	bool InitSDL();
 	bool CloseSDL();
 
 public:
+	Window();
+	Window(const char* name, unsigned int width, unsigned int height);
+
 	bool Init();
 	void Update();
 	void Render();
@@ -37,6 +39,7 @@ public:
 	inline int GetHeight();
 
 	void Fullscreen();
+	void Borderless();
 };
 
 #endif

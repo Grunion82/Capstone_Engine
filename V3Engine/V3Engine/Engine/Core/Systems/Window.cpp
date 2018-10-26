@@ -35,7 +35,7 @@ bool Window::Init()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	//V-sync
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(vsync);
 
 	//Set surface
 	screenSurface = SDL_GetWindowSurface(window);
@@ -49,12 +49,23 @@ bool Window::Init()
 
 void Window::Update()
 {
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e) != 0) {
+		if (e.type == SDL_WINDOWEVENT) {
+			switch (e.window.event)
+			{
+			default:
+				break;
+			}
+		}
+	}
+
 	SDL_GL_SwapWindow(window);
 }
 
 void Window::Render()
 {
-
 }
 bool Window::Shutdown()
 {
@@ -103,12 +114,30 @@ bool Window::CloseSDL()
 
 void Window::Fullscreen() {
 	if (!fullscreen) {
-		windowParameters = windowParameters | SDL_WINDOW_FULLSCREEN_DESKTOP;
+		windowParameters |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		fullscreen = true;
 	}
 	else {
-		windowParameters = windowParameters ^ SDL_WINDOW_FULLSCREEN_DESKTOP;
+		windowParameters ^= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		fullscreen = false;
 	}
 	SDL_SetWindowFullscreen(window, windowParameters);
 }
+
+void Window::Borderless()
+{
+	SDL_bool b;
+	if (!borderless) {
+		windowParameters |= SDL_WINDOW_BORDERLESS;
+		borderless = true;
+		b = SDL_TRUE;
+		
+	}
+	else {
+		windowParameters ^= SDL_WINDOW_BORDERLESS;
+		borderless = false;
+		b = SDL_FALSE;
+	}
+	SDL_SetWindowBordered(window, b);
+}
+
