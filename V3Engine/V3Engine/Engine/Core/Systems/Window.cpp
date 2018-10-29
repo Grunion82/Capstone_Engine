@@ -41,9 +41,9 @@ bool Window::Init()
 	screenSurface = SDL_GetWindowSurface(window);
 
 	//Remove mouse cursor and capture in window
-	/*SDL_ShowCursor(SDL_DISABLE);
+	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetWindowGrab(window, SDL_TRUE);
-	SDL_SetRelativeMouseMode(SDL_TRUE);*/
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 	return true;
 }
 
@@ -55,6 +55,39 @@ void Window::Update()
 		if (e.type == SDL_WINDOWEVENT) {
 			switch (e.window.event)
 			{
+			case(SDL_WINDOWEVENT_SHOWN):
+			case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn?
+			case(SDL_WINDOWEVENT_FOCUS_GAINED):
+			case(SDL_WINDOWEVENT_ENTER)://Window has gained mouse focus
+				SDL_ShowCursor(SDL_DISABLE);
+				SDL_SetWindowGrab(window, SDL_TRUE);
+				SDL_SetRelativeMouseMode(SDL_TRUE);
+				break;
+			case(SDL_WINDOWEVENT_HIDDEN):
+			case(SDL_WINDOWEVENT_FOCUS_LOST):
+			case(SDL_WINDOWEVENT_LEAVE)://Window has lost mouse focus
+				SDL_ShowCursor(SDL_ENABLE);
+				SDL_SetWindowGrab(window, SDL_FALSE);
+				SDL_SetRelativeMouseMode(SDL_FALSE);
+				break;
+			case(SDL_WINDOWEVENT_RESIZED):
+			case(SDL_WINDOWEVENT_SIZE_CHANGED)://The window size has changed, either as a result of an API call or through the system or user changing the window size
+				screenSurface = SDL_GetWindowSurface(window);
+				break;
+			/*
+			case(SDL_WINDOWEVENT_MINIMIZED):
+				break;
+			case(SDL_WINDOWEVENT_MAXIMIZED):
+				break;
+			case(SDL_WINDOWEVENT_CLOSE)://Window manager requests window to be closed
+				break;
+			case(SDL_WINDOWEVENT_TAKE_FOCUS)://Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore)
+				break;
+			case(SDL_WINDOWEVENT_HIT_TEST)://Window had a hit test that wasn't SDL_HITTEST_NORMAL
+				break;
+			case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
+			*/
+
 			default:
 				break;
 			}
@@ -139,5 +172,11 @@ void Window::Borderless()
 		b = SDL_FALSE;
 	}
 	SDL_SetWindowBordered(window, b);
+}
+
+void Window::VSync()
+{
+	vsync = vsync ? false : true;
+	SDL_GL_SetSwapInterval(vsync);
 }
 

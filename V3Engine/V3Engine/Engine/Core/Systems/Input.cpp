@@ -58,6 +58,67 @@ bool Input::Init() {
 				std::cout << "Number of buttons: " << SDL_JoystickNumButtons(j) << std::endl;
 				std::cout << "Number of balls: " << SDL_JoystickNumBalls(j) << std::endl;
 				std::cout << std::endl;
+
+				//Check if joysticks are pointing in a direction
+				Sint16 state;
+				for (unsigned int a = 0; a < SDL_JoystickNumAxes(j); i++) {
+					//If there is a change for joystick during init
+					if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
+						switch (a)
+						{
+						case(0):
+							joysticks.at(i).leftXAxis = state;
+							if (state > joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickLeftAxisX = 1;
+							}
+							else if (state < -joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickLeftAxisX = -1;
+							}
+							else {
+								joysticks.at(i).joystickLeftAxisX = 0;
+							}
+							break;
+						case(1):
+							joysticks.at(i).leftYAxis = state;
+							if (state > joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickLeftAxisY = 1;
+							}
+							else if (state < -joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickLeftAxisY = -1;
+							}
+							else {
+								joysticks.at(i).joystickLeftAxisY = 0;
+							}
+							break;
+						case(3):
+							joysticks.at(i).rightXAxis = state;
+							if (state > joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickRightAxisX = 1;
+							}
+							else if (state < -joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickRightAxisX = -1;
+							}
+							else {
+								joysticks.at(i).joystickRightAxisX = 0;
+							}
+							break;
+						case(4):
+							joysticks.at(i).rightYAxis = state;
+							if (state > joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickRightAxisY = 1;
+							}
+							else if (state < -joysticks.at(i).JOYSTICK_DEAD_ZONE) {
+								joysticks.at(i).joystickRightAxisY = -1;
+							}
+							else {
+								joysticks.at(i).joystickRightAxisY = 0;
+							}
+							break;
+						default:
+							break;
+						}
+					}
+				}
 			}
 			else {
 				std::cout << "Failed to open joystick " << i << std::endl;

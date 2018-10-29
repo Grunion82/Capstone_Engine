@@ -40,6 +40,7 @@ public:
 
 	void Fullscreen();
 	void Borderless();
+	void VSync();
 };
 
 #endif
