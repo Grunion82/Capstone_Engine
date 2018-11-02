@@ -1,5 +1,5 @@
 #include "Window.h"
-#include <SDL.h>
+//#include <SDL.h>
 #include <glew.h>
 
 
@@ -13,6 +13,7 @@ Window::Window(const char * name, unsigned int width, unsigned int height) : win
 
 Window::~Window()
 {
+	Shutdown();
 }
 
 bool Window::Init()
@@ -36,9 +37,6 @@ bool Window::Init()
 
 	//V-sync
 	SDL_GL_SetSwapInterval(vsync);
-
-	//Set surface
-	screenSurface = SDL_GetWindowSurface(window);
 
 	//Remove mouse cursor and capture in window
 	SDL_ShowCursor(SDL_DISABLE);
@@ -70,16 +68,24 @@ void Window::Update()
 				SDL_SetWindowGrab(window, SDL_FALSE);
 				SDL_SetRelativeMouseMode(SDL_FALSE);
 				break;
-			case(SDL_WINDOWEVENT_RESIZED):
 			case(SDL_WINDOWEVENT_SIZE_CHANGED)://The window size has changed, either as a result of an API call or through the system or user changing the window size
-				screenSurface = SDL_GetWindowSurface(window);
+			case(SDL_WINDOWEVENT_RESIZED):
+				windowWidth = e.window.data1;
+				windowHeight = e.window.data2;
+				glViewport(0, 0, windowWidth, windowHeight);
+				//screenSurface = SDL_GetWindowSurface(window);
+				break;
+			case(SDL_WINDOWEVENT_MAXIMIZED):
+				windowWidth = e.window.data1;
+				windowHeight = e.window.data2;
+				glViewport(0, 0, windowWidth, windowHeight);
 				break;
 			/*
 			case(SDL_WINDOWEVENT_MINIMIZED):
 				break;
-			case(SDL_WINDOWEVENT_MAXIMIZED):
-				break;
 			case(SDL_WINDOWEVENT_CLOSE)://Window manager requests window to be closed
+				e.type = SDL_QUIT;
+				SDL_PushEvent(&e);
 				break;
 			case(SDL_WINDOWEVENT_TAKE_FOCUS)://Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore)
 				break;
@@ -99,34 +105,22 @@ void Window::Update()
 
 void Window::Render()
 {
+	
 }
 bool Window::Shutdown()
 {
 	bool success = true;
 
-	SDL_FreeSurface(screenSurface);
-	screenSurface = nullptr;
-
 	SDL_DestroyWindow(window);
 	window = nullptr;
 
-	if (window || screenSurface) {
+	if (window) {
 		success = false;
 	}
 
 	CloseSDL();
 
 	return success;
-}
-
-int Window::GetWidth()
-{
-	return GetScreenSurface()->w;
-}
-
-int Window::GetHeight()
-{
-	return GetScreenSurface()->h;
 }
 
 bool Window::InitSDL() {
@@ -147,14 +141,32 @@ bool Window::CloseSDL()
 
 void Window::Fullscreen() {
 	if (!fullscreen) {
-		windowParameters |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		windowParameters |= SDL_WINDOW_FULLSCREEN;
 		fullscreen = true;
 	}
 	else {
-		windowParameters ^= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		windowParameters ^= SDL_WINDOW_FULLSCREEN;
 		fullscreen = false;
 	}
 	SDL_SetWindowFullscreen(window, windowParameters);
+
+	SDL_DisplayMode mode;
+	int display_mode_count = SDL_GetNumDisplayModes(0);//Get the number of display modes for display 0(I assume default)
+
+	//So this loop would go through all the display modes available for a certain display
+	//for (int i = 0; i < display_mode_count; ++i) {
+		SDL_GetDisplayMode(0, 0, &mode);
+		if (fullscreen) {
+			SDL_SetWindowSize(window, mode.w, mode.h);
+			//break;
+		}
+		//Uint32 f = mode.format;
+		//SDL_Log("Mode %i\tbpp %i\t%s\t%i x %i", i,SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h);
+	//}
+
+
+
+
 }
 
 void Window::Borderless()

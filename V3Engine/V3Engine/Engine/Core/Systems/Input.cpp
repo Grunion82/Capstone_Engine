@@ -33,6 +33,7 @@ Input * Input::GetInstance()
 
 Input::~Input()
 {
+	Input::Shutdown();
 }
 
 Joystick::~Joystick() {
@@ -337,6 +338,9 @@ bool Input::Shutdown() {
 
 	keys.clear();
 	oldkeys.clear();
+
+	mouseButtons.clear();
+	oldMouseButtons.clear();
 
 	return true;
 }

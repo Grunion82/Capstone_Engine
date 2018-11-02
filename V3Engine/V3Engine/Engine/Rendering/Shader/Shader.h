@@ -1,8 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h>
-
+#include <glew.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,6 +23,7 @@ public:
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath);
 	Shader(std::string& vertexPath, std::string& fragmentPath);
 	Shader(std::string& vertexPath, std::string& fragmentPath,std::string& geometryPath);
+	~Shader();
 
 	//Activate shader
 	void Use();

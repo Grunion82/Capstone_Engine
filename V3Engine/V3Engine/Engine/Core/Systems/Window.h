@@ -1,19 +1,17 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-struct SDL_Window;
-struct SDL_Surface;
+#include <SDL.h>
 
 class Window
 {
 	~Window();
 
 	SDL_Window* window;
-	SDL_Surface* screenSurface;
 
 	const char* windowName;
-	const unsigned int windowWidth;
-	const unsigned int windowHeight;
+	unsigned int windowWidth;
+	unsigned int windowHeight;
 
 	unsigned int windowParameters;
 
@@ -33,10 +31,10 @@ public:
 	void Render();
 	bool Shutdown();
 
-	inline SDL_Surface* GetScreenSurface() { return screenSurface; }
+	inline SDL_Surface* GetScreenSurface() { return SDL_GetWindowSurface(window); }
 	inline SDL_Window* GetWindow() { return window; }
-	inline int GetWidth();
-	inline int GetHeight();
+	inline int GetWidth() { return windowWidth; }
+	inline int GetHeight() { return windowHeight; }
 
 	void Fullscreen();
 	void Borderless();

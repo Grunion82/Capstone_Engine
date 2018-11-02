@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+//Vertex and fragment
 Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 {
 	//Retrieve vertex/fragment source code from filePath
@@ -42,12 +43,13 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 		fShaderCode = fragmentCode.c_str();
 	}
 	else {
+		//Maybe it's the actual string?
 		vShaderCode = vertexPath;
 		fShaderCode = fragmentPath;
 	}
 
 	//Compile shaders
-	unsigned int vertex, fragment;
+	int vertex, fragment;
 	int success;
 	char infoLog[512];
 
@@ -94,6 +96,7 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 	glDeleteShader(fragment);
 }
 
+//Vertex, geometry, and fragment shader
 Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLchar * geometryPath)
 {
 	std::string vertexCode;
@@ -211,6 +214,7 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLc
 	glDeleteShader(geometry);
 }
 
+//Vertex and fragment
 Shader::Shader(std::string& vertexPath, std::string& fragmentPath)
 {
 	//Retrieve vertex/fragment source code from filePath
@@ -305,6 +309,7 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath)
 	glDeleteShader(fragment);
 }
 
+//Vertex, fragment, and geometry shader
 Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& geometryPath)
 {
 	std::string vertexCode;
@@ -420,6 +425,11 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 	glDeleteShader(geometry);
+}
+
+Shader::~Shader()
+{
+
 }
 
 /*Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
