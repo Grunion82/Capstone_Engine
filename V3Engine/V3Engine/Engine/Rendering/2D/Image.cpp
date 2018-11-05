@@ -12,6 +12,23 @@ Texture::Texture(const char* filepath) : filepath(filepath)
 
 Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 {
+}
+
+Cubemap::~Cubemap()
+{
+}
+
+
+Texture::~Texture()
+{
+}
+
+void Cubemap::Use() {
+	glBindTexture(GL_TEXTURE_CUBE_MAP,cubemapID);
+}
+
+bool Cubemap::Init()
+{
 	GLenum format;
 
 	int w, h, nr;
@@ -21,8 +38,8 @@ Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 	glGenTextures(1, &cubemapID);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
-	
-	stbi_set_flip_vertically_on_load(true);
+
+	//stbi_set_flip_vertically_on_load(true);
 
 	//Increment faces
 	for (GLuint i = 0; i < faces.size(); i++) {
@@ -45,6 +62,7 @@ Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 		}
 		else {
 			std::cout << "CUBEMAP TEXUTE FAILED TO LOAD AT PATH: " << &faces[i] << std::endl;
+			return false;
 		}
 
 		stbi_image_free(data);
@@ -59,15 +77,8 @@ Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 	//Returns edge values when sampling between faces
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-}
 
-
-Texture::~Texture()
-{
-}
-
-void Cubemap::Use() {
-	glBindTexture(GL_TEXTURE_CUBE_MAP,cubemapID);
+	return true;
 }
 
 void Texture::Use()

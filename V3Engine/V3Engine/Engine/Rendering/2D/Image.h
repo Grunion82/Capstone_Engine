@@ -14,6 +14,7 @@ public:
 
 	void Use();
 	inline unsigned int ID() { return cubemapID; }
+	bool Init();
 };
 
 class Texture
