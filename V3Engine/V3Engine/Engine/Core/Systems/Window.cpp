@@ -7,7 +7,7 @@ Window::Window() : windowName("V3Engine") , windowWidth(800), windowHeight(600)
 {
 }
 
-Window::Window(const char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height)
+Window::Window(const char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height), defaultWidth(width), defaultHeight(height)
 {
 }
 
@@ -37,7 +37,6 @@ bool Window::Init()
 
 	//V-sync
 	SDL_GL_SetSwapInterval(vsync);
-
 	//Remove mouse cursor and capture in window
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetWindowGrab(window, SDL_TRUE);
@@ -145,6 +144,7 @@ void Window::Fullscreen() {
 		fullscreen = true;
 	}
 	else {
+		
 		windowParameters ^= SDL_WINDOW_FULLSCREEN;
 		fullscreen = false;
 	}
@@ -160,13 +160,14 @@ void Window::Fullscreen() {
 			SDL_SetWindowSize(window, mode.w, mode.h);
 			//break;
 		}
+		else {
+			windowWidth = defaultWidth;
+			windowHeight = defaultHeight;
+			SDL_SetWindowSize(window, defaultWidth, defaultHeight);
+		}
 		//Uint32 f = mode.format;
 		//SDL_Log("Mode %i\tbpp %i\t%s\t%i x %i", i,SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h);
 	//}
-
-
-
-
 }
 
 void Window::Borderless()

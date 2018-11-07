@@ -17,6 +17,7 @@ Graphic::~Graphic()
 	glDeleteBuffers(1, &quadVBO);
 	glDeleteFramebuffers(1, &FBO);
 	glDeleteRenderbuffers(1, &RBO);
+	
 }
 
 bool Graphic::InitOpenGL(Window* w)
@@ -41,16 +42,6 @@ bool Graphic::InitOpenGL(Window* w)
 	1.0f,  1.0f,  1.0f, 1.0f
 	};
 	
-	glGenVertexArrays(1, &quadVAO);
-	glGenBuffers(1, &quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-	glBindVertexArray(0);
 
 	renderingParameter = GL_DEPTH_TEST | GL_STENCIL_TEST;
 	clearParameters = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
@@ -58,7 +49,7 @@ bool Graphic::InitOpenGL(Window* w)
 	glEnable(renderingParameter);
 	glDepthFunc(GL_LESS);
 
-	glGenBuffers(1, &FBO);
+	glGenFramebuffers(1, &FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
 	glGenTextures(1, &bufferTexture);
@@ -103,6 +94,18 @@ bool Graphic::InitOpenGL(Window* w)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	quadShader = new Shader("quadShader.vs", "quadShader.fs");
+
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glBindVertexArray(0);
+
 
 	quadShader->Use();
 	quadShader->SetInt("screenTexture", 0);
@@ -208,19 +211,19 @@ bool Graphic::InitOpenGL(unsigned int width, unsigned int height)
 void Graphic::Update()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH);
 
-	glClear(clearParameters);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(clearParameters);
 }
 
 void Graphic::Render()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH);
 
-	glClear(clearParameters);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(clearParameters);
 
 	quadShader->Use();
 	glBindVertexArray(quadVAO);

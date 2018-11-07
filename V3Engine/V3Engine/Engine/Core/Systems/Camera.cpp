@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera() : Position(0.0f,0.0f,0.0f), Forward(0.0f,0.0f,-1.0f), Up(0.0f,1.0f,0.0f), Right(1.0f,0.0f,0.0f), WorldUp(0.0f,1.0f,0.0f), Yaw(YAW), Pitch(PITCH), MovementSpeed(1.0f), MouseSensitivity(MOUSE_SENSITIVITY), FOV(FIELD_OF_VIEW)
+Camera::Camera() : Position(0.0f,0.0f,0.0f), Forward(0.0f,0.0f,-1.0f), Up(0.0f,1.0f,0.0f), Right(1.0f,0.0f,0.0f), WorldUp(0.0f,1.0f,0.0f), Yaw(YAW), Pitch(PITCH), MovementSpeed(10.0f), MouseSensitivity(MOUSE_SENSITIVITY), FOV(FIELD_OF_VIEW)
 {
 }
 

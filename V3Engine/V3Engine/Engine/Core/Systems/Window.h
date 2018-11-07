@@ -12,6 +12,8 @@ class Window
 	const char* windowName;
 	unsigned int windowWidth;
 	unsigned int windowHeight;
+	unsigned int defaultWidth;
+	unsigned int defaultHeight;
 
 	unsigned int windowParameters;
 
