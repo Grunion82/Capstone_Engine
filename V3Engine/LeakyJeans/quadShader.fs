@@ -6,10 +6,30 @@ out vec4 FragColor;
 
 uniform sampler2D screenTexture;
 
-//const float offset = 1.0f / 300.0f;//For kernel
+uniform float exposure;
+
+const float offset = 1.0f / 300.0f;//For kernel
 
 void main(){
-	FragColor = texture(screenTexture,TexCoords);
+	const float gamma = 2.2;
+	
+	vec3 hdrColor = texture(screenTexture,TexCoords).rgb;
+	
+	//Reinhard tone mapping - favors brighter area
+	//vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+	
+	//exposure tone mapping
+	vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
+	
+	//gamma correction
+	mapped = pow(mapped,vec3(1.0/gamma));
+	
+	
+	FragColor = vec4(mapped,1.0);
+	//FragColor = vec4(hdrColor,1.0);
+	
+	//Default
+	//FragColor = texture(screenTexture,TexCoords);
 	
 	//Inverse
 	//FragColor = vec4(vec3(1.0 - texture(screenTexture,TexCoords)),1.0);

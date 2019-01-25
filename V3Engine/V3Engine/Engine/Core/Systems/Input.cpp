@@ -6,10 +6,6 @@
 
 #include <iostream>
 
-#define MAX(a,b) a > b ? a : b
-#define MIN(a,b) a < b ? a : b
-#define CLAMP(x,upper,lower) MIN(upper,MAX(x,lower))
-
 Input* Input::instance;
 
 Input::Input() : requestedQuit(false)
@@ -22,7 +18,7 @@ Joystick::Joystick(SDL_Joystick * j, int deadzone) : joy(j), JOYSTICK_DEAD_ZONE(
 
 Input * Input::GetInstance()
 {
-	if (instance != nullptr) {
+	if (instance) {
 		return instance;
 	}
 	else {
@@ -50,7 +46,8 @@ bool Input::Init() {
 			SDL_Joystick* j = SDL_JoystickOpen(i);
 			if (j) {
 				joysticks.push_back(Joystick(j, 8000));
-				//joysticks.insert(joysticks.begin() + i, Joystick(j,8000));
+				//joysticks.insert(joysticks.begin() + i, Joystick(j, 8000));
+
 				std::cout << "Opened joystick: " << i << std::endl;
 				std::cout << "Name: " << SDL_JoystickNameForIndex(i) << std::endl;
 				std::cout << "Id: " << SDL_JoystickInstanceID(j) << std::endl;
@@ -62,7 +59,7 @@ bool Input::Init() {
 
 				//Check if joysticks are pointing in a direction
 				Sint16 state;
-				for (unsigned int a = 0; a < SDL_JoystickNumAxes(j); i++) {
+				for (unsigned int a = 0; a < SDL_JoystickNumAxes(j); a++) {
 					//If there is a change for joystick during init
 					if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
 						switch (a)
@@ -191,6 +188,8 @@ void Input::Update() {
 			//Value for axis ranges form -32768 to 32767
 			//Some joy sticks use 2 and 3 for extra buttons
 			//Set axis values
+			//****CURRENT AXIS ARE BASED OFF XBOX CONTROLLER****
+
 			if (e.jaxis.axis == 0) {
 				joysticks.at(e.jaxis.which).leftXAxis = e.jaxis.value;
 			}
@@ -331,9 +330,11 @@ bool Input::Shutdown() {
 			}
 
 			joysticks.at(i).joyButtons.clear();
+
 			joysticks.at(i).oldJoyButtons.clear();
 		}
 		joysticks.clear();
+		joysticks.shrink_to_fit();
 	}
 
 	keys.clear();
@@ -367,6 +368,7 @@ bool Input::IsKeyDown(unsigned int key)
 }
 
 //KEYBOARD===================================================
+
 bool Input::IsKeyUp(unsigned int key)
 {
 	auto it = keys.find(key);
@@ -406,6 +408,7 @@ bool Input::WasKeyReleased(unsigned int key)
 }
 
 //JOYSTICK=========================================================
+
 bool Joystick::IsJoyStickButtonDown(unsigned int key)
 {
 	auto it = joyButtons.find(key);
@@ -458,6 +461,7 @@ bool Joystick::WasJoyStickButtonReleased(unsigned int key)
 }
 
 //MOUSE=====================================================================
+
 bool Input::IsMouseButtonDown(unsigned int key)
 {
 	auto it = mouseButtons.find(key);

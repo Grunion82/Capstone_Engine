@@ -56,9 +56,9 @@ public:
 	//Get left Y axis value
 	inline int GetLeftYAxis() { return leftYAxis; }
 	//Get right X axis value
-	inline int GerRightXAxis() { return rightXAxis; }
+	inline int GetRightXAxis() { return rightXAxis; }
 	//Get right Y axis value
-	inline int GerRightYAxis() { return rightYAxis; }
+	inline int GetRightYAxis() { return rightYAxis; }
 	//Get left trigger value 
 	inline int GetLeftTrigger() { return leftTrigger; }
 	//Get right trigger value

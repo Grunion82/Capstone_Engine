@@ -6,6 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+class Window;
+
 enum class CameraMovement : unsigned __int8 {
 	FORWARD = 0,
 	BACKWARD = 1,
@@ -16,12 +18,15 @@ enum class CameraMovement : unsigned __int8 {
 
 class Camera
 {
+	glm::mat4 cameraProjection = glm::mat4();
+
 	//Default values
 	const float YAW = -90.0f;
 	const float PITCH = 0.0f;
 	const float ROLL = 0.0f;
 	const float SPEED = 2.5f;
 	const float MOUSE_SENSITIVITY = 0.3f;
+	const float CONTROLLER_SENSITIVITY = 1.5f;
 	const float FIELD_OF_VIEW = 45.0f;
 
 	glm::vec3 Position;
@@ -37,6 +42,7 @@ class Camera
 
 	float MovementSpeed;
 	float MouseSensitivity;
+	float ControllerSensitivity;
 	float FOV;
 
 	//Options
@@ -44,12 +50,14 @@ class Camera
 	bool isPitchInvert = true;
 
 public:
-	Camera();
+	Camera(Window* w, float near = 0.1f, float far = 100.0f);
+	Camera(float l, float r, float b, float t, float near, float far);
 	~Camera();
-	Camera(glm::vec3 pos,glm::vec3 forward,glm::vec3 up,glm::vec3 right,glm::vec3 worldup,float yaw,float pitch,float movespeed,float sensitivity,float fov);
+	Camera(glm::vec3 pos,glm::vec3 forward,glm::vec3 up,glm::vec3 right,glm::vec3 worldup,float yaw,float pitch,float movespeed,float sensitivity,float c_sensitivity,float fov, Window* w,float near, float far);
+	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, float yaw, float pitch, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
 	void Keyboard(CameraMovement direction, float deltaTime);
-	void Controller(float xvalue,float zvalue, float deltaTime);
+	void Controller(float xvalue,float zvalue, float xoffset, float yoffset, float deltaTime, bool constrainPitch = true);
 	void MouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
 	void MouseScroll(float offset);
 
@@ -62,7 +70,11 @@ public:
 	void InvertPitch() { isPitchInvert = isPitchInvert ? false : true; }
 
 	//Getters
-	glm::vec3 GetPosition() { return Position; }
+	inline glm::vec3 GetPosition() { return Position; }
+	glm::mat4 GetPerspective(Window& w, float near, float far);
+	glm::mat4 GetOrtho(float left, float right, float bottom, float top);
+	glm::mat4 GetOrtho(float left, float right, float bottom, float top, float near, float far);
+	inline glm::mat4 GetProjectionMatrix() { return cameraProjection; }
 	float GetFov() { return FOV; }
 
 	//Setters
