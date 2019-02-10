@@ -2,76 +2,59 @@
 #define INPUT_H
 
 #include <SDL_joystick.h>
+#include <SDL_gamecontroller.h>
 #include <map>
 #include <vector>
 
 class Joystick {
-	//The actual joystick
-	SDL_Joystick* joy;
 public:
-	Joystick(SDL_Joystick* j, int deadzone);
-	~Joystick();
-	
+	//For axis
+	//Joy axis value
+	std::map<unsigned int, int> joyAxis;
+	//For axis direciton
+	std::map<unsigned int, short> joyAxisDir;
 	//Current joystick button state
 	std::map<unsigned int, bool> joyButtons;
 	//Old joystick button state
 	std::map<unsigned int, bool> oldJoyButtons;
 
-	//Joystick left axis
-	int joystickLeftAxisX;
-	int joystickLeftAxisY;
-	//Joystick right axis
-	int joystickRightAxisX;
-	int joystickRightAxisY;
-	//Joystick triggers
-	int joystickLeftTrigger;
-	int joystickRightTrigger;
-	//Joystick axis
-	int leftXAxis;
-	int leftYAxis;
-	int rightXAxis;
-	int rightYAxis;
-	int leftTrigger;
-	int rightTrigger;
+private:
+	//The actual joystick
+	SDL_Joystick* joy;
 
-	//Dead zone of the joystick
-	const int JOYSTICK_DEAD_ZONE = 8000;
+protected:
+	int id;
+	int hats;
+	int axes;
+	int buttons;
+	int balls;
+	SDL_JoystickType type;
 
-	//JOYSTICK AXIS===================================================
+	//Dead zone of the left stick
+	int left_stick_dead_zone = 8000;
+	//Dead zone of the right stick
+	int right_stick_dead_zone = 8000;
 
-	//Get joystick axis in X direction
-	inline int GetJoyStickLeftAxisX() { return joystickLeftAxisX; }
-	//Get joystick axis in Y direction
-	inline int GetJoyStickLeftAxisY() { return joystickLeftAxisY; }
-	//Get joystick axis in X direction
-	inline int GetJoyStickRightAxisX() { return joystickRightAxisX; }
-	//Get joystick axis in Y direction
-	inline int GetJoyStickRightAxisY() { return joystickRightAxisY; }
-	//Get joystick left trigger value
-	inline int GetJoyStickLeftTrigger() { return joystickLeftTrigger; }
-	//Get joystick right trigger value
-	inline int GetJoyStickRightTrigger() { return joystickRightTrigger; }
-	//Get left X axis value
-	inline int GetLeftXAxis() { return leftXAxis; }
-	//Get left Y axis value
-	inline int GetLeftYAxis() { return leftYAxis; }
-	//Get right X axis value
-	inline int GetRightXAxis() { return rightXAxis; }
-	//Get right Y axis value
-	inline int GetRightYAxis() { return rightYAxis; }
-	//Get left trigger value 
-	inline int GetLeftTrigger() { return leftTrigger; }
-	//Get right trigger value
-	inline int GetRightTrigger() { return rightTrigger; }
+public:
 
-	//JOYSTICK PROPERTIES
-	const int id;
-	const int hats;
-	const int axes;
-	const int buttons;
-	const int balls;
+	Joystick(SDL_Joystick* j, int left_stick_dead_zone, int right_stick_dead_zone);
+	~Joystick();
 
+	//GETTERS
+
+	inline int GetLeftStickDeadZone() { return left_stick_dead_zone; }
+	inline int GetRightStickDeadZone() { return right_stick_dead_zone; }
+
+	inline int GetID() { return id; }
+	inline int GetHats() { return hats; }
+	inline int GetAxes() { return axes; }
+	inline int GetButtons() { return buttons; }
+	inline int GetBalls() { return balls; }
+	inline SDL_JoystickType GetType() { return type; }
 	inline SDL_Joystick* GetJoyStick() { return joy; }
+
+	inline int GetAxisValue(unsigned int axis) { return joyAxis[axis]; }
+	inline int GetAxisDir(unsigned int axis) { return joyAxisDir[axis]; }
 
 	//JOYSTICK BUTTONS===============================================
 	//Check if button is down (Button down)
@@ -82,6 +65,23 @@ public:
 	bool WasJoyStickButtonPressed(unsigned int key);
 	//Check if button was released this frame
 	bool WasJoyStickButtonReleased(unsigned int key);
+
+	//SETTERS
+
+	void SetLeftStickDeadZone(unsigned int value) { left_stick_dead_zone = value; }
+	void SetRightStickDeadZone(unsigned int value) { right_stick_dead_zone = value; }
+};
+
+class GameController : public Joystick {
+	SDL_GameController* gameController;
+	char* mapping = nullptr;
+
+public:
+	GameController(SDL_Joystick* j, int left_stick_dead_zone, int right_stick_dead_zone);
+	//GameController(SDL_GameController* gc,int left_stick_dead_zone, int right_stick_dead_zone);
+	~GameController();
+
+	inline SDL_GameController* GetGameController() { return gameController; }
 };
 
 class Input
@@ -97,12 +97,15 @@ class Input
 	std::map<unsigned int, bool> keys;
 	//Old key state
 	std::map<unsigned int, bool> oldkeys;
-	//Old mouse button
+	//Old mouse butt
 	std::map<unsigned int, bool>oldMouseButtons;
 	//Current mouse button
 	std::map<unsigned int, bool>mouseButtons;
 
 	static Input* instance;
+
+	//For number of click
+	unsigned int clicks;
 
 	//Mouse motion
 	int mouseMotionX;
@@ -110,13 +113,7 @@ class Input
 	//Mouse wheel 
 	int mouseWheelY;
 	int mouseButtonPress;
-	//Mouse button press
-	int mouseButtonLeftPress;
-	int mouseButtonRightPress;
-	int mouseButtonMiddlePress;
 
-	//For number of click
-	unsigned int clicks;
 	bool requestedQuit;
 public:
 	//Get instance for singleton
@@ -164,5 +161,6 @@ public:
 	//Get number of clicks
 	inline unsigned int GetMouseClicks() { return clicks; }
 };
+
 #endif // !INPUT_H
 

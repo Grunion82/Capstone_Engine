@@ -5,32 +5,97 @@
 
 class Window;
 class Shader;
+class Texture;
 
-class Graphic
+class Quad
 {
-	unsigned int FBO;
-	unsigned int bufferTexture;
-	unsigned int RBO;
+	Shader* quadShader = nullptr;
 	unsigned int quadVAO, quadVBO;
-	unsigned int SCR_WIDTH, SCR_HEIGHT;
+public:
+	Quad();
+	~Quad();
 
+	bool Init(unsigned int w, unsigned int h);
+
+	//Call this before any graphics rendering
+	//void Update();
+	void Render();
+	bool Shutdown();
+};
+
+
+class GBuffer {
+
+public:
+	Shader* gbufferShader = nullptr;
+	Shader* lightShader = nullptr;
+
+	enum GBUFFER_TEXTURE_TYPE {
+		GBUFFER_TEXTURE_TYPE_POSITION,
+		GBUFFER_TEXTURE_TYPE_NORMAL,
+		GBUFFER_TEXTURE_TYPE_ALBEDOSPEC,
+		//GBUFFER_TEXTURE_TYPE_TEXCOORD,
+		GBUFFER_NUM_TEXTURES
+	};
+
+	GBuffer();
+	~GBuffer();
+
+	void BindForWriting();
+	void BindForReading();
+	void LightPassBindForReading();
+	void BindFramebuffer();
+	void BindBufferTexture();
+	void SetReadBuffer(GBUFFER_TEXTURE_TYPE type);
+	bool WindowChange(unsigned int width, unsigned int height);
+
+	bool Init(unsigned int width,unsigned int height);
+	void LightPass(unsigned int width,unsigned int height);
+	void LightPass();
+	void GeometryPass();
+	bool Shutdown();
+private:
+	//Textures for position, normal, and albedo specular
+	Texture* gbufferTextures[GBUFFER_NUM_TEXTURES];
+	//These two are suppose to be the textures that are sampled from
+	unsigned int FBO;
+	//unsigned int bufferTexture;
+
+	//Albedo,normals,position
+	//unsigned int textures[GBUFFER_NUM_TEXTURES];
+	unsigned int RBO;
+};
+
+class Graphic {
+	static Graphic* instance;
+public:
+	Quad quad;
+	GBuffer gbuffer;
+
+private:
 	int renderingParameter;
 	int clearParameters;
 
-	Shader* quadShader;
-	
-public:
+	unsigned int SCR_WIDTH, SCR_HEIGHT;
+
 	Graphic();
 	~Graphic();
+	bool InitSDL();
+	bool CloseSDL();
 
-	bool InitOpenGL(Window* w);
-	bool InitOpenGL(unsigned int width, unsigned int height);
+public:
+	static Graphic* GetInstance();
 
-	//Call this before any graphics rendering
+	bool InitOpenGL();
+	bool Init(Window* w);
+	bool WindowChange(Window* w);
+
 	void Update();
 	void Render();
-	bool WindowChange(Window* w);
-	bool WindowChange(unsigned int width, unsigned int height);
+	//Call this before rendering geomtry/color based
+	void GeometryPass();
+	//Call this before rendering lighting
+	void LightingPass();
+	bool Shutdown();
 };
-
 #endif // !GRAPHIC_H

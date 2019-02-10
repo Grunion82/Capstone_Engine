@@ -2,18 +2,21 @@
 //#include <SDL.h>
 #include <glew.h>
 
+Window::Window(const char* name) : windowName(name), windowWidth(0), windowHeight(0) {
 
-Window::Window() : windowName("V3Engine") , windowWidth(800), windowHeight(600)
-{
 }
 
-Window::Window(const char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height), defaultWidth(width), defaultHeight(height)
+Window::Window(unsigned int width, unsigned int height) : windowName("Window"),windowWidth(width)
+{
+	
+}
+
+Window::Window(const char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height)
 {
 }
 
 Window::~Window()
 {
-	Shutdown();
 }
 
 bool Window::Init()
@@ -22,9 +25,49 @@ bool Window::Init()
 		return false;
 	}
 
+	SDL_DisplayMode mode;
+	//int display_mode_count = SDL_GetNumVideoDisplays();//For current display
+	int display_mode_count = SDL_GetNumDisplayModes(0);//Get the number of display modes for display 0(I assume default)
+	windowResolutions.reserve(display_mode_count);
+
+	for (int i = 0; i < display_mode_count; ++i) {
+		if (SDL_GetDisplayMode(0, i, &mode) != 0) {
+			SDL_Log("SDL_GetDisplayMode failed: %s", SDL_GetError());
+		}
+		//Uint32 f = mode.format;
+		//SDL_Log("Mode %i\tbpp %i\t%s\t%i x %i\t %i", i, SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h, mode.refresh_rate);
+		windowResolutions.push_back(mode);
+	}
+
 	windowParameters = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-	window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
+	if (windowWidth != 0 || windowHeight != 0) {
+		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
+	}
+	else {
+		int displays = SDL_GetNumVideoDisplays();
+		SDL_DisplayMode current;
+
+		if (windowResolutions.size() > 0) {
+			currentDisplay = windowResolutions[0];
+			windowWidth = currentDisplay.w;
+			windowHeight = currentDisplay.h;
+		}
+		//If there are displays get the resolution of the first one
+		else if (displays > 0) {
+			//This should be native display even if it goes fullscreen(vs SDL_GetDesktopDisplayMode())
+			SDL_GetCurrentDisplayMode(0, &current);
+			windowWidth = current.w;
+			windowHeight = current.h;
+			currentDisplay = current;
+		}
+		else {
+			windowWidth = 800;
+			windowHeight = 600;
+		}
+
+		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
+	}
 	//If failed to create window
 	if (!window) {
 		return false;
@@ -41,6 +84,7 @@ bool Window::Init()
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetWindowGrab(window, SDL_TRUE);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
+
 	return true;
 }
 
@@ -111,11 +155,13 @@ bool Window::Shutdown()
 	bool success = true;
 
 	SDL_DestroyWindow(window);
-	window = nullptr;
 
 	if (window) {
 		success = false;
 	}
+
+	windowResolutions.clear();
+	windowResolutions.shrink_to_fit();
 
 	CloseSDL();
 
@@ -139,35 +185,18 @@ bool Window::CloseSDL()
 }
 
 void Window::Fullscreen() {
+	//Fullscreen
 	if (!fullscreen) {
 		windowParameters |= SDL_WINDOW_FULLSCREEN;
 		fullscreen = true;
 	}
+	//Don't fullscreen
 	else {
-		
 		windowParameters ^= SDL_WINDOW_FULLSCREEN;
 		fullscreen = false;
 	}
+
 	SDL_SetWindowFullscreen(window, windowParameters);
-
-	SDL_DisplayMode mode;
-	int display_mode_count = SDL_GetNumDisplayModes(0);//Get the number of display modes for display 0(I assume default)
-
-	//So this loop would go through all the display modes available for a certain display
-	//for (int i = 0; i < display_mode_count; ++i) {
-		SDL_GetDisplayMode(0, 0, &mode);
-		if (fullscreen) {
-			SDL_SetWindowSize(window, mode.w, mode.h);
-			//break;
-		}
-		else {
-			windowWidth = defaultWidth;
-			windowHeight = defaultHeight;
-			SDL_SetWindowSize(window, defaultWidth, defaultHeight);
-		}
-		//Uint32 f = mode.format;
-		//SDL_Log("Mode %i\tbpp %i\t%s\t%i x %i", i,SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h);
-	//}
 }
 
 void Window::Borderless()

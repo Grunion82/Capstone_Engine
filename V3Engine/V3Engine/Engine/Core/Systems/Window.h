@@ -2,18 +2,20 @@
 #define WINDOW_H
 
 #include <SDL.h>
+#include <vector>
+
 
 class Window
 {
+	std::vector<SDL_DisplayMode> windowResolutions;
 	~Window();
 
 	SDL_Window* window;
+	SDL_DisplayMode currentDisplay;
 
 	const char* windowName;
 	unsigned int windowWidth;
 	unsigned int windowHeight;
-	unsigned int defaultWidth;
-	unsigned int defaultHeight;
 
 	unsigned int windowParameters;
 
@@ -25,7 +27,8 @@ class Window
 	bool CloseSDL();
 
 public:
-	Window();
+	Window(const char* name);
+	Window(unsigned int width,unsigned int height);
 	Window(const char* name, unsigned int width, unsigned int height);
 
 	bool Init();
@@ -37,6 +40,8 @@ public:
 	inline SDL_Window* GetWindow() { return window; }
 	inline int GetWidth() { return windowWidth; }
 	inline int GetHeight() { return windowHeight; }
+	inline std::vector<SDL_DisplayMode> GetWindowResolutions() { return windowResolutions; }
+	inline SDL_DisplayMode GetResolution(unsigned int index) { if (&windowResolutions[index] != nullptr) { return windowResolutions[index]; } }
 
 	void Fullscreen();
 	void Borderless();

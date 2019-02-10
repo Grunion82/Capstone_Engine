@@ -50,8 +50,8 @@ class Camera
 	bool isPitchInvert = true;
 
 public:
-	Camera(Window* w, float near = 0.1f, float far = 100.0f);
-	Camera(float l, float r, float b, float t, float near, float far);
+	Camera(Window* window, float near = 0.1f, float far = 100.0f);
+	Camera(float left, float right, float bottom, float top, float near, float far);
 	~Camera();
 	Camera(glm::vec3 pos,glm::vec3 forward,glm::vec3 up,glm::vec3 right,glm::vec3 worldup,float yaw,float pitch,float movespeed,float sensitivity,float c_sensitivity,float fov, Window* w,float near, float far);
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, float yaw, float pitch, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);

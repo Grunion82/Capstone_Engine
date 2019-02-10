@@ -16,11 +16,7 @@ Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 
 Cubemap::~Cubemap()
 {
-}
-
-
-Texture::~Texture()
-{
+	glDeleteTextures(1, &cubemapID);
 }
 
 void Cubemap::Use() {
@@ -81,10 +77,35 @@ bool Cubemap::Init()
 	return true;
 }
 
-void Texture::Use()
+Texture::Texture(unsigned int width,unsigned int height, int format, int format2, int tex, int type,int styleS, int styleT, int fminStyle, int fmaxStyle) : width(width),height(height)
 {
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glGenTextures(1, &textureID);
+	glBindTexture(tex,textureID);
+
+	glTexImage2D(tex, 0, format, width, height, 0, format2, type, NULL);
+	
+	//Wrapping
+	glTexParameteri(tex, GL_TEXTURE_WRAP_S, styleS);
+	glTexParameteri(tex, GL_TEXTURE_WRAP_T, styleT);
+
+	//Filtering
+	glTexParameteri(tex, GL_TEXTURE_MIN_FILTER, fminStyle);
+	glTexParameteri(tex, GL_TEXTURE_MAG_FILTER, fmaxStyle);
+
+	glBindTexture(tex, 0);
 }
+
+Texture::~Texture()
+{
+	glDeleteTextures(1, &textureID);
+}
+
+//Bind the texture
+void Texture::Use(unsigned int type)
+{
+	glBindTexture(type, textureID);
+}
+
 bool Texture::Init()
 {
 	stbi_set_flip_vertically_on_load(true);
@@ -141,6 +162,8 @@ void Texture::Render()
 }
 bool Texture::Shutdown()
 {
+	glDeleteTextures(1, &textureID);
+
 	return true;
 }
 

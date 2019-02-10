@@ -1,36 +1,24 @@
 #include "Graphic.h"
 #include <iostream>
 #include "Shader/Shader.h"
+#include "2D/Image.h"
 #include "../Core/Systems/Window.h"
 
-Graphic::Graphic()
+Quad::Quad()
 {
 }
 
-
-Graphic::~Graphic()
+Quad::~Quad()
 {
 	quadShader = nullptr;
 	delete quadShader;
 
 	glDeleteVertexArrays(1, &quadVAO);
 	glDeleteBuffers(1, &quadVBO);
-	glDeleteFramebuffers(1, &FBO);
-	glDeleteRenderbuffers(1, &RBO);
-	
 }
 
-bool Graphic::InitOpenGL(Window* w)
+bool Quad::Init(unsigned int width, unsigned int height)
 {
-	SCR_WIDTH = w->GetWidth();
-	SCR_HEIGHT = w->GetHeight();
-
-	GLenum error = glewInit();
-
-	if (error != GLEW_OK) {
-		return false;
-	}
-
 	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates
 	// positions   // texCoords
 	-1.0f,  1.0f,  0.0f, 1.0f,
@@ -41,57 +29,6 @@ bool Graphic::InitOpenGL(Window* w)
 	1.0f, -1.0f,  1.0f, 0.0f,
 	1.0f,  1.0f,  1.0f, 1.0f
 	};
-	
-
-	renderingParameter = GL_DEPTH_TEST | GL_STENCIL_TEST;
-	clearParameters = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
-
-	glEnable(renderingParameter);
-	glDepthFunc(GL_LESS);
-
-	glGenFramebuffers(1, &FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-	glGenTextures(1, &bufferTexture);
-	glBindTexture(GL_TEXTURE_2D, bufferTexture);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH,SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	//Can specify texture as depth and/or stencil
-	/*
-	GL_DEPTH_ATTACHMENT - specify format and internalformat as GL_DEPTH_COMPONENT
-	GL_STENCIL_ATTACHMENT - specift format and internalformat to GL_STENCIL_INDEX
-	*/
-	//32 bits of texture = 24 bits of depth info and 8 bits of stencil info
-	/*
-	GL_DEPTH_STENCIL_ATTACHMENT - configure texture format for both depth and stencil values
-	Ex.
-	glTexImage2D(
-	GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, 800, 600, 0,
-	GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL
-	);
-	
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
-	*/
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTexture, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenRenderbuffers(1, &RBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,SCR_WIDTH,SCR_HEIGHT);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "ENGINE::CORE::RENDERIGN::GRAPHICS::INIT() - Failed to complete framebuffer" << std::endl;
-		return false;
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	quadShader = new Shader("quadShader.vs", "quadShader.fs");
 
@@ -109,127 +46,155 @@ bool Graphic::InitOpenGL(Window* w)
 
 	quadShader->Use();
 	quadShader->SetInt("screenTexture", 0);
+	quadShader->SetFloat("exposure", 1.0f);
 
 	return true;
 }
 
-bool Graphic::InitOpenGL(unsigned int width, unsigned int height)
+void Quad::Render()
 {
-	SCR_WIDTH = width;
-	SCR_HEIGHT = height;
+	quadShader->Use();
+	glBindVertexArray(quadVAO);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, bufferTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
 
+bool Quad::Shutdown()
+{
+	//glDeleteVertexArrays(1, &quadVAO);
+	//glDeleteBuffers(1, &quadVBO);
+
+	quadShader = nullptr;
+	delete quadShader;
+
+	return true;
+}
+
+Graphic::Graphic() {
+
+}
+
+Graphic::~Graphic()
+{
+}
+
+bool Graphic::InitSDL() {
+	bool success = true;
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+		success = false;
+	}
+
+	return success;
+}
+
+bool Graphic::CloseSDL()
+{
+	SDL_Quit();
+
+	return true;
+}
+
+bool Graphic::InitOpenGL()
+{
 	GLenum error = glewInit();
 
 	if (error != GLEW_OK) {
 		return false;
 	}
 
-	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates
-	// positions   // texCoords
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	-1.0f, -1.0f,  0.0f, 0.0f,
-	1.0f, -1.0f,  1.0f, 0.0f,
+	std::cout << "Version: " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
+	std::cout << "Name: " << glGetString(GL_RENDERER) << std::endl;
+	std::cout << "Language: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+	
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, GL_VERSION);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	1.0f, -1.0f,  1.0f, 0.0f,
-	1.0f,  1.0f,  1.0f, 1.0f
-	};
-
-	glGenVertexArrays(1, &quadVAO);
-	glGenBuffers(1, &quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-
-	renderingParameter = GL_DEPTH | GL_DEPTH_TEST | GL_STENCIL_TEST;
+	renderingParameter = GL_DEPTH_TEST | GL_STENCIL_TEST;
 	clearParameters = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
 
-	glEnable(renderingParameter);
-	glDepthFunc(GL_LESS);
+	//glEnable(renderingParameter);
 
-	glGenBuffers(1, &FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	return true;
+}
 
-	glGenTextures(1, &bufferTexture);
-	glBindTexture(GL_TEXTURE_2D, bufferTexture);
+bool Graphic::Init(Window* w) {
+	SCR_WIDTH = w->GetWidth();
+	SCR_HEIGHT = w->GetHeight();
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	//Can specify texture as depth and/or stencil
-	/*
-	GL_DEPTH_ATTACHMENT - specify format and internalformat as GL_DEPTH_COMPONENT
-	GL_STENCIL_ATTACHMENT - specift format and internalformat to GL_STENCIL_INDEX
-	*/
-	//32 bits of texture = 24 bits of depth info and 8 bits of stencil info
-	/*
-	GL_DEPTH_STENCIL_ATTACHMENT - configure texture format for both depth and stencil values
-	Ex.
-	glTexImage2D(
-	GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, 800, 600, 0,
-	GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL
-	);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
-	*/
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTexture, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenRenderbuffers(1, &RBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "ENGINE::CORE::RENDERIGN::GRAPHICS::INIT() - Failed to complete framebuffer" << std::endl;
+	if (!quad.Init(SCR_WIDTH, SCR_HEIGHT) || gbuffer.Init(SCR_WIDTH, SCR_HEIGHT)) {
 		return false;
 	}
-
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	quadShader = new Shader("quadShader.vs", "quadShader.fs");
-
-	quadShader->Use();
-	quadShader->SetInt("screenTexture", 0);
-
+	
 	return true;
 }
 
 void Graphic::Update()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-	glEnable(GL_DEPTH);
-
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	//Update quad
+	//quad.BindFramebuffer();
+	//glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(clearParameters);
 }
 
 void Graphic::Render()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glDisable(GL_DEPTH_TEST);
 
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	//glClear(clearParameters);
+
+	//Render quad
+	quad.Render();
+}
+
+void Graphic::GeometryPass()
+{
+	gbuffer.BindFramebuffer();
+	//Only geometry pass updates depth buffer
+	glClear(clearParameters);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glDisable(GL_BLEND);
+	gbuffer.GeometryPass();
+}
+
+void Graphic::LightingPass()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(clearParameters);
 
-	quadShader->Use();
-	glBindVertexArray(quadVAO);
-	glBindTexture(GL_TEXTURE_2D, bufferTexture);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);	
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	gbuffer.LightPass();
+	//gbuffer.LightPass(SCR_WIDTH,SCR_HEIGHT);
+}
+
+bool Graphic::Shutdown()
+{
+	quad.Shutdown();
+	gbuffer.Shutdown();
+
+	return true;
+}
+
+Graphic* Graphic::instance;
+Graphic * Graphic::GetInstance()
+{
+	if (instance) {
+		return instance;
+	}
+	else {
+		instance = new Graphic();
+		return instance;
+	}
 }
 
 bool Graphic::WindowChange(Window* w)
@@ -237,28 +202,183 @@ bool Graphic::WindowChange(Window* w)
 	SCR_WIDTH = w->GetWidth();
 	SCR_HEIGHT = w->GetHeight();
 
-	printf("Width %d\n",SCR_WIDTH);
-	printf("Height %d\n",SCR_HEIGHT);
+	gbuffer.WindowChange(SCR_WIDTH, SCR_HEIGHT);
 
+	//For quad
+	//quad.WindowChange(SCR_WIDTH, SCR_HEIGHT);
+
+	return true;
+}
+
+GBuffer::GBuffer() {
+
+}
+
+GBuffer::~GBuffer() {
+	glDeleteFramebuffers(1, &FBO);
+	glDeleteRenderbuffers(1, &RBO);
+
+	//glDeleteTextures(GBUFFER_NUM_TEXTURES, textures);
+
+	lightShader = nullptr;
+	delete lightShader;
+
+	gbufferShader = nullptr;
+	delete gbufferShader;
+
+	//diffuse = nullptr;
+	//delete diffuse;
+	
+	//specular = nullptr;
+	//delete specular;
+
+	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
+		delete gbufferTextures[i];
+		gbufferTextures[i] = nullptr;
+	}
+}
+
+bool GBuffer::Init(unsigned int width, unsigned int height)
+{
+	glGenFramebuffers(1, &FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-	glBindTexture(GL_TEXTURE_2D, bufferTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTexture, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	//For depth
+	glGenRenderbuffers(1, &RBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
-
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
 
+	//glBindTexture(GL_TEXTURE_2D, depthTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+
+	//glGenTextures(1, &bufferTexture);
+	//glBindTexture(GL_TEXTURE_2D, bufferTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTexture, 0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_POSITION] = new Texture(width,height,GL_RGB16F,GL_RGB,GL_TEXTURE_2D,GL_FLOAT,GL_REPEAT,GL_REPEAT,GL_NEAREST,GL_NEAREST);
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_NORMAL] = new Texture(width, height, GL_RGB16F, GL_RGB, GL_TEXTURE_2D, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_ALBEDOSPEC] = new Texture(width, height,GL_RGBA,GL_RGBA,GL_TEXTURE_2D,GL_UNSIGNED_BYTE,GL_REPEAT,GL_REPEAT,GL_NEAREST,GL_NEAREST);
+	
+	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		gbufferTextures[i]->Use();
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, gbufferTextures[i]->ID(), 0);
+	}
+
+	//Position, normal and albedo(diffuse and specular)
+	GLenum drawBuffers[GBUFFER_NUM_TEXTURES] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+	
+	glDrawBuffers(GBUFFER_NUM_TEXTURES, drawBuffers);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "ENGINE::CORE::RENDERIGN::GRAPHICS::WINDOWCHANGE() - Failed to complete framebuffer" << std::endl;
+		printf("FAILED TO COMPLETE GBUFFER FBO - GBUFFER::INIT()\n");
 		return false;
 	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	gbufferShader = new Shader("gbufferVert.glsl", "gbufferFrag.glsl");
+	gbufferShader->Use();
+	gbufferShader->SetInt("texture_diffuse1", 0);
+	gbufferShader->SetInt("texture_specular1", 1);
+
+	lightShader = new Shader("lightVert.glsl", "lightFrag.glsl");
+	lightShader->Use();
+	lightShader->SetInt("gPosition", 0);
+	lightShader->SetInt("gNormal", 1);
+	lightShader->SetInt("gAlbedoSpec", 2);
+
+	return true;
+}
+
+void GBuffer::GeometryPass()
+{
+	gbufferShader->Use();
+
+	glActiveTexture(GL_TEXTURE0);
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_POSITION]->Use();
+
+	glActiveTexture(GL_TEXTURE1);
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_ALBEDOSPEC]->Use();
+}
+
+void GBuffer::LightPass()
+{
+	lightShader->Use();
+
+	//Position,normal, then albedospec
+	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		//glBindTexture(GL_TEXTURE_2D, textures[i]);
+		gbufferTextures[i]->Use();
+	}
+}
+
+void GBuffer::LightPass(unsigned int width, unsigned int height)
+{
+	//Disable stencil for directional lights
+	//glDisable(GL_STENCIL_TEST
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	BindForReading();
+
+	for (unsigned int i = 0 ; i < GBUFFER_NUM_TEXTURES; i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		//glBindTexture(GL_TEXTURE_2D, textures[i]);
+		gbufferTextures[i]->Use();
+	}
+
+	unsigned int halfWidth = width / 2;
+	unsigned int halfHeight = height / 2;
+
+	SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_POSITION);
+	glBlitFramebuffer(0, 0, width, height,0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_ALBEDOSPEC);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	/*SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_TEXCOORD);
+	glBlitFramebuffer(0, 0, w, h, 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);*/
+
+}
+
+bool GBuffer::WindowChange(unsigned int width, unsigned int height)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_POSITION]->Use();
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, width);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_HEIGHT, height);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gbufferTextures[0]->ID(), 0);
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_NORMAL]->Use();
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, width);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_HEIGHT, height);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gbufferTextures[1]->ID(), 0);
+	gbufferTextures[GBUFFER_TEXTURE_TYPE_ALBEDOSPEC]->Use();
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, width);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_HEIGHT, height);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbufferTextures[2]->ID(), 0);
+
+
+	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -267,34 +387,56 @@ bool Graphic::WindowChange(Window* w)
 	return true;
 }
 
-bool Graphic::WindowChange(unsigned int width, unsigned int height)
+void GBuffer::BindForWriting()
 {
-	SCR_WIDTH = width;
-	SCR_HEIGHT = height;
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
+}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+void GBuffer::BindForReading()
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+}
 
-	glBindTexture(GL_TEXTURE_2D, bufferTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+void GBuffer::LightPassBindForReading() {
+	glBindFramebuffer(GL_DRAW_BUFFER, 0);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTexture, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "ENGINE::CORE::RENDERIGN::GRAPHICS::WINDOWCHANGE() - Failed to complete framebuffer" << std::endl;
-		return false;
+	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		//glBindTexture(GL_TEXTURE_2D, textures[GBUFFER_TEXTURE_TYPE_POSITION + i]);
+		gbufferTextures[i]->Use();
 	}
+}
 
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+void GBuffer::BindFramebuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+void GBuffer::BindBufferTexture()
+{
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, bufferTexture);
+}
+
+void GBuffer::SetReadBuffer(GBUFFER_TEXTURE_TYPE type)
+{
+	glReadBuffer(GL_COLOR_ATTACHMENT0 + type);
+}
+
+bool GBuffer::Shutdown()
+{
+	gbufferShader = nullptr;
+	delete gbufferShader;
+	
+	lightShader = nullptr;
+	delete lightShader;
+	
+	glDeleteFramebuffers(1, &FBO);
+	glDeleteRenderbuffers(1, &RBO);
+	
+	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
+		gbufferTextures[i]->Shutdown();
+	}
 
 	return true;
 }
