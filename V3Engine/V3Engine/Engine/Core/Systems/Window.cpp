@@ -88,10 +88,8 @@ bool Window::Init()
 	return true;
 }
 
-void Window::Update()
+void Window::Update(SDL_Event& e)
 {
-	SDL_Event e;
-
 	while (SDL_PollEvent(&e) != 0) {
 		if (e.type == SDL_WINDOWEVENT) {
 			switch (e.window.event)

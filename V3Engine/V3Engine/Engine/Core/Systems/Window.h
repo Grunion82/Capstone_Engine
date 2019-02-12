@@ -32,7 +32,7 @@ public:
 	Window(const char* name, unsigned int width, unsigned int height);
 
 	bool Init();
-	void Update();
+	void Update(SDL_Event& e);
 	void Render();
 	bool Shutdown();
 

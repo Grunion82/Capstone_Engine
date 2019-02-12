@@ -6,6 +6,8 @@
 #include <map>
 #include <vector>
 
+union SDL_Event;
+
 class Joystick {
 public:
 	//For axis
@@ -39,6 +41,8 @@ public:
 
 	Joystick(SDL_Joystick* j, int left_stick_dead_zone, int right_stick_dead_zone);
 	~Joystick();
+
+	virtual void Update(SDL_Event& e);
 
 	//GETTERS
 
@@ -81,6 +85,8 @@ public:
 	//GameController(SDL_GameController* gc,int left_stick_dead_zone, int right_stick_dead_zone);
 	~GameController();
 
+	void Update(SDL_Event& e) override;
+
 	inline SDL_GameController* GetGameController() { return gameController; }
 };
 
@@ -120,7 +126,7 @@ public:
 	static Input* GetInstance();
 
 	bool Init();
-	void Update();
+	void Update(SDL_Event& e);
 	void Render();
 	bool Shutdown();
 	//SystemType getSystemType();

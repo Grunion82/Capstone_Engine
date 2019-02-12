@@ -98,7 +98,7 @@ bool Input::Init() {
 
 	return true;
 }
-void Input::Update() {
+void Input::Update(SDL_Event& e) {
 	oldkeys = keys;
 	oldMouseButtons = mouseButtons;
 
@@ -109,9 +109,6 @@ void Input::Update() {
 	mouseMotionX = 0;
 	mouseMotionY = 0;
 	mouseWheelY = 0;
-
-
-	SDL_Event e;
 
 	while (SDL_PollEvent(&e) != 0) {
 		//Check for event type
@@ -155,11 +152,7 @@ void Input::Update() {
 		//JOYSTICK=================================
 		//For controller axis
 		case(SDL_JOYAXISMOTION):
-
-
 			if (joysticks.at(e.jaxis.which).GetType() != SDL_JOYSTICK_TYPE_GAMECONTROLLER) {
-				std::cout << "j" << std::endl;
-
 				//Value for axis ranges form -32768 to 32767
 				//Set axis values
 				joysticks.at(e.jaxis.which).joyAxis[e.jaxis.axis] = e.jaxis.value;
@@ -195,73 +188,73 @@ void Input::Update() {
 			//Left X axis
 			case(SDL_CONTROLLER_AXIS_LEFTX):
 				if (e.jaxis.value > joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
 				}
 				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = -1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 0;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
 			//Left Y axis
 			case(SDL_CONTROLLER_AXIS_LEFTY):
 				if (e.jaxis.value > joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
 				}
 				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = -1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 0;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
 			//Right X axis
 			case(SDL_CONTROLLER_AXIS_RIGHTX):
 				if (e.jaxis.value > joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
 				}
 				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = -1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 0;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;				 
 			//Right Y axis			 
 			case(SDL_CONTROLLER_AXIS_RIGHTY):
 				if (e.jaxis.value > joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
 				}
 				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = -1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 0;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
 			//Left trigger
 			case(SDL_CONTROLLER_AXIS_TRIGGERLEFT):
 				if (e.jaxis.value > 0) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
 				}
 				else if (e.jaxis.value < 0) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = -1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 0;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
 			//Right trigger
 			case(SDL_CONTROLLER_AXIS_TRIGGERRIGHT):
 				if (e.jaxis.value > 0) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
 				}
 				else if (e.jaxis.value < 0) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = -1;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.caxis.axis] = 0;
+					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
 			}
@@ -465,6 +458,33 @@ Joystick::Joystick(SDL_Joystick * j,int left_stick_sensitivity,int right_stick_s
 Joystick::~Joystick() {
 }
 
+void Joystick::Update(SDL_Event & e)
+{
+	switch (e.type) {
+	case(SDL_JOYAXISMOTION):
+		//Value for axis ranges form -32768 to 32767
+		//Set axis values
+		joyAxis[e.jaxis.axis] = e.jaxis.value;
+
+		if (e.jaxis.value > 0) {
+			joyAxisDir[e.jaxis.axis] = 1;
+		}
+		else if (e.jaxis.value < 0) {
+			joyAxisDir[e.jaxis.axis] = -1;
+		}
+		else {
+			joyAxisDir[e.jaxis.axis] = 0;
+		}
+		break;
+	case(SDL_JOYBUTTONDOWN):
+		joyButtons[e.jbutton.button] = true;
+		break;
+	case(SDL_JOYBUTTONUP):
+		joyButtons[e.jbutton.button] = false;
+		break;
+	}
+}
+
 Joystick* Input::GetJoystick(unsigned int which)
 {
 	if (&joysticks[which]) {
@@ -536,4 +556,95 @@ GameController::GameController(SDL_Joystick * j, int left_stick_dead_zone, int r
 
 GameController::~GameController()
 {
+}
+
+void GameController::Update(SDL_Event & e)
+{
+	switch(e.type){
+		case(SDL_CONTROLLERAXISMOTION):
+			joyAxis[e.caxis.axis] = e.caxis.value;
+
+			switch (e.caxis.axis)
+			{
+			//Left X axis
+			case(SDL_CONTROLLER_AXIS_LEFTX):
+				if (e.jaxis.value > GetLeftStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = 1;
+				}
+				else if (e.jaxis.value < -GetLeftStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = -1;
+				}
+				else {
+					joyAxisDir[e.caxis.axis] = 0;
+				}
+				break;
+			//Left Y axis
+			case(SDL_CONTROLLER_AXIS_LEFTY):
+				if (e.jaxis.value > GetLeftStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = 1;
+				}
+				else if (e.jaxis.value < -GetLeftStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = -1;
+				}
+				else {
+					joyAxisDir[e.caxis.axis] = 0;
+				}
+				break;
+			//Right X axis
+			case(SDL_CONTROLLER_AXIS_RIGHTX):
+				if (e.jaxis.value > GetRightStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = 1;
+				}
+				else if (e.jaxis.value < -GetRightStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = -1;
+				}
+				else {
+					joyAxisDir[e.caxis.axis] = 0;
+				}
+				break;
+			//Right Y axis			 
+			case(SDL_CONTROLLER_AXIS_RIGHTY):
+				if (e.jaxis.value > GetRightStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = 1;
+				}
+				else if (e.jaxis.value < -GetRightStickDeadZone()) {
+					joyAxisDir[e.caxis.axis] = -1;
+				}
+				else {
+					joyAxisDir[e.caxis.axis] = 0;
+				}
+				break;
+			//Left trigger
+			case(SDL_CONTROLLER_AXIS_TRIGGERLEFT):
+				if (e.jaxis.value > 0) {
+					joyAxisDir[e.caxis.axis] = 1;
+				}
+				else if (e.jaxis.value < 0) {
+					joyAxisDir[e.caxis.axis] = -1;
+				}
+				else {
+					joyAxisDir[e.caxis.axis] = 0;
+				}
+				break;
+			//Right trigger
+			case(SDL_CONTROLLER_AXIS_TRIGGERRIGHT):
+				if (e.jaxis.value > 0) {
+					joyAxisDir[e.caxis.axis] = 1;
+				}
+				else if (e.jaxis.value < 0) {
+					joyAxisDir[e.caxis.axis] = -1;
+				}
+				else {
+					joyAxisDir[e.caxis.axis] = 0;
+				}
+				break;
+			}
+			break;
+		case(SDL_CONTROLLERBUTTONDOWN):
+			joyButtons[e.cbutton.button] = true;
+			break;
+		case(SDL_CONTROLLERBUTTONUP):
+			joyButtons[e.cbutton.button] = false;
+			break;
+	}
 }
