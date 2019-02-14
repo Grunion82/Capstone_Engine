@@ -28,17 +28,27 @@ public:
 	//Activate shader
 	void Use();
 	//Utility uniform functions
+	void SetBool(const char* name, bool value) const;
 	void SetBool(const std::string& name, bool value) const;
+	void SetInt(const char* name, int value) const;
 	void SetInt(const std::string& name, int value) const;
+	void SetFloat(const char* name, float value) const;
 	void SetFloat(const std::string& name, float value) const;
 
 	//Vec
 	void SetVec2(const char* name, float x,float y);
+	void SetVec2(const std::string& name, float x, float y);
 	void SetVec2(const char* name, glm::vec2 vec);
+	void SetVec2(const std::string& name, glm::vec2 vec);
 	void SetVec3(const char* name, float x,float y,float z);
+	void SetVec3(const std::string& name, float x, float y, float z);
 	void SetVec3(const char* name, glm::vec3 vec);
+	void SetVec3(const std::string& name, glm::vec3 vec);
 	void SetVec4(const char* name, float x, float y, float z,float w);
+	void SetVec4(const std::string& name, float x, float y, float z, float w);
 	void SetVec4(const char* name, glm::vec4 vec);
+	void SetVec4(const std::string& name, glm::vec4 vec);
+
 
 	//Matrix
 	void SetMat4(const char* name, glm::mat4 newMat);

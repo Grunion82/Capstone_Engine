@@ -121,19 +121,19 @@ void Window::Update(SDL_Event& e)
 				windowHeight = e.window.data2;
 				glViewport(0, 0, windowWidth, windowHeight);
 				break;
-			/*
-			case(SDL_WINDOWEVENT_MINIMIZED):
-				break;
-			case(SDL_WINDOWEVENT_CLOSE)://Window manager requests window to be closed
-				e.type = SDL_QUIT;
-				SDL_PushEvent(&e);
-				break;
-			case(SDL_WINDOWEVENT_TAKE_FOCUS)://Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore)
-				break;
-			case(SDL_WINDOWEVENT_HIT_TEST)://Window had a hit test that wasn't SDL_HITTEST_NORMAL
-				break;
-			case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
-			*/
+				/*
+				case(SDL_WINDOWEVENT_MINIMIZED):
+					break;
+				case(SDL_WINDOWEVENT_CLOSE)://Window manager requests window to be closed
+					e.type = SDL_QUIT;
+					SDL_PushEvent(&e);
+					break;
+				case(SDL_WINDOWEVENT_TAKE_FOCUS)://Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore)
+					break;
+				case(SDL_WINDOWEVENT_HIT_TEST)://Window had a hit test that wasn't SDL_HITTEST_NORMAL
+					break;
+				case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
+				*/
 
 			default:
 				break;
@@ -141,12 +141,12 @@ void Window::Update(SDL_Event& e)
 		}
 	}
 
-	SDL_GL_SwapWindow(window);
+	Render();
 }
 
 void Window::Render()
 {
-	
+	SDL_GL_SwapWindow(window);
 }
 bool Window::Shutdown()
 {

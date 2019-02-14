@@ -25,12 +25,13 @@ private:
 	SDL_Joystick* joy;
 
 protected:
+	SDL_JoystickType type;
 	int id;
 	int hats;
 	int axes;
 	int buttons;
 	int balls;
-	SDL_JoystickType type;
+	int eventFLag;
 
 	//Dead zone of the left stick
 	int left_stick_dead_zone = 8000;
@@ -88,6 +89,7 @@ public:
 	void Update(SDL_Event& e) override;
 
 	inline SDL_GameController* GetGameController() { return gameController; }
+	void RebindButton();
 };
 
 class Input
@@ -110,8 +112,7 @@ class Input
 
 	static Input* instance;
 
-	//For number of click
-	unsigned int clicks;
+	int evenFlag;
 
 	//Mouse motion
 	int mouseMotionX;
@@ -119,6 +120,8 @@ class Input
 	//Mouse wheel 
 	int mouseWheelY;
 	int mouseButtonPress;
+	//For number of click
+	unsigned int clicks;
 
 	bool requestedQuit;
 public:

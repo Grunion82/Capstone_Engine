@@ -1,8 +1,6 @@
 #include "Input.h"
 #include <SDL.h>
 #include <stdio.h>
-//#include "imgui/imgui.h"
-//#include "imgui/imgui_impl_sdl_gl3.h"
 
 #include <iostream>
 
@@ -647,4 +645,9 @@ void GameController::Update(SDL_Event & e)
 			joyButtons[e.cbutton.button] = false;
 			break;
 	}
+}
+
+void GameController::RebindButton()
+{
+
 }

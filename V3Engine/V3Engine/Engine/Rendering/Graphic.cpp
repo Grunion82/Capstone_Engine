@@ -43,7 +43,6 @@ bool Quad::Init(unsigned int width, unsigned int height)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 	glBindVertexArray(0);
 
-
 	quadShader->Use();
 	quadShader->SetInt("screenTexture", 0);
 	quadShader->SetFloat("exposure", 1.0f);
@@ -115,7 +114,7 @@ bool Graphic::InitOpenGL()
 	renderingParameter = GL_DEPTH_TEST | GL_STENCIL_TEST;
 	clearParameters = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
 
-	//glEnable(renderingParameter);
+	glEnable(renderingParameter);
 
 	return true;
 }
@@ -124,7 +123,7 @@ bool Graphic::Init(Window* w) {
 	SCR_WIDTH = w->GetWidth();
 	SCR_HEIGHT = w->GetHeight();
 
-	if (!quad.Init(SCR_WIDTH, SCR_HEIGHT) || gbuffer.Init(SCR_WIDTH, SCR_HEIGHT)) {
+	if (!quad.Init(SCR_WIDTH, SCR_HEIGHT) || !gbuffer.Init(SCR_WIDTH, SCR_HEIGHT)) {
 		return false;
 	}
 	
@@ -133,9 +132,6 @@ bool Graphic::Init(Window* w) {
 
 void Graphic::Update()
 {
-	//Update quad
-	//quad.BindFramebuffer();
-	//glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(clearParameters);
 }
@@ -290,9 +286,9 @@ bool GBuffer::Init(unsigned int width, unsigned int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	gbufferShader = new Shader("gbufferVert.glsl", "gbufferFrag.glsl");
-	gbufferShader->Use();
-	gbufferShader->SetInt("texture_diffuse1", 0);
-	gbufferShader->SetInt("texture_specular1", 1);
+	//gbufferShader->Use();
+	//gbufferShader->SetInt("texture_diffuse1", 0);
+	//gbufferShader->SetInt("texture_specular1", 1);
 
 	lightShader = new Shader("lightVert.glsl", "lightFrag.glsl");
 	lightShader->Use();
@@ -307,11 +303,11 @@ void GBuffer::GeometryPass()
 {
 	gbufferShader->Use();
 
-	glActiveTexture(GL_TEXTURE0);
-	gbufferTextures[GBUFFER_TEXTURE_TYPE_POSITION]->Use();
+	//glActiveTexture(GL_TEXTURE0);
+	//gbufferTextures[GBUFFER_TEXTURE_TYPE_POSITION]->Use();
 
-	glActiveTexture(GL_TEXTURE1);
-	gbufferTextures[GBUFFER_TEXTURE_TYPE_ALBEDOSPEC]->Use();
+	//glActiveTexture(GL_TEXTURE1);
+	//gbufferTextures[GBUFFER_TEXTURE_TYPE_ALBEDOSPEC]->Use();
 }
 
 void GBuffer::LightPass()
@@ -321,9 +317,9 @@ void GBuffer::LightPass()
 	//Position,normal, then albedospec
 	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		//glBindTexture(GL_TEXTURE_2D, textures[i]);
 		gbufferTextures[i]->Use();
 	}
+
 }
 
 void GBuffer::LightPass(unsigned int width, unsigned int height)
