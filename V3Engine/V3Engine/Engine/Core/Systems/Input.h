@@ -122,12 +122,12 @@ class Input : public EventSystem
 	//Mouse wheel 
 	int mouseWheelY;
 	int mouseButtonPress;
+	int eventFlags;
 	//For number of click
 	unsigned int clicks;
 
 	bool requestedQuit;
 
-	int eventFlags;
 public:
 
 	//Get instance for singleton
