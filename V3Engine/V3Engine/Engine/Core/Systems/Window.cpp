@@ -72,8 +72,8 @@ bool Window::Init()
 	if (!window) {
 		return false;
 	}
-	SDL_GLContext glContext = SDL_GL_CreateContext(window);
-
+	windowContext = SDL_GL_CreateContext(window);
+	
 	//Creating a double buffer
 	//Draw on back buffer display on front
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -85,63 +85,61 @@ bool Window::Init()
 	SDL_SetWindowGrab(window, SDL_TRUE);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
+	eventFlags = SDL_WINDOWEVENT_SHOWN | SDL_WINDOWEVENT_EXPOSED | SDL_WINDOWEVENT_FOCUS_GAINED | SDL_WINDOWEVENT_ENTER | SDL_WINDOWEVENT_HIDDEN | SDL_WINDOWEVENT_FOCUS_LOST | SDL_WINDOWEVENT_LEAVE | SDL_WINDOWEVENT_SIZE_CHANGED | SDL_WINDOWEVENT_RESIZED | SDL_WINDOWEVENT_MAXIMIZED | SDL_WINDOWEVENT_RESTORED;
+
 	return true;
 }
 
 void Window::Update(SDL_Event& e)
 {
-	while (SDL_PollEvent(&e) != 0) {
-		if (e.type == SDL_WINDOWEVENT) {
-			switch (e.window.event)
-			{
-			case(SDL_WINDOWEVENT_SHOWN):
-			case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn?
-			case(SDL_WINDOWEVENT_FOCUS_GAINED):
-			case(SDL_WINDOWEVENT_ENTER)://Window has gained mouse focus
-				SDL_ShowCursor(SDL_DISABLE);
-				SDL_SetWindowGrab(window, SDL_TRUE);
-				SDL_SetRelativeMouseMode(SDL_TRUE);
+	if(e.type | eventFlags) {
+		switch (e.window.event)
+		{
+		case(SDL_WINDOWEVENT_SHOWN):
+		case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn?
+		case(SDL_WINDOWEVENT_FOCUS_GAINED):
+		case(SDL_WINDOWEVENT_ENTER)://Window has gained mouse focus
+			SDL_ShowCursor(SDL_DISABLE);
+			SDL_SetWindowGrab(window, SDL_TRUE);
+			SDL_SetRelativeMouseMode(SDL_TRUE);
+			break;
+		case(SDL_WINDOWEVENT_HIDDEN):
+		case(SDL_WINDOWEVENT_FOCUS_LOST):
+		case(SDL_WINDOWEVENT_LEAVE)://Window has lost mouse focus
+			SDL_ShowCursor(SDL_ENABLE);
+			SDL_SetWindowGrab(window, SDL_FALSE);
+			SDL_SetRelativeMouseMode(SDL_FALSE);
+			break;
+		case(SDL_WINDOWEVENT_SIZE_CHANGED)://The window size has changed, either as a result of an API call or through the system or user changing the window size
+		case(SDL_WINDOWEVENT_RESIZED):
+			windowWidth = e.window.data1;
+			windowHeight = e.window.data2;
+			glViewport(0, 0, windowWidth, windowHeight);
+			//screenSurface = SDL_GetWindowSurface(window);
+			break;
+		case(SDL_WINDOWEVENT_MAXIMIZED):
+			windowWidth = e.window.data1;
+			windowHeight = e.window.data2;
+			glViewport(0, 0, windowWidth, windowHeight);
+			break;
+			/*
+			case(SDL_WINDOWEVENT_MINIMIZED):
 				break;
-			case(SDL_WINDOWEVENT_HIDDEN):
-			case(SDL_WINDOWEVENT_FOCUS_LOST):
-			case(SDL_WINDOWEVENT_LEAVE)://Window has lost mouse focus
-				SDL_ShowCursor(SDL_ENABLE);
-				SDL_SetWindowGrab(window, SDL_FALSE);
-				SDL_SetRelativeMouseMode(SDL_FALSE);
+			case(SDL_WINDOWEVENT_CLOSE)://Window manager requests window to be closed
+				e.type = SDL_QUIT;
+				SDL_PushEvent(&e);
 				break;
-			case(SDL_WINDOWEVENT_SIZE_CHANGED)://The window size has changed, either as a result of an API call or through the system or user changing the window size
-			case(SDL_WINDOWEVENT_RESIZED):
-				windowWidth = e.window.data1;
-				windowHeight = e.window.data2;
-				glViewport(0, 0, windowWidth, windowHeight);
-				//screenSurface = SDL_GetWindowSurface(window);
+			case(SDL_WINDOWEVENT_TAKE_FOCUS)://Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore)
 				break;
-			case(SDL_WINDOWEVENT_MAXIMIZED):
-				windowWidth = e.window.data1;
-				windowHeight = e.window.data2;
-				glViewport(0, 0, windowWidth, windowHeight);
+			case(SDL_WINDOWEVENT_HIT_TEST)://Window had a hit test that wasn't SDL_HITTEST_NORMAL
 				break;
-				/*
-				case(SDL_WINDOWEVENT_MINIMIZED):
-					break;
-				case(SDL_WINDOWEVENT_CLOSE)://Window manager requests window to be closed
-					e.type = SDL_QUIT;
-					SDL_PushEvent(&e);
-					break;
-				case(SDL_WINDOWEVENT_TAKE_FOCUS)://Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore)
-					break;
-				case(SDL_WINDOWEVENT_HIT_TEST)://Window had a hit test that wasn't SDL_HITTEST_NORMAL
-					break;
-				case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
-				*/
+			case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
+			*/
 
-			default:
-				break;
-			}
+		default:
+			break;
 		}
 	}
-
-	Render();
 }
 
 void Window::Render()

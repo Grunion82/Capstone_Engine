@@ -1,12 +1,11 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "EventSystem.h"
 #include <SDL_joystick.h>
 #include <SDL_gamecontroller.h>
 #include <map>
 #include <vector>
-
-union SDL_Event;
 
 class Joystick {
 public:
@@ -31,7 +30,7 @@ protected:
 	int axes;
 	int buttons;
 	int balls;
-	int eventFLag;
+	int eventFlags;
 
 	//Dead zone of the left stick
 	int left_stick_dead_zone = 8000;
@@ -44,6 +43,7 @@ public:
 	~Joystick();
 
 	virtual void Update(SDL_Event& e);
+	virtual void Shutdown();
 
 	//GETTERS
 
@@ -87,18 +87,21 @@ public:
 	~GameController();
 
 	void Update(SDL_Event& e) override;
+	void Shutdown() override;
 
 	inline SDL_GameController* GetGameController() { return gameController; }
+	inline SDL_Joystick* GetGameControllerJoystick() { SDL_GameControllerGetJoystick(gameController); }
+
 	void RebindButton();
 };
 
-class Input
+class Input : public EventSystem
 {	
 	//Make private for singleton
 	Input();
 	~Input();
 
-	std::vector<Joystick> joysticks;
+	std::vector<Joystick*> joysticks;
 
 	//Map is a dictionary that has a key and a value
 	//Current key state
@@ -112,7 +115,6 @@ class Input
 
 	static Input* instance;
 
-	int evenFlag;
 
 	//Mouse motion
 	int mouseMotionX;
@@ -124,18 +126,22 @@ class Input
 	unsigned int clicks;
 
 	bool requestedQuit;
+
+	int eventFlags;
 public:
+
 	//Get instance for singleton
 	static Input* GetInstance();
 
 	bool Init();
-	void Update(SDL_Event& e);
-	void Render();
+	void Update(SDL_Event& e) override;
 	bool Shutdown();
 	//SystemType getSystemType();
 	bool QuitRequested() { return requestedQuit; }
 
-	Joystick* GetJoystick(unsigned int which);
+	//Joystick* GetJoystick(unsigned int which);
+
+	inline std::vector<Joystick*> GetJoysticks() { return joysticks; }
 
 	//KEYBOARD=======================================================
 

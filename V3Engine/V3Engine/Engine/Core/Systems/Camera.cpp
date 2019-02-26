@@ -70,6 +70,14 @@ glm::mat4 Camera::GetOrtho(float left, float right, float bottom, float top, flo
 	return glm::ortho(left, right, bottom, top, near, far);
 }
 
+void Camera::Keyboard(float forward, float right, float deltaTime)
+{
+	float velocity = MovementSpeed * deltaTime;
+
+
+	Position += (Forward * forward * velocity) + (Right * right * velocity);
+}
+
 void Camera::Keyboard(CameraMovement direction, float deltaTime)
 {
 	float velocity = MovementSpeed * deltaTime;

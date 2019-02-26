@@ -3,6 +3,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
+#include <glew.h>
 #include <vector>
 
 class Cubemap {
@@ -27,10 +28,10 @@ class Texture
 public:
 	Texture(const char* filepath);
 	//For a specification of a texture
-	Texture(unsigned int width, unsigned int height, int format = 0x1907, int format2 = 0x1907, int tex = 0x0DE1, int type = 0x1406, int styleS = 0x2901, int styleT = 0x2901, int fminStyle = 0x2601, int fmaxStyle = 0x2601);
+	Texture(unsigned int width, unsigned int height, int format = GL_RGB, int format2 = GL_RGB, int tex = GL_TEXTURE_2D, int type = GL_FLOAT, int styleS = GL_REPEAT, int styleT = GL_REPEAT, int fminStyle = GL_LINEAR, int fmaxStyle = GL_LINEAR);
 	~Texture();
 
-	void Use(unsigned int type = 0x0DE1);
+	void Use(unsigned int type = GL_TEXTURE_2D);
 
 	inline unsigned int ID() { return textureID; }
 	bool Init();

@@ -4,11 +4,11 @@
 #include <memory>
 #include <stdio.h>
 #include <SDL.h>
+
 class V3Engine {
 private:
 	V3Engine();
 	~V3Engine();
-	class Input* engineInput;
 	class Window* engineWindow;
 
 	static std::unique_ptr<V3Engine> engineInstance;
@@ -23,6 +23,11 @@ public:
 
 	static V3Engine* GetInstance();
 	void speak();
+
+	bool Init();
+	void Update();
+	void Render();
+	bool Shutdown(); 
 };
 
 #endif // ! V3ENGINE_H

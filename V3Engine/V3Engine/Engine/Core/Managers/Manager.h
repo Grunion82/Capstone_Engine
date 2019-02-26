@@ -5,14 +5,14 @@ template <class T>
 class Manager {
 	static T* instance;
 protected:
-	Manager();
+	Manager() {}
 	virtual ~Manager() {
 		instance = nullptr;
 		delete instance;
 	}
+
 	virtual void Update() = 0;
 public:
-
 	Manager(const Manager&) = delete;
 	Manager(Manager&&) = delete;
 

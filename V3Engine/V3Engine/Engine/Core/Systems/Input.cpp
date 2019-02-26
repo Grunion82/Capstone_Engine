@@ -54,35 +54,15 @@ bool Input::Init() {
 				{
 				//Unknown - assume joystick
 				case(0):
-					joysticks.push_back(Joystick(j, 8000, 8000));
+					joysticks.push_back(new Joystick(j, 8000, 8000));
 					break;
 				//Game controller
 				case(1):
-					joysticks.push_back(GameController(j, 8000, 8000));
+					joysticks.push_back(new GameController(j, 8000, 8000));
 					//SDL_JoystickClose(j);
-
 					break;
 				default:
 					break;
-				}
-
-				//Check if joysticks are pointing in a direction
-				Sint16 state;
-				for (unsigned int a = 0; a < SDL_JoystickNumAxes(j); a++) {
-					//If there is a change for joystick during init
-					if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
-						joysticks.at(i).joyAxis[a] = state;
-
-						if (state > 0) {
-							joysticks.at(i).joyAxisDir[a] = 1;
-						}
-						else if (state < 0) {
-							joysticks.at(i).joyAxisDir[a] = -1;
-						}
-						else {
-							joysticks.at(i).joyAxisDir[a] = 0;
-						}
-					}
 				}
 			}
 			else {
@@ -93,43 +73,43 @@ bool Input::Init() {
 			std::cout << std::endl;
 		}
 	}
+	
+	eventFlags = SDL_KEYUP | SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP | SDL_MOUSEWHEEL;
 
 	return true;
 }
 void Input::Update(SDL_Event& e) {
-	oldkeys = keys;
-	oldMouseButtons = mouseButtons;
+	if (e.type | eventFlags) {
+		oldkeys = keys;
+		oldMouseButtons = mouseButtons;
 
-	for (unsigned int i = 0; i < joysticks.size(); i++){
-		joysticks.at(i).oldJoyButtons = joysticks.at(i).joyButtons;
-	}
+		mouseMotionX = 0;
+		mouseMotionY = 0;
+		mouseWheelY = 0;
 
-	mouseMotionX = 0;
-	mouseMotionY = 0;
-	mouseWheelY = 0;
+		clicks = 0;
 
-	while (SDL_PollEvent(&e) != 0) {
 		//Check for event type
 		switch (e.type) {
-		//KEYBOARD========================
-		//Is key down
+			//KEYBOARD========================
+			//Is key down
 		case(SDL_KEYDOWN):
 			//Check for key
 			//oldkeys = keys;
 			keys[e.key.keysym.sym] = true;
 			break;
-		//Is key up
+			//Is key up
 		case(SDL_KEYUP):
 			//oldkeys = keys;
 			keys[e.key.keysym.sym] = false;
 			break;
-		//MOUSE==============================
-		//For mouse movement
+			//MOUSE==============================
+			//For mouse movement
 		case(SDL_MOUSEMOTION):
 			mouseMotionX = e.motion.xrel;
 			mouseMotionY = e.motion.yrel;
 			break;
-		//For mouse button down
+			//For mouse button down
 		case(SDL_MOUSEBUTTONDOWN):
 			//1 - Left click
 			//2 - Middle click
@@ -143,182 +123,24 @@ void Input::Update(SDL_Event& e) {
 		case(SDL_MOUSEBUTTONUP):
 			mouseButtons[e.button.button] = false;
 			break;
-		//For mouse wheel
+			//For mouse wheel
 		case(SDL_MOUSEWHEEL):
 			mouseWheelY = e.wheel.y;
 			break;
-		//JOYSTICK=================================
-		//For controller axis
-		case(SDL_JOYAXISMOTION):
-			if (joysticks.at(e.jaxis.which).GetType() != SDL_JOYSTICK_TYPE_GAMECONTROLLER) {
-				//Value for axis ranges form -32768 to 32767
-				//Set axis values
-				joysticks.at(e.jaxis.which).joyAxis[e.jaxis.axis] = e.jaxis.value;
+		}
 
-				if (e.jaxis.value > 0) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.jaxis.axis] = 1;
-				}
-				else if (e.jaxis.value < 0) {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.jaxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.jaxis.which).joyAxisDir[e.jaxis.axis] = 0;
-				}
-			}
-			break;
-		case(SDL_JOYBUTTONDOWN):
-			if (joysticks.at(e.jbutton.which).GetType() != SDL_JOYSTICK_TYPE_GAMECONTROLLER) {
-				joysticks.at(e.jbutton.which).joyButtons[e.jbutton.button] = true;
-			}
-			break;
-		case(SDL_JOYBUTTONUP):
-			if (joysticks.at(e.jbutton.which).GetType() != SDL_JOYSTICK_TYPE_GAMECONTROLLER) {
-				joysticks.at(e.jbutton.which).joyButtons[e.jbutton.button] = false;
-			}
-			break;
-
-		//CONTROLLER=============================================
-		case(SDL_CONTROLLERAXISMOTION):
-			joysticks.at(e.caxis.which).joyAxis[e.caxis.axis] = e.caxis.value;
-
-			switch (e.caxis.axis)
-			{
-			//Left X axis
-			case(SDL_CONTROLLER_AXIS_LEFTX):
-				if (e.jaxis.value > joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
-				}
-				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
-				}
-				break;
-			//Left Y axis
-			case(SDL_CONTROLLER_AXIS_LEFTY):
-				if (e.jaxis.value > joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
-				}
-				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetLeftStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
-				}
-				break;
-			//Right X axis
-			case(SDL_CONTROLLER_AXIS_RIGHTX):
-				if (e.jaxis.value > joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
-				}
-				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
-				}
-				break;				 
-			//Right Y axis			 
-			case(SDL_CONTROLLER_AXIS_RIGHTY):
-				if (e.jaxis.value > joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
-				}
-				else if (e.jaxis.value < -joysticks.at(e.caxis.which).GetRightStickDeadZone()) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
-				}
-				break;
-			//Left trigger
-			case(SDL_CONTROLLER_AXIS_TRIGGERLEFT):
-				if (e.jaxis.value > 0) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
-				}
-				else if (e.jaxis.value < 0) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
-				}
-				break;
-			//Right trigger
-			case(SDL_CONTROLLER_AXIS_TRIGGERRIGHT):
-				if (e.jaxis.value > 0) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 1;
-				}
-				else if (e.jaxis.value < 0) {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = -1;
-				}
-				else {
-					joysticks.at(e.caxis.which).joyAxisDir[e.caxis.axis] = 0;
-				}
-				break;
-			}
-			break;
-		case(SDL_CONTROLLERBUTTONDOWN):
-			joysticks.at(e.cbutton.which).joyButtons[e.cbutton.button] = true;
-			break;
-		case(SDL_CONTROLLERBUTTONUP):
-			joysticks.at(e.cbutton.which).joyButtons[e.cbutton.button] = false;
-			break;
-		//For joy hat motion
-		/*
-		case(SDL_JOYHATMOTION):
-			std::cout << e.jhat.hat << std::endl;
-			switch (e.jhat.value) {
-				case(SDL_HAT_CENTERED):
-				break;
-				case(SDL_HAT_UP):
-				break;
-				case(SDL_HAT_RIGHT):
-				break;
-				case(SDL_HAT_DOWN):
-				break;
-				case(SDL_HAT_LEFT):
-				break;
-				case(SDL_HAT_RIGHTUP):
-				break;
-				case(SDL_HAT_RIGHTDOWN):
-				break;
-				case(SDL_HAT_LEFTUP):
-				break;
-				case(SDL_HAT_LEFTDOWN):
-				break;
-			}
-			break;*/
-		//Is quit
-		case(SDL_QUIT):
-			requestedQuit = true;
-			break;
+		for (unsigned int i = 0; i < joysticks.size(); i++) {
+			joysticks[i]->Update(e);
 		}
 	}
-}
-
-void Input::Render(){
 }
 
 bool Input::Shutdown() {
 	//Close if open
 	if (joysticks.size() > 0) {
 		for (unsigned int i = 0; i < joysticks.size(); i++) {
-			SDL_Joystick* joy = joysticks.at(i).GetJoyStick();
-			if (SDL_JoystickGetAttached(joy)) {
-				SDL_JoystickClose(joy);
-			}
-
-			if (SDL_JoystickGetAttached(joy)) {
-				std::cout << "Joy: " << i << " still acitve" << std::endl;
-			}
-
-			joysticks.at(i).joyButtons.clear();
-
-			joysticks.at(i).oldJoyButtons.clear();
-
-			joysticks.at(i).joyAxis.clear();
-
-			joysticks.at(i).joyAxisDir.clear();
+			joysticks[i]->Shutdown();
+			joysticks[i] = nullptr;
 		}
 		joysticks.clear();
 		joysticks.shrink_to_fit();
@@ -451,6 +273,27 @@ Joystick::Joystick(SDL_Joystick * j,int left_stick_sensitivity,int right_stick_s
 	std::cout << "Number of balls: " << SDL_JoystickNumBalls(j) << std::endl;
 	std::cout << "Vendor: " << SDL_JoystickGetVendor(j) << std::endl;
 	std::cout << "Product: " << SDL_JoystickGetProduct(j) << std::endl;
+	
+	eventFlags = SDL_JOYAXISMOTION | SDL_JOYBUTTONDOWN | SDL_JOYBUTTONUP;
+
+	//Check if joysticks are pointing in a direction
+	Sint16 state;
+	for (int a = 0; a < SDL_JoystickNumAxes(j); a++) {
+		//If there is a change for joystick during init
+		if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
+			joyAxis[a] = state;
+
+			if (state > 0) {
+				joyAxisDir[a] = 1;
+			}
+			else if (state < 0) {
+				joyAxisDir[a] = -1;
+			}
+			else {
+				joyAxisDir[a] = 0;
+			}
+		}
+	}
 }
 
 Joystick::~Joystick() {
@@ -458,38 +301,60 @@ Joystick::~Joystick() {
 
 void Joystick::Update(SDL_Event & e)
 {
-	switch (e.type) {
-	case(SDL_JOYAXISMOTION):
-		//Value for axis ranges form -32768 to 32767
-		//Set axis values
-		joyAxis[e.jaxis.axis] = e.jaxis.value;
+	if (e.type | eventFlags && e.jdevice.which == id) {
+		oldJoyButtons = joyButtons;
 
-		if (e.jaxis.value > 0) {
-			joyAxisDir[e.jaxis.axis] = 1;
+		switch (e.type) {
+		case(SDL_JOYAXISMOTION):
+			//Value for axis ranges form -32768 to 32767
+			//Set axis values
+			joyAxis[e.jaxis.axis] = e.jaxis.value;
+
+			if (e.jaxis.value > 0) {
+				joyAxisDir[e.jaxis.axis] = 1;
+			}
+			else if (e.jaxis.value < 0) {
+				joyAxisDir[e.jaxis.axis] = -1;
+			}
+			else {
+				joyAxisDir[e.jaxis.axis] = 0;
+			}
+			break;
+		case(SDL_JOYBUTTONDOWN):
+			joyButtons[e.jbutton.button] = true;
+			break;
+		case(SDL_JOYBUTTONUP):
+			joyButtons[e.jbutton.button] = false;
+			break;
 		}
-		else if (e.jaxis.value < 0) {
-			joyAxisDir[e.jaxis.axis] = -1;
-		}
-		else {
-			joyAxisDir[e.jaxis.axis] = 0;
-		}
-		break;
-	case(SDL_JOYBUTTONDOWN):
-		joyButtons[e.jbutton.button] = true;
-		break;
-	case(SDL_JOYBUTTONUP):
-		joyButtons[e.jbutton.button] = false;
-		break;
 	}
 }
 
-Joystick* Input::GetJoystick(unsigned int which)
+void Joystick::Shutdown()
 {
-	if (&joysticks[which]) {
-		return &joysticks[which];
+	SDL_JoystickClose(joy);
+
+	if(SDL_JoystickGetAttached(joy)){
+		std::cout << "Joy " << id << " still active!" << std::endl;
 	}
-	return nullptr;
+	else {
+		joy = nullptr;
+	}
+
+	joyButtons.clear();
+	oldJoyButtons.clear();
+
+	joyAxis.clear();
+	joyAxisDir.clear();
 }
+
+//Joystick* Input::GetJoystick(unsigned int which)
+//{
+//	if (&joysticks[which]) {
+//		return &joysticks[which];
+//	}
+//	return nullptr;
+//}
 
 bool Joystick::IsJoyStickButtonDown(unsigned int key)
 {
@@ -544,12 +409,97 @@ bool Joystick::WasJoyStickButtonReleased(unsigned int key)
 
 //GAMECONTROLLER==========================================================================
 
-GameController::GameController(SDL_Joystick * j, int left_stick_dead_zone, int right_stick_dead_zone) : Joystick(j,left_stick_dead_zone,right_stick_dead_zone), gameController(SDL_GameControllerOpen(SDL_JoystickInstanceID(j)))
+GameController::GameController(SDL_Joystick * j, int left_stick_dead_zone, int right_stick_dead_zone) : Joystick(j, left_stick_dead_zone, right_stick_dead_zone), gameController(SDL_GameControllerOpen(SDL_JoystickInstanceID(j)))
 {
 	if (mapping == nullptr) {
 		mapping = SDL_GameControllerMapping(gameController);
 	}
-	SDL_JoystickClose(j);
+
+	//SDL_JoystickClose(j);
+	eventFlags = SDL_CONTROLLERAXISMOTION | SDL_CONTROLLER_AXIS_LEFTX | SDL_CONTROLLER_AXIS_LEFTY | SDL_CONTROLLER_AXIS_RIGHTX | SDL_CONTROLLER_AXIS_RIGHTY | SDL_CONTROLLER_AXIS_TRIGGERLEFT | SDL_CONTROLLER_AXIS_TRIGGERRIGHT | SDL_CONTROLLERBUTTONDOWN | SDL_CONTROLLERBUTTONUP;
+
+	//Check if joysticks are pointing in a direction
+	Sint16 state;
+	for (int a = 0; a < SDL_JoystickNumAxes(j); a++) {
+		if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
+			//If there is a change for joystick during init
+			switch (a)
+			{
+				//Left X axis
+			case(SDL_CONTROLLER_AXIS_LEFTX):
+				if (state > left_stick_dead_zone) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < -left_stick_dead_zone) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
+				break;
+				//Left Y axis
+			case(SDL_CONTROLLER_AXIS_LEFTY):
+				if (state > left_stick_dead_zone) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < -left_stick_dead_zone) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
+				break;
+				//Right X axis
+			case(SDL_CONTROLLER_AXIS_RIGHTX):
+				if (state > right_stick_dead_zone) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < -right_stick_dead_zone) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
+				break;
+				//Right Y axis			 
+			case(SDL_CONTROLLER_AXIS_RIGHTY):
+				if (state > right_stick_dead_zone) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < -right_stick_dead_zone) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
+				break;
+				//Left trigger
+			case(SDL_CONTROLLER_AXIS_TRIGGERLEFT):
+				if (state > 0) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < 0) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
+				break;
+				//Right trigger
+			case(SDL_CONTROLLER_AXIS_TRIGGERRIGHT):
+				if (state > 0) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < 0) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
+				break;
+			}
+		}
+	}
 }
 
 GameController::~GameController()
@@ -558,78 +508,82 @@ GameController::~GameController()
 
 void GameController::Update(SDL_Event & e)
 {
-	switch(e.type){
+	if (e.type | eventFlags && e.cdevice.which == id) {
+		switch (e.type) {
+			oldJoyButtons = joyButtons;
+
 		case(SDL_CONTROLLERAXISMOTION):
+			std::cout << "Axis " << e.caxis.axis << std::endl;
 			joyAxis[e.caxis.axis] = e.caxis.value;
 
 			switch (e.caxis.axis)
 			{
-			//Left X axis
+				//Left X axis
 			case(SDL_CONTROLLER_AXIS_LEFTX):
-				if (e.jaxis.value > GetLeftStickDeadZone()) {
+				if (e.caxis.value > left_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = 1;
 				}
-				else if (e.jaxis.value < -GetLeftStickDeadZone()) {
+				else if (e.caxis.value < -left_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
 					joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
-			//Left Y axis
+				//Left Y axis
 			case(SDL_CONTROLLER_AXIS_LEFTY):
-				if (e.jaxis.value > GetLeftStickDeadZone()) {
+				if (e.caxis.value > left_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = 1;
 				}
-				else if (e.jaxis.value < -GetLeftStickDeadZone()) {
+				else if (e.caxis.value < -left_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
 					joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
-			//Right X axis
+				//Right X axis
 			case(SDL_CONTROLLER_AXIS_RIGHTX):
-				if (e.jaxis.value > GetRightStickDeadZone()) {
+				if (e.caxis.value > right_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = 1;
 				}
-				else if (e.jaxis.value < -GetRightStickDeadZone()) {
+				else if (e.caxis.value < -right_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
 					joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
-			//Right Y axis			 
+				//Right Y axis			 
 			case(SDL_CONTROLLER_AXIS_RIGHTY):
-				if (e.jaxis.value > GetRightStickDeadZone()) {
+				if (e.caxis.value > right_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = 1;
 				}
-				else if (e.jaxis.value < -GetRightStickDeadZone()) {
+				else if (e.caxis.value < -right_stick_dead_zone) {
 					joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
 					joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
-			//Left trigger
+				//Left trigger
 			case(SDL_CONTROLLER_AXIS_TRIGGERLEFT):
-				if (e.jaxis.value > 0) {
+				if (e.caxis.value > 0) {
 					joyAxisDir[e.caxis.axis] = 1;
 				}
-				else if (e.jaxis.value < 0) {
+				else if (e.caxis.value < 0) {
 					joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
 					joyAxisDir[e.caxis.axis] = 0;
 				}
 				break;
-			//Right trigger
+				//Right trigger
 			case(SDL_CONTROLLER_AXIS_TRIGGERRIGHT):
-				if (e.jaxis.value > 0) {
+				if (e.caxis.value > 0) {
 					joyAxisDir[e.caxis.axis] = 1;
 				}
-				else if (e.jaxis.value < 0) {
+				else if (e.caxis.value < 0) {
 					joyAxisDir[e.caxis.axis] = -1;
 				}
 				else {
@@ -640,14 +594,34 @@ void GameController::Update(SDL_Event & e)
 			break;
 		case(SDL_CONTROLLERBUTTONDOWN):
 			joyButtons[e.cbutton.button] = true;
+			std::cout << "Button: " << e.cbutton.button << std::endl;
 			break;
 		case(SDL_CONTROLLERBUTTONUP):
 			joyButtons[e.cbutton.button] = false;
 			break;
+		}
 	}
+}
+
+void GameController::Shutdown() 
+{
+	SDL_GameControllerClose(gameController);
+
+	if (SDL_GameControllerGetAttached(gameController)) {
+		std::cout << "Game controller " << id << " still active!" << std::endl;
+	}
+	else {
+		gameController = nullptr;
+	}
+
+	joyButtons.clear();
+	oldJoyButtons.clear();
+
+	joyAxis.clear();
+	joyAxisDir.clear();
 }
 
 void GameController::RebindButton()
 {
-
+	
 }

@@ -56,6 +56,7 @@ public:
 	Camera(glm::vec3 pos,glm::vec3 forward,glm::vec3 up,glm::vec3 right,glm::vec3 worldup,float yaw,float pitch,float movespeed,float sensitivity,float c_sensitivity,float fov, Window* w,float near, float far);
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, float yaw, float pitch, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
+	void Keyboard(float forward, float right, float deltaTime);
 	void Keyboard(CameraMovement direction, float deltaTime);
 	void Controller(float xvalue,float zvalue, float xoffset, float yoffset, float deltaTime, bool constrainPitch = true);
 	void MouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
