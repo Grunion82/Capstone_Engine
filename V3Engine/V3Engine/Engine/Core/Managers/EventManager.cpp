@@ -13,6 +13,8 @@ EventManager::~EventManager()
 
 void EventManager::Update()
 {
+	Input::GetInstance()->Update();
+
 	SDL_Event e;
 
 	while (SDL_PollEvent(&e) != 0) {

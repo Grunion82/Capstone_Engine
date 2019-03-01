@@ -237,6 +237,7 @@ void V3Engine::speak() {
 		}*/
 
 		c->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer.GetDeltaTime());
+
 		c->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 		//c.Controller(Input::GetInstance()->GetJoystick(0)->joyAxisDir[SDL_CONTROLLER_AXIS_LEFTX], Input::GetInstance()->GetJoystick(0)->joyAxisDir[SDL_CONTROLLER_AXIS_LEFTY], Input::GetInstance()->GetJoystick(0)->joyAxisDir[SDL_CONTROLLER_AXIS_RIGHTX], Input::GetInstance()->GetJoystick(0)->joyAxisDir[SDL_CONTROLLER_AXIS_RIGHTY], timer.GetDeltaTime());
 

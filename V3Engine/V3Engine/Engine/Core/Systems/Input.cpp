@@ -78,17 +78,19 @@ bool Input::Init() {
 
 	return true;
 }
+void Input::Update()
+{
+	oldkeys = keys;
+	oldMouseButtons = mouseButtons;
+
+	mouseMotionX = 0;
+	mouseMotionY = 0;
+	mouseWheelY = 0;
+
+	clicks = 0;
+}
 void Input::Update(SDL_Event& e) {
 	if (e.type | eventFlags) {
-		oldkeys = keys;
-		oldMouseButtons = mouseButtons;
-
-		mouseMotionX = 0;
-		mouseMotionY = 0;
-		mouseWheelY = 0;
-
-		clicks = 0;
-
 		//Check for event type
 		switch (e.type) {
 			//KEYBOARD========================

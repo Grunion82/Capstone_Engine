@@ -134,6 +134,8 @@ public:
 	static Input* GetInstance();
 
 	bool Init();
+	//"Reset" values
+	void Update();
 	void Update(SDL_Event& e) override;
 	bool Shutdown();
 	//SystemType getSystemType();
