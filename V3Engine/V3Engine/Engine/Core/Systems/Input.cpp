@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <string>
+
 Input* Input::instance;
 
 Input::Input() : requestedQuit(false)
@@ -31,6 +33,8 @@ bool Input::Init() {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
 	if (SDL_NumJoysticks() > 0) {
+		std::cout << "Number of mapping: " << SDL_GameControllerNumMappings() << std::endl;
+		std::wcout << std::endl;
 		joysticks.reserve(SDL_NumJoysticks());
 		//Check for joysticks
 		for (int i = 0; i < SDL_NumJoysticks(); i++) {
@@ -43,38 +47,32 @@ bool Input::Init() {
 			std::cout << "Name: " << SDL_JoystickNameForIndex(i) << std::endl;
 			std::cout << "Id: " << SDL_JoystickGetDeviceInstanceID(i) << std::endl;
 			std::cout << "Type: " << SDL_JoystickGetDeviceType(i) << std::endl;
-			std::cout << "Number of mapping: " << SDL_GameControllerNumMappings() << std::endl;
 
 			int type = SDL_JoystickGetDeviceType(i);
 
-			SDL_Joystick* j = SDL_JoystickOpen(i);
+			void* j;
 
-			if (j) {
-				switch (type)
-				{
-				//Unknown - assume joystick
-				case(0):
-					joysticks.push_back(new Joystick(j, 8000, 8000));
-					break;
-				//Game controller
-				case(1):
-					joysticks.push_back(new GameController(j, 8000, 8000));
-					//SDL_JoystickClose(j);
-					break;
-				default:
-					break;
-				}
-			}
-			else {
-				std::cout << "Failed to open " << i << std::endl;
-				std::cout << SDL_GetError() << std::endl;
+			switch (type)
+			{
+			//Unknown - assume joystick
+			case(0):
+				j = SDL_JoystickOpen(i);
+				joysticks.push_back(new Joystick((SDL_Joystick*)j));
+				break;
+			//Game controller
+			case(1):
+				j = SDL_GameControllerOpen(i);
+				joysticks.push_back(new GameController((SDL_GameController*)j, 8000, 8000));
+				break;
+			default:
+				break;
 			}
 
 			std::cout << std::endl;
 		}
 	}
 	
-	eventFlags = SDL_KEYUP | SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP | SDL_MOUSEWHEEL;
+	eventFlags = SDL_KEYDOWN | SDL_KEYUP | SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP | SDL_MOUSEWHEEL | SDL_TEXTINPUT;
 
 	return true;
 }
@@ -90,7 +88,7 @@ void Input::Update()
 	clicks = 0;
 }
 void Input::Update(SDL_Event& e) {
-	if (e.type | eventFlags) {
+	if ((e.type & eventFlags) == e.type) {
 		//Check for event type
 		switch (e.type) {
 			//KEYBOARD========================
@@ -265,34 +263,40 @@ bool Input::WasMouseButtonReleased(unsigned int key)
 
 //JOYSTICK=========================================================
 
-Joystick::Joystick(SDL_Joystick * j,int left_stick_sensitivity,int right_stick_sensitivity) : joy(j),id(SDL_JoystickInstanceID(j)), hats(SDL_JoystickNumHats(j)), axes(SDL_JoystickNumAxes(j)),
-																							  left_stick_dead_zone(left_stick_sensitivity),right_stick_dead_zone(right_stick_sensitivity),
-																							  buttons(SDL_JoystickNumButtons(j)),balls(SDL_JoystickNumBalls(j)), type(SDL_JoystickGetType(j))
+Joystick::Joystick()
 {
-	std::cout << "Number of hats: " << SDL_JoystickNumHats(j) << std::endl;
-	std::cout << "Number of axes: " << SDL_JoystickNumAxes(j) << std::endl;
-	std::cout << "Number of buttons: " << SDL_JoystickNumButtons(j) << std::endl;
-	std::cout << "Number of balls: " << SDL_JoystickNumBalls(j) << std::endl;
+}
+
+Joystick::Joystick(SDL_Joystick * j) : joy(j),id(SDL_JoystickInstanceID(j)), hats(SDL_JoystickNumHats(j)), axes(SDL_JoystickNumAxes(j)),
+								       buttons(SDL_JoystickNumButtons(j)),balls(SDL_JoystickNumBalls(j)), type(SDL_JoystickGetType(j))
+{
+	std::cout << "Number of hats: " << hats << std::endl;
+	std::cout << "Number of axes: " << axes << std::endl;
+	std::cout << "Number of buttons: " << buttons << std::endl;
+	std::cout << "Number of balls: " << balls << std::endl;
 	std::cout << "Vendor: " << SDL_JoystickGetVendor(j) << std::endl;
 	std::cout << "Product: " << SDL_JoystickGetProduct(j) << std::endl;
 	
-	eventFlags = SDL_JOYAXISMOTION | SDL_JOYBUTTONDOWN | SDL_JOYBUTTONUP;
+	if (type == SDL_JOYSTICK_POWER_UNKNOWN) {
 
-	//Check if joysticks are pointing in a direction
-	Sint16 state;
-	for (int a = 0; a < SDL_JoystickNumAxes(j); a++) {
-		//If there is a change for joystick during init
-		if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
-			joyAxis[a] = state;
+		eventFlags = SDL_JOYAXISMOTION | SDL_JOYBUTTONDOWN | SDL_JOYBUTTONUP | SDL_JOYDEVICEADDED | SDL_JOYDEVICEREMOVED;
 
-			if (state > 0) {
-				joyAxisDir[a] = 1;
-			}
-			else if (state < 0) {
-				joyAxisDir[a] = -1;
-			}
-			else {
-				joyAxisDir[a] = 0;
+		//Check if joysticks are pointing in a direction
+		Sint16 state;
+		for (int a = 0; a < SDL_JoystickNumAxes(j); a++) {
+			//If there is a change for joystick during init
+			if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
+				joyAxis[a] = state;
+
+				if (state > 0) {
+					joyAxisDir[a] = 1;
+				}
+				else if (state < 0) {
+					joyAxisDir[a] = -1;
+				}
+				else {
+					joyAxisDir[a] = 0;
+				}
 			}
 		}
 	}
@@ -301,10 +305,39 @@ Joystick::Joystick(SDL_Joystick * j,int left_stick_sensitivity,int right_stick_s
 Joystick::~Joystick() {
 }
 
+void Joystick::Update(SDL_Event& e)
+{
+	//SDL_JoystickUpdate();
+	oldJoyButtons = joyButtons;
+	if ((e.type & eventFlags) == e.type && e.jdevice.which == id) {
+		for (unsigned int i = 0; i < axes; i++) {
+			joyAxis[i] = SDL_JoystickGetAxis(joy, i);
+
+			if (joyAxis[i] > 0) {
+				joyAxisDir[i] = 1;
+			}
+			else if (joyAxis[i] < 0) {
+				joyAxisDir[i] = -1;
+			}
+			else {
+				joyAxisDir[i] = 0;
+			}
+		}
+
+		for (unsigned int i = 0; i < buttons; i++) {
+			joyButtons[i] = SDL_JoystickGetButton(joy, i);
+		}
+	}
+
+}
+
+//Event based update
+/*
 void Joystick::Update(SDL_Event & e)
 {
-	if (e.type | eventFlags && e.jdevice.which == id) {
-		oldJoyButtons = joyButtons;
+	oldJoyButtons = joyButtons;
+
+	if ((e.type & eventFlags) == e.type && e.jdevice.which == id) {
 
 		switch (e.type) {
 		case(SDL_JOYAXISMOTION):
@@ -330,7 +363,7 @@ void Joystick::Update(SDL_Event & e)
 			break;
 		}
 	}
-}
+}*/
 
 void Joystick::Shutdown()
 {
@@ -358,52 +391,52 @@ void Joystick::Shutdown()
 //	return nullptr;
 //}
 
-bool Joystick::IsJoyStickButtonDown(unsigned int key)
+bool Joystick::IsButtonDown(unsigned int button)
 {
-	auto it = joyButtons.find(key);
+	auto it = joyButtons.find(button);
 
 	if (it != joyButtons.end()) {
 		//Returns true or false based on the state of the map
-		return joyButtons[key];
+		return joyButtons[button];
 	}
 
 	//The button has never been pressed
 	return false;
 }
 
-bool Joystick::IsJoyStickButtonUp(unsigned int key)
+bool Joystick::IsButtonUp(unsigned int button)
 {
-	auto it = joyButtons.find(key);
+	auto it = joyButtons.find(button);
 
 	if (it != joyButtons.end()) {
-		return !joyButtons[key];
+		return !joyButtons[button];
 	}
 
 	//Button has never been pressed
 	return true;
 }
 
-bool Joystick::WasJoyStickButtonPressed(unsigned int key)
+bool Joystick::WasButtonPressed(unsigned int button)
 {
-	auto it = oldJoyButtons.find(key);
+	auto it = oldJoyButtons.find(button);
 
 	//If button was in old array
 	if (it != oldJoyButtons.end()) {
 		//If false and if true
-		return !oldJoyButtons[key] && joyButtons[key];
+		return !oldJoyButtons[button] && joyButtons[button];
 	}
 
-	return joyButtons[key];
+	return joyButtons[button];
 }
 
-bool Joystick::WasJoyStickButtonReleased(unsigned int key)
+bool Joystick::WasButtonReleased(unsigned int button)
 {
-	auto it = oldJoyButtons.find(key);
+	auto it = oldJoyButtons.find(button);
 
 	//If button was in old array
 	if (it != oldJoyButtons.end()) {
 		//If true and if false
-		return oldJoyButtons[key] && !joyButtons[key];
+		return oldJoyButtons[button] && !joyButtons[button];
 	}
 
 	return false;
@@ -411,94 +444,51 @@ bool Joystick::WasJoyStickButtonReleased(unsigned int key)
 
 //GAMECONTROLLER==========================================================================
 
-GameController::GameController(SDL_Joystick * j, int left_stick_dead_zone, int right_stick_dead_zone) : Joystick(j, left_stick_dead_zone, right_stick_dead_zone), gameController(SDL_GameControllerOpen(SDL_JoystickInstanceID(j)))
+GameController::GameController(SDL_GameController* gc, int left_stick_dead_zone, int right_stick_dead_zone) : Joystick(SDL_GameControllerGetJoystick(gc)), gameController(gc), left_stick_dead_zone(left_stick_dead_zone), right_stick_dead_zone(right_stick_dead_zone), mapping(SDL_GameControllerMapping(gc))
 {
-	if (mapping == nullptr) {
-		mapping = SDL_GameControllerMapping(gameController);
-	}
+	eventFlags = SDL_CONTROLLERAXISMOTION | SDL_CONTROLLERBUTTONDOWN | SDL_CONTROLLERBUTTONUP | SDL_CONTROLLERDEVICEADDED | SDL_CONTROLLERDEVICEREMOVED;
 
-	//SDL_JoystickClose(j);
-	eventFlags = SDL_CONTROLLERAXISMOTION | SDL_CONTROLLER_AXIS_LEFTX | SDL_CONTROLLER_AXIS_LEFTY | SDL_CONTROLLER_AXIS_RIGHTX | SDL_CONTROLLER_AXIS_RIGHTY | SDL_CONTROLLER_AXIS_TRIGGERLEFT | SDL_CONTROLLER_AXIS_TRIGGERRIGHT | SDL_CONTROLLERBUTTONDOWN | SDL_CONTROLLERBUTTONUP;
+	std::cout << mapping << std::endl;
 
 	//Check if joysticks are pointing in a direction
 	Sint16 state;
-	for (int a = 0; a < SDL_JoystickNumAxes(j); a++) {
-		if (SDL_JoystickGetAxisInitialState(j, a, &state)) {
+	for (int a = 0; a < SDL_JoystickNumAxes(joy); a++) {
+		if (SDL_JoystickGetAxisInitialState(joy, a, &state)) {
 			//If there is a change for joystick during init
-			switch (a)
-			{
-				//Left X axis
-			case(SDL_CONTROLLER_AXIS_LEFTX):
-				if (state > left_stick_dead_zone) {
+			joyAxis[a] = SDL_GameControllerGetAxis(gameController, (SDL_GameControllerAxis)a);
+
+			if (a == SDL_CONTROLLER_AXIS_LEFTX || a == SDL_CONTROLLER_AXIS_LEFTY) {
+				if (joyAxis[a] > 0 && joyAxis[a] > left_stick_dead_zone) {
 					joyAxisDir[a] = 1;
 				}
-				else if (state < -left_stick_dead_zone) {
+				else if (joyAxis[a] < 0 && joyAxis[a] < -left_stick_dead_zone) {
 					joyAxisDir[a] = -1;
 				}
 				else {
 					joyAxisDir[a] = 0;
 				}
-				break;
-				//Left Y axis
-			case(SDL_CONTROLLER_AXIS_LEFTY):
-				if (state > left_stick_dead_zone) {
+			}
+			else if (a == SDL_CONTROLLER_AXIS_RIGHTX || a == SDL_CONTROLLER_AXIS_RIGHTY) {
+				if (joyAxis[a] > 0 && joyAxis[a] > right_stick_dead_zone) {
 					joyAxisDir[a] = 1;
 				}
-				else if (state < -left_stick_dead_zone) {
+				else if (joyAxis[a] < 0 && joyAxis[a] < -right_stick_dead_zone) {
 					joyAxisDir[a] = -1;
 				}
 				else {
 					joyAxisDir[a] = 0;
 				}
-				break;
-				//Right X axis
-			case(SDL_CONTROLLER_AXIS_RIGHTX):
-				if (state > right_stick_dead_zone) {
+			}
+			else {
+				if (joyAxis[a] > 0) {
 					joyAxisDir[a] = 1;
 				}
-				else if (state < -right_stick_dead_zone) {
+				else if (joyAxis[a] < 0) {
 					joyAxisDir[a] = -1;
 				}
 				else {
 					joyAxisDir[a] = 0;
 				}
-				break;
-				//Right Y axis			 
-			case(SDL_CONTROLLER_AXIS_RIGHTY):
-				if (state > right_stick_dead_zone) {
-					joyAxisDir[a] = 1;
-				}
-				else if (state < -right_stick_dead_zone) {
-					joyAxisDir[a] = -1;
-				}
-				else {
-					joyAxisDir[a] = 0;
-				}
-				break;
-				//Left trigger
-			case(SDL_CONTROLLER_AXIS_TRIGGERLEFT):
-				if (state > 0) {
-					joyAxisDir[a] = 1;
-				}
-				else if (state < 0) {
-					joyAxisDir[a] = -1;
-				}
-				else {
-					joyAxisDir[a] = 0;
-				}
-				break;
-				//Right trigger
-			case(SDL_CONTROLLER_AXIS_TRIGGERRIGHT):
-				if (state > 0) {
-					joyAxisDir[a] = 1;
-				}
-				else if (state < 0) {
-					joyAxisDir[a] = -1;
-				}
-				else {
-					joyAxisDir[a] = 0;
-				}
-				break;
 			}
 		}
 	}
@@ -508,14 +498,65 @@ GameController::~GameController()
 {
 }
 
+void GameController::Update(SDL_Event& e)
+{
+	//SDL_GameControllerUpdate();
+	oldJoyButtons = joyButtons;
+	if ((e.type & eventFlags) == e.type && e.cdevice.which == id) {
+		for (unsigned int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
+			joyAxis[i] = SDL_GameControllerGetAxis(gameController, (SDL_GameControllerAxis)i);
+
+			if (i == SDL_CONTROLLER_AXIS_LEFTX || i == SDL_CONTROLLER_AXIS_LEFTY) {
+				if (joyAxis[i] > 0 && joyAxis[i] > left_stick_dead_zone) {
+					joyAxisDir[i] = 1;
+				}
+				else if (joyAxis[i] < 0 && joyAxis[i] < -left_stick_dead_zone) {
+					joyAxisDir[i] = -1;
+				}
+				else {
+					joyAxisDir[i] = 0;
+				}
+			}
+			else if (i == SDL_CONTROLLER_AXIS_RIGHTX || i == SDL_CONTROLLER_AXIS_RIGHTY) {
+				if (joyAxis[i] > 0 && joyAxis[i] > right_stick_dead_zone) {
+					joyAxisDir[i] = 1;
+				}
+				else if (joyAxis[i] < 0 && joyAxis[i] < -right_stick_dead_zone) {
+					joyAxisDir[i] = -1;
+				}
+				else {
+					joyAxisDir[i] = 0;
+				}
+			}
+			else {
+				if (joyAxis[i] > 0) {
+					joyAxisDir[i] = 1;
+				}
+				else if (joyAxis[i] < 0) {
+					joyAxisDir[i] = -1;
+				}
+				else {
+					joyAxisDir[i] = 0;
+				}
+			}
+		}
+
+		for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
+			joyButtons[i] = SDL_JoystickGetButton(joy, i);
+		}
+	}
+}
+
+//Event based update method
+/*
 void GameController::Update(SDL_Event & e)
 {
-	if (e.type | eventFlags && e.cdevice.which == id) {
-		switch (e.type) {
-			oldJoyButtons = joyButtons;
+	oldJoyButtons = joyButtons;
 
+	if ((e.type & eventFlags) == e.type && e.cdevice.which == id) {
+		switch (e.type) {
+		case(SDL_JOYAXISMOTION):
 		case(SDL_CONTROLLERAXISMOTION):
-			std::cout << "Axis " << e.caxis.axis << std::endl;
 			joyAxis[e.caxis.axis] = e.caxis.value;
 
 			switch (e.caxis.axis)
@@ -594,16 +635,17 @@ void GameController::Update(SDL_Event & e)
 				break;
 			}
 			break;
+		case(SDL_JOYBUTTONDOWN):
 		case(SDL_CONTROLLERBUTTONDOWN):
 			joyButtons[e.cbutton.button] = true;
-			std::cout << "Button: " << e.cbutton.button << std::endl;
 			break;
+		case(SDL_JOYBUTTONUP):
 		case(SDL_CONTROLLERBUTTONUP):
 			joyButtons[e.cbutton.button] = false;
 			break;
 		}
 	}
-}
+}*/
 
 void GameController::Shutdown() 
 {
@@ -621,6 +663,65 @@ void GameController::Shutdown()
 
 	joyAxis.clear();
 	joyAxisDir.clear();
+}
+
+bool GameController::IsButtonDown(unsigned int button)
+{
+	int b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)button).value.button;
+
+	auto it = joyButtons.find(b);
+
+	if (it != joyButtons.end()) {
+		//Returns true or false based on the state of the map
+		return joyButtons[b];
+	}
+
+	//The button has never been pressed
+	return false;
+}
+
+bool GameController::IsButtonUp(unsigned int button)
+{
+	int b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)button).value.button;
+
+	auto it = joyButtons.find(b);
+
+	if (it != joyButtons.end()) {
+		return !joyButtons[b];
+	}
+
+	//Button has never been pressed
+	return true;
+}
+
+bool GameController::WasButtonPressed(unsigned int button)
+{
+	int b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)button).value.button;
+
+	auto it = oldJoyButtons.find(b);
+
+	//If button was in old array
+	if (it != oldJoyButtons.end()) {
+		//If false and if true
+		return !oldJoyButtons[b] && joyButtons[b];
+	}
+
+	return joyButtons[b];
+}
+
+bool GameController::WasButtonReleased(unsigned int button)
+{
+	int b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)button).value.button;
+
+	auto it = oldJoyButtons.find(b);
+
+	//If button was in old array
+	if (it != oldJoyButtons.end()) {
+		//If true and if false
+		return oldJoyButtons[b] && !joyButtons[b];
+	}
+
+	return false;
 }
 
 void GameController::RebindButton()

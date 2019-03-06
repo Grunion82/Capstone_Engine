@@ -74,32 +74,7 @@ void Camera::Keyboard(float forward, float right, float deltaTime)
 {
 	float velocity = MovementSpeed * deltaTime;
 
-
 	Position += (Forward * forward * velocity) + (Right * right * velocity);
-}
-
-void Camera::Keyboard(CameraMovement direction, float deltaTime)
-{
-	float velocity = MovementSpeed * deltaTime;
-	switch (direction)
-	{
-	case CameraMovement::FORWARD:
-		Position += Forward * velocity;
-		break;
-	case CameraMovement::BACKWARD:
-		Position -= Forward * velocity;
-		break;
-	case CameraMovement::RIGHT:
-		Position += Right * velocity;
-		break;
-	case CameraMovement::LEFT:
-		Position -= Right * velocity;
-		break;
-	default:
-		break;
-	}
-
-	//Update();
 }
 
 void Camera::Controller(float xvalue, float zvalue, float xoffset, float yoffset, float deltaTime, bool constrainPitch)

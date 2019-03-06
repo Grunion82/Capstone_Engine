@@ -1,6 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+//Default values
+#define YAW -90.0f
+#define PITCH 0.0f
+#define ROLL 0.0f
+#define SPEED 2.5f
+#define MOUSE_SENSITIVITY 0.3f
+#define CONTROLLER_SENSITIVITY 1.5f
+#define FIELD_OF_VIEW 45.0f
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,26 +17,9 @@
 
 class Window;
 
-enum class CameraMovement : unsigned __int8 {
-	FORWARD = 0,
-	BACKWARD = 1,
-	RIGHT = 3,
-	LEFT = 4,
-	TOTAL
-};
-
 class Camera
 {
 	glm::mat4 cameraProjection = glm::mat4();
-
-	//Default values
-	const float YAW = -90.0f;
-	const float PITCH = 0.0f;
-	const float ROLL = 0.0f;
-	const float SPEED = 2.5f;
-	const float MOUSE_SENSITIVITY = 0.3f;
-	const float CONTROLLER_SENSITIVITY = 1.5f;
-	const float FIELD_OF_VIEW = 45.0f;
 
 	glm::vec3 Position;
 	glm::vec3 Forward;
@@ -57,7 +49,6 @@ public:
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, float yaw, float pitch, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
 	void Keyboard(float forward, float right, float deltaTime);
-	void Keyboard(CameraMovement direction, float deltaTime);
 	void Controller(float xvalue,float zvalue, float xoffset, float yoffset, float deltaTime, bool constrainPitch = true);
 	void MouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
 	void MouseScroll(float offset);

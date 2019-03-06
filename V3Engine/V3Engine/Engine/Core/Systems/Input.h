@@ -13,17 +13,16 @@ public:
 	//Joy axis value
 	std::map<unsigned int, int> joyAxis;
 	//For axis direciton
-	std::map<unsigned int, short> joyAxisDir;
+	std::map<unsigned int, __int8> joyAxisDir;
 	//Current joystick button state
 	std::map<unsigned int, bool> joyButtons;
 	//Old joystick button state
 	std::map<unsigned int, bool> oldJoyButtons;
 
-private:
+protected:
 	//The actual joystick
 	SDL_Joystick* joy;
 
-protected:
 	SDL_JoystickType type;
 	int id;
 	int hats;
@@ -32,23 +31,14 @@ protected:
 	int balls;
 	int eventFlags;
 
-	//Dead zone of the left stick
-	int left_stick_dead_zone = 8000;
-	//Dead zone of the right stick
-	int right_stick_dead_zone = 8000;
-
 public:
-
-	Joystick(SDL_Joystick* j, int left_stick_dead_zone, int right_stick_dead_zone);
+	Joystick();
+	Joystick(SDL_Joystick* j);
 	~Joystick();
 
+	//virtual void Update();
 	virtual void Update(SDL_Event& e);
 	virtual void Shutdown();
-
-	//GETTERS
-
-	inline int GetLeftStickDeadZone() { return left_stick_dead_zone; }
-	inline int GetRightStickDeadZone() { return right_stick_dead_zone; }
 
 	inline int GetID() { return id; }
 	inline int GetHats() { return hats; }
@@ -58,39 +48,60 @@ public:
 	inline SDL_JoystickType GetType() { return type; }
 	inline SDL_Joystick* GetJoyStick() { return joy; }
 
-	inline int GetAxisValue(unsigned int axis) { return joyAxis[axis]; }
-	inline int GetAxisDir(unsigned int axis) { return joyAxisDir[axis]; }
+	inline virtual int GetAxisValue(unsigned int axis) { return joyAxis[axis]; }
+	inline virtual int GetAxisDir(unsigned int axis) { return joyAxisDir[axis]; }
 
 	//JOYSTICK BUTTONS===============================================
 	//Check if button is down (Button down)
-	bool IsJoyStickButtonDown(unsigned int key);
+	virtual bool IsButtonDown(unsigned int button);
 	//Check if button is not down
-	bool IsJoyStickButtonUp(unsigned int key);
+	virtual bool IsButtonUp(unsigned int button);
 	//Check if button was pressed this frame (Button pressed)
-	bool WasJoyStickButtonPressed(unsigned int key);
+	virtual bool WasButtonPressed(unsigned int button);
 	//Check if button was released this frame
-	bool WasJoyStickButtonReleased(unsigned int key);
+	virtual bool WasButtonReleased(unsigned int button);
 
-	//SETTERS
-
-	void SetLeftStickDeadZone(unsigned int value) { left_stick_dead_zone = value; }
-	void SetRightStickDeadZone(unsigned int value) { right_stick_dead_zone = value; }
 };
 
 class GameController : public Joystick {
 	SDL_GameController* gameController;
+
 	char* mapping = nullptr;
 
+	//Dead zone of the left stick
+	int left_stick_dead_zone = 8000;
+	//Dead zone of the right stick
+	int right_stick_dead_zone = 8000;
+
 public:
-	GameController(SDL_Joystick* j, int left_stick_dead_zone, int right_stick_dead_zone);
+	GameController(SDL_GameController* gc, int left_stick_dead_zone, int right_stick_dead_zone);
 	//GameController(SDL_GameController* gc,int left_stick_dead_zone, int right_stick_dead_zone);
 	~GameController();
 
+	//void Update() override;
 	void Update(SDL_Event& e) override;
 	void Shutdown() override;
 
 	inline SDL_GameController* GetGameController() { return gameController; }
 	inline SDL_Joystick* GetGameControllerJoystick() { SDL_GameControllerGetJoystick(gameController); }
+
+	inline int GetLeftStickDeadZone() { return left_stick_dead_zone; }
+	inline int GetRightStickDeadZone() { return right_stick_dead_zone; }
+
+	void SetLeftStickDeadZone(unsigned int value) { left_stick_dead_zone = value; }
+	void SetRightStickDeadZone(unsigned int value) { right_stick_dead_zone = value; }
+
+	inline virtual int GetAxisValue(unsigned int axis) override { return joyAxis[axis]; }
+	inline virtual int GetAxisDir(unsigned int axis) override { return joyAxisDir[axis]; }
+
+	//Check if button is down (Button down)
+	bool IsButtonDown(unsigned int button) override;
+	//Check if button is not down
+	bool IsButtonUp(unsigned int button) override;
+	//Check if button was pressed this frame (Button pressed)
+	bool WasButtonPressed(unsigned int button) override;
+	//Check if button was released this frame
+	bool WasButtonReleased(unsigned int button) override;
 
 	void RebindButton();
 };
