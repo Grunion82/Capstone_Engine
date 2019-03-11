@@ -1,5 +1,5 @@
 #include "Window.h"
-//#include <SDL.h>
+#include <SDL.h>
 #include <glew.h>
 
 Window::Window(const char* name) : windowName(name), windowWidth(0), windowHeight(0) {
@@ -166,6 +166,7 @@ bool Window::Shutdown()
 
 bool Window::InitSDL() {
 	bool success = true;
+	SDL_SetHint("SDL_HINT_GAMECONTROLLERCONFIG", "1");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		success = false;
 	}

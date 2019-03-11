@@ -1,5 +1,6 @@
 #include "Graphic.h"
 #include <iostream>
+#include <SDL.h>
 #include "Shader/Shader.h"
 #include "2D/Image.h"
 #include "../Core/Systems/Window.h"
@@ -79,21 +80,21 @@ Graphic::~Graphic()
 {
 }
 
-bool Graphic::InitSDL() {
+/*bool Graphic::InitSDL() {
 	bool success = true;
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		success = false;
 	}
 
 	return success;
-}
+}*/
 
-bool Graphic::CloseSDL()
+/*bool Graphic::CloseSDL()
 {
 	SDL_Quit();
 
 	return true;
-}
+}*/
 
 bool Graphic::InitOpenGL()
 {
@@ -371,7 +372,6 @@ bool GBuffer::WindowChange(unsigned int width, unsigned int height)
 	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, width);
 	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_HEIGHT, height);
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbufferTextures[2]->ID(), 0);
-
 
 	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);

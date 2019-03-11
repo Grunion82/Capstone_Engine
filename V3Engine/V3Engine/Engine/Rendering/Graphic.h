@@ -80,8 +80,8 @@ private:
 
 	Graphic();
 	~Graphic();
-	bool InitSDL();
-	bool CloseSDL();
+	//bool InitSDL();
+	//bool CloseSDL();
 
 public:
 	static Graphic* GetInstance();

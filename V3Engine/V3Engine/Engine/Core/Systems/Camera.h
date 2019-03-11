@@ -32,9 +32,13 @@ class Camera
 	float Pitch;
 	float Roll;
 
+	//PROPERTIES THAT SHOULD BE MOVED SOMEWHERE ELSE
+	//===============================================
 	float MovementSpeed;
 	float MouseSensitivity;
 	float ControllerSensitivity;
+	//===============================================
+
 	float FOV;
 
 	//Options
@@ -42,15 +46,23 @@ class Camera
 	bool isPitchInvert = true;
 
 public:
+	//Generic camera with a perspective matrix
 	Camera(Window* window, float near = 0.1f, float far = 100.0f);
+	//Generic camera with an orthographic matrix
 	Camera(float left, float right, float bottom, float top, float near, float far);
-	~Camera();
+	//Camera with perspective matrix and more specific properties
 	Camera(glm::vec3 pos,glm::vec3 forward,glm::vec3 up,glm::vec3 right,glm::vec3 worldup,float yaw,float pitch,float movespeed,float sensitivity,float c_sensitivity,float fov, Window* w,float near, float far);
+	//Camera with orthographic matrix and more specific properties
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, float yaw, float pitch, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
+	~Camera();
+	//For keyboard input
 	void Keyboard(float forward, float right, float deltaTime);
+	//For controller input
 	void Controller(float xvalue,float zvalue, float xoffset, float yoffset, float deltaTime, bool constrainPitch = true);
+	//For rotation
 	void MouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
+	//For FOV mainpulation
 	void MouseScroll(float offset);
 
 	bool Init();
@@ -61,15 +73,20 @@ public:
 	void InvertYaw() { isYawInvert = isYawInvert ? false : true; }
 	void InvertPitch() { isPitchInvert = isPitchInvert ? false : true; }
 
-	//Getters
+	//GETTERS
+
 	inline glm::vec3 GetPosition() { return Position; }
+	//Get a perspective matrix based off this camera
 	glm::mat4 GetPerspective(Window& w, float near, float far);
+	//Get an orthographic matrix based off this camera
 	glm::mat4 GetOrtho(float left, float right, float bottom, float top);
+	//Get an orthographic matrix based off this camera
 	glm::mat4 GetOrtho(float left, float right, float bottom, float top, float near, float far);
 	inline glm::mat4 GetProjectionMatrix() { return cameraProjection; }
 	float GetFov() { return FOV; }
 
-	//Setters
+	//SETTERS
+
 	void SetSensitivity(float sensitivity) { MouseSensitivity = sensitivity; }
 	void SetFov(float fov) { FOV = fov; }
 	void Translate(glm::vec3 position) { Position = position; }

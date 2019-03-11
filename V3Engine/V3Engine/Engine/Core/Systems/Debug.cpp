@@ -8,7 +8,6 @@ void Debug::DebugInit() {
 	out.open("V3ENGINELOG.txt", std::ios::out);
 	out.close();
 	currentSev = MessageType::TYPE_INFO;
-
 }
 void Debug::SetSeverity(MessageType type_) {
 

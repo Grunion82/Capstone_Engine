@@ -1,4 +1,7 @@
 #include "V3Engine.h"
+
+#include <SDL.h>
+
 #include "Core/Managers/EventManager.h"
 #include "Core/Systems/Window.h"
 #include "Core/Systems/Input.h"
@@ -229,12 +232,15 @@ void V3Engine::speak() {
 		if (Input::GetInstance()->IsKeyDown(SDLK_d)) {
 			c->Keyboard(CameraMovement::RIGHT, timer.GetDeltaTime());
 			//printf("d\n");
-		}
+		}*/
 
 		if (Input::GetInstance()->WasKeyPressed(SDLK_p)) {
 			engineWindow->Fullscreen();
 			Graphic::GetInstance()->WindowChange(engineWindow);
-		}*/
+		}
+		if (Input::GetInstance()->WasKeyPressed(SDLK_k)) {
+			static_cast<GameController*>(Input::GetInstance()->GetJoystick(0))->RebindButton();
+		}
 
 		c->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer.GetDeltaTime());
 

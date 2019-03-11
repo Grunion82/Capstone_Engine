@@ -3,10 +3,16 @@
 
 class System {
 public:
-	System();
-	virtual ~System();
+	System() {
 
-	virtual void Update();
+	}
+	virtual ~System() {
+
+	}
+
+	virtual void Update() {
+
+	}
 };
 
 #endif // !SYSTEM_H

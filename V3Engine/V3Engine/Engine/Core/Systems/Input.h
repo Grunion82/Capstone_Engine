@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 
-class Joystick {
+class Joystick : public EventSystem {
 public:
 	//For axis
 	//Joy axis value
@@ -23,12 +23,24 @@ protected:
 	//The actual joystick
 	SDL_Joystick* joy;
 
+	//Properties of the joystick
+
+	//Type of joystick (ex.Game controller,Arcade pad)
 	SDL_JoystickType type;
+
+	//The name of the joystick
+	const char* joystickName;
+	//ID used to identify a joystick
 	int id;
+	//Number of hats
 	int hats;
+	//Numbder of axes
 	int axes;
+	//Number of buttons
 	int buttons;
+	//Number of balls
 	int balls;
+	//Used to flag for events regrading the controller
 	int eventFlags;
 
 public:
@@ -37,8 +49,8 @@ public:
 	~Joystick();
 
 	//virtual void Update();
-	virtual void Update(SDL_Event& e);
-	virtual void Shutdown();
+	virtual void Update(SDL_Event& e) override;
+	virtual bool Shutdown() override;
 
 	inline int GetID() { return id; }
 	inline int GetHats() { return hats; }
@@ -52,6 +64,7 @@ public:
 	inline virtual int GetAxisDir(unsigned int axis) { return joyAxisDir[axis]; }
 
 	//JOYSTICK BUTTONS===============================================
+
 	//Check if button is down (Button down)
 	virtual bool IsButtonDown(unsigned int button);
 	//Check if button is not down
@@ -64,8 +77,10 @@ public:
 };
 
 class GameController : public Joystick {
+	//The actual game controller - has an inner SDL_Joystick
 	SDL_GameController* gameController;
 
+	//Mapping of the controller
 	char* mapping = nullptr;
 
 	//Dead zone of the left stick
@@ -80,7 +95,7 @@ public:
 
 	//void Update() override;
 	void Update(SDL_Event& e) override;
-	void Shutdown() override;
+	bool Shutdown() override;
 
 	inline SDL_GameController* GetGameController() { return gameController; }
 	inline SDL_Joystick* GetGameControllerJoystick() { SDL_GameControllerGetJoystick(gameController); }
@@ -103,6 +118,7 @@ public:
 	//Check if button was released this frame
 	bool WasButtonReleased(unsigned int button) override;
 
+	//Rebind a gamecontroller button to another value
 	void RebindButton();
 };
 
@@ -112,9 +128,9 @@ class Input : public EventSystem
 	Input();
 	~Input();
 
+	//Array of joysticks 
 	std::vector<Joystick*> joysticks;
 
-	//Map is a dictionary that has a key and a value
 	//Current key state
 	std::map<unsigned int, bool> keys;
 	//Old key state
@@ -127,16 +143,20 @@ class Input : public EventSystem
 	static Input* instance;
 
 
-	//Mouse motion
+	//Mouse motion in X direction(left and right)
 	int mouseMotionX;
+	//Mouse motion in Y direction(up and down)
 	int mouseMotionY;
 	//Mouse wheel 
 	int mouseWheelY;
+	//Mouse button that was pressed
 	int mouseButtonPress;
+	//Used to check for events regarding inputs such as keyboard and mouse
 	int eventFlags;
 	//For number of click
 	unsigned int clicks;
 
+	//Currently used to quit the main game loop
 	bool requestedQuit;
 
 public:
@@ -155,6 +175,7 @@ public:
 	//Joystick* GetJoystick(unsigned int which);
 
 	inline std::vector<Joystick*> GetJoysticks() { return joysticks; }
+	inline Joystick* GetJoystick(unsigned int index) { return joysticks[index]; }
 
 	//KEYBOARD=======================================================
 
