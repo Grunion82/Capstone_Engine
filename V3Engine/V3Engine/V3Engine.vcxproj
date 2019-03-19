@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Game\GameInterface.h" />
+    <ClInclude Include="Engine\Core\Game\GameObject.h" />
     <ClInclude Include="Engine\Core\Managers\Manager.h" />
     <ClInclude Include="Engine\Core\Systems\Camera.h" />
     <ClInclude Include="Engine\Core\Systems\Debug.h" />
@@ -161,6 +162,8 @@
     <ClInclude Include="Engine\Core\Managers\EventManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Game\GameInterface.cpp" />
+    <ClCompile Include="Engine\Core\Game\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Systems\Camera.cpp" />
     <ClCompile Include="Engine\Core\Systems\Debug.cpp" />
     <ClCompile Include="Engine\Core\Systems\Input.cpp" />

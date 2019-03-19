@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+#include "GameObject.h"
 
 Scene::Scene() {
 
@@ -15,49 +16,59 @@ bool Scene::Init() {
 	return true;
 }
 
-void Scene::Update() {
+void Scene::Update(float deltaTime) {
 
-	for (GameObject* go : gameObjects) {
+	for (auto go : gameObjects) {
 		
-		//g->Update();
+		go.second->Update(deltaTime);
 	}
 }
 
 void Scene::Render() {
 
-	for (GameObject* go : gameObjects) {
+	for (auto go : gameObjects) {
 
-		//g->Render();
+		go.second->Render();
 	}
 }
 
 void Scene::Shutdown() {
 
-	for (GameObject* go : gameObjects) {
+	if (gameObjects.size() > 0) {
+		for (auto go : gameObjects) {
 
-		//delete g;
-		//g = nullptr;
+			delete go.second;
+			go.second = nullptr;
+		}
+		gameObjects.clear();
 	}
-	gameObjects.clear();
 }
 
-void Scene::AddGameObject(class GameObject* object) {
-
-	gameObjects.push_back(object);
+void Scene::SetName(std::string name) {
+	Name = name;
 }
 
-void Scene::AddGameObject(unsigned int index, GameObject * object)
-{
-	gameObjects.insert(gameObjects.begin() + index, object);
+std::string Scene::GetName() const {
+	return Name;
 }
 
-void Scene::RemoveGameObject(const unsigned int index) {
+void Scene::AddGameObject(GameObject* object) {
 
-	gameObjects.erase(gameObjects.begin() + index);
-	gameObjects.shrink_to_fit();
+	gameObjects[object->GetName()] = object;
 }
 
-GameObject* Scene::Find(const unsigned int index) {
+void Scene::RemoveGameObject(const std::string name) {
 
-	return gameObjects.at(index);
+	if (gameObjects.find(name) != gameObjects.end()) {
+		delete gameObjects[name];
+		gameObjects.erase(name);
+	}
+}
+
+GameObject* Scene::Find(const std::string name) {
+
+	if (gameObjects.find(name) != gameObjects.end())
+		return gameObjects[name];
+
+	return new GameObject("BlankGameObject");
 }
