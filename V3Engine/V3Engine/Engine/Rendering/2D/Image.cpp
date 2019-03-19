@@ -1,14 +1,10 @@
 #include "Image.h"
 
 #include "stb_image.h"
+#include "../../Core/Systems/Debug.h"
 
-#include <iostream>
 #include <glew.h>
 
-Texture::Texture(const char* filepath) : filepath(filepath)
-{
-
-}
 
 Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
 {
@@ -57,7 +53,11 @@ bool Cubemap::Init()
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
 		}
 		else {
-			std::cout << "CUBEMAP TEXUTE FAILED TO LOAD AT PATH: " << &faces[i] << std::endl;
+			std::cout << "CUBEMAP TEXTURE FAILED TO LOAD AT PATH: " << faces[i] << std::endl;
+			std::string message = "CUBEMAP TEXTURE FAILED TO LOAD AT PATH: ";
+			message += faces[i];
+			Debug::SetSeverity(MessageType::TYPE_WARNING);
+			Debug::Warning(message, __FILE__, __LINE__);
 			return false;
 		}
 
@@ -75,6 +75,13 @@ bool Cubemap::Init()
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	return true;
+}
+
+Texture::Texture(const char* filepath) : filepath(filepath)
+{
+	if (filepath != nullptr) {
+		Init();
+	}
 }
 
 Texture::Texture(unsigned int width,unsigned int height, int format, int format2, int tex, int type,int styleS, int styleT, int fminStyle, int fmaxStyle) : width(width),height(height)
@@ -146,7 +153,11 @@ bool Texture::Init()
 
 	}
 	else {
-		std::cout << "FAILED TO LOAD TEXTURE::" << filepath << std::endl;
+		std::cout << "FAILED TO LOAD TEXTURE: " << filepath << std::endl;
+		std::string message = "FAILED TO LOAD TEXTURE: ";
+		message += filepath;
+		Debug::SetSeverity(MessageType::TYPE_WARNING);
+		Debug::Warning(message, __FILE__, __LINE__);
 		return false;
 	}
 

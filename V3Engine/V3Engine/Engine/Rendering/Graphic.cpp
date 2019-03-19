@@ -5,6 +5,8 @@
 #include "2D/Image.h"
 #include "../Core/Systems/Window.h"
 
+#include "../Core/Systems/Debug.h"
+
 Quad::Quad()
 {
 }
@@ -240,12 +242,6 @@ bool GBuffer::Init(unsigned int width, unsigned int height)
 	glGenFramebuffers(1, &FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-	//For depth
-	glGenRenderbuffers(1, &RBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
 	//glBindTexture(GL_TEXTURE_2D, depthTexture);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
@@ -269,21 +265,26 @@ bool GBuffer::Init(unsigned int width, unsigned int height)
 		gbufferTextures[i]->Use();
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, gbufferTextures[i]->ID(), 0);
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//Position, normal and albedo(diffuse and specular)
 	GLenum drawBuffers[GBUFFER_NUM_TEXTURES] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
 	
 	glDrawBuffers(GBUFFER_NUM_TEXTURES, drawBuffers);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//For depth
+	glGenRenderbuffers(1, &RBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		printf("FAILED TO COMPLETE GBUFFER FBO - GBUFFER::INIT()\n");
+		Debug::SetSeverity(MessageType::TYPE_FATAL_ERROR);
+		Debug::FatalError("FAILED TO COMPLETE GBUFFER FBO - GBUFFER::INIT()\n", __FILE__, __LINE__);
 		return false;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	gbufferShader = new Shader("gbufferVert.glsl", "gbufferFrag.glsl");

@@ -70,20 +70,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x86\lib;$(SolutionDir)SDK_Source\SDL\x86\lib;$(LibraryPath);$(SolutionDir)SDK_Source\SDL_image\x86\lib</LibraryPath>
+    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(SolutionDir)SDK_Source\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x86\lib;$(SolutionDir)SDK_Source\SDL\x86\lib;$(LibraryPath);$(SolutionDir)SDK_Source\SDL_image\x86\lib;$(SolutionDir)SDK_Source\Assimp\resources</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x86\lib;$(SolutionDir)SDK_Source\SDL\x86\lib;$(SolutionDir)SDK_Source\SDL\dll;$(LibraryPath);$(SolutionDir)SDK_Source\SDL_image\x86\lib</LibraryPath>
+    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(SolutionDir)SDK_Source\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x86\lib;$(SolutionDir)SDK_Source\SDL\x86\lib;$(SolutionDir)SDK_Source\SDL\dll;$(LibraryPath);$(SolutionDir)SDK_Source\SDL_image\x86\lib;$(SolutionDir)SDK_Source\Assimp\resources</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x64\lib;$(SolutionDir)SDK_Source\SDL\x64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(SolutionDir)SDK_Source\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x64\lib;$(SolutionDir)SDK_Source\SDL\x64\lib;$(LibraryPath);$(SolutionDir)SDK_Source\Assimp\resources</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x64\lib;$(SolutionDir)SDK_Source\SDL\x64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)SDK_Source\OpenGL\include;$(SolutionDir)SDK_Source\SDL\include;$(SolutionDir)SDK_Source\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)SDK_Source\OpenGL\x64\lib;$(SolutionDir)SDK_Source\SDL\x64\lib;$(SolutionDir)SDK_Source\Assimp\resources;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,7 +93,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,7 +104,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +121,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,7 +138,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;SDL2test.lib;glew32.lib;glew32s.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

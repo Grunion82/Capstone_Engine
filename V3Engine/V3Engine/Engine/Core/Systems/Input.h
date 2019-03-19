@@ -81,7 +81,7 @@ class GameController : public Joystick {
 	SDL_GameController* gameController;
 
 	//Mapping of the controller
-	char* mapping = nullptr;
+	const char* mapping = nullptr;
 
 	//Dead zone of the left stick
 	int left_stick_dead_zone = 8000;
@@ -106,8 +106,8 @@ public:
 	void SetLeftStickDeadZone(unsigned int value) { left_stick_dead_zone = value; }
 	void SetRightStickDeadZone(unsigned int value) { right_stick_dead_zone = value; }
 
-	inline virtual int GetAxisValue(unsigned int axis) override { return joyAxis[axis]; }
-	inline virtual int GetAxisDir(unsigned int axis) override { return joyAxisDir[axis]; }
+	//inline int GetAxisValue(unsigned int axis) override { return joyAxis[SDL_GameControllerGetBindForAxis(gameController,(SDL_GameControllerAxis)axis).value.axis]; }
+	//inline int GetAxisDir(unsigned int axis) override { return joyAxisDir[SDL_GameControllerGetBindForAxis(gameController,(SDL_GameControllerAxis)axis).value.axis]; }
 
 	//Check if button is down (Button down)
 	bool IsButtonDown(unsigned int button) override;
@@ -118,8 +118,12 @@ public:
 	//Check if button was released this frame
 	bool WasButtonReleased(unsigned int button) override;
 
-	//Rebind a gamecontroller button to another value
-	void RebindButton();
+	//Rebind a gamecontroller button/axis to another value
+	void Rebind();
+	void Rebind(SDL_GameControllerAxis axis, SDL_GameControllerAxis axis1);
+	void Rebind(SDL_GameControllerAxis axis, SDL_GameControllerButton button);
+	void Rebind(SDL_GameControllerButton button, SDL_GameControllerButton button1);
+	void Rebind(SDL_GameControllerButton button, SDL_GameControllerAxis axis);
 };
 
 class Input : public EventSystem

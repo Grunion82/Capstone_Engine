@@ -2,6 +2,8 @@
 #include <SDL.h>
 #include <glew.h>
 
+#include "Debug.h"
+
 Window::Window(const char* name) : windowName(name), windowWidth(0), windowHeight(0) {
 
 }
@@ -33,6 +35,10 @@ bool Window::Init()
 	for (int i = 0; i < display_mode_count; ++i) {
 		if (SDL_GetDisplayMode(0, i, &mode) != 0) {
 			SDL_Log("SDL_GetDisplayMode failed: %s", SDL_GetError());
+			std::string message = "SDL_GetDisplayMode failed; ";;
+			message += SDL_GetError();
+			Debug::SetSeverity(MessageType::TYPE_WARNING);
+			Debug::Warning(message, __FILE__, __LINE__);
 		}
 		//Uint32 f = mode.format;
 		//SDL_Log("Mode %i\tbpp %i\t%s\t%i x %i\t %i", i, SDL_BITSPERPIXEL(f), SDL_GetPixelFormatName(f), mode.w, mode.h, mode.refresh_rate);
@@ -41,7 +47,7 @@ bool Window::Init()
 
 	windowParameters = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-	if (windowWidth != 0 || windowHeight != 0) {
+	if (windowWidth != 0 && windowHeight != 0) {
 		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
 	}
 	else {

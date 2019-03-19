@@ -24,7 +24,6 @@ glm::vec3 lightColor[] = { glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f, 1.0f, 1.
 Shader* shader = nullptr;
 Shader* lampShader = nullptr;
 Shader* densityCube = nullptr;
-Texture* containrTexture = nullptr;
 
 //For a cube with normals
 float cubeVertices[] = {
@@ -133,6 +132,7 @@ unsigned int cubeTwoVAO, cubeTwoVBO, densityVBO;
 
 
 V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",800,600)) {
+	Debug::DebugInit();
 	timer.Start();
 	engineWindow->Init();
 	EventManager::GetInstace()->AddEventSystem<Window>(engineWindow);
@@ -142,9 +142,6 @@ V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",800,600)) {
 	shader = new Shader("genericVert.glsl", "genericFrag.glsl");
 	lampShader = new Shader("lampVert.glsl", "lampFrag.glsl");
 	densityCube = new Shader("density_volume_vertex.glsl","density_volume_fragment.glsl", "density_volume_geometry.glsl");
-
-	containrTexture = new Texture("container.jpg");
-	containrTexture->Init();
 
 	c = new Camera(engineWindow);
 
@@ -239,14 +236,17 @@ void V3Engine::speak() {
 			Graphic::GetInstance()->WindowChange(engineWindow);
 		}
 		if (Input::GetInstance()->WasKeyPressed(SDLK_k)) {
-			static_cast<GameController*>(Input::GetInstance()->GetJoystick(0))->RebindButton();
+			static_cast<GameController*>(Input::GetInstance()->GetJoystick(0))->Rebind();
+		}
+		if (Input::GetInstance()->WasKeyPressed(SDLK_l)) {
+			static_cast<GameController*>(Input::GetInstance()->GetJoystick(1))->Rebind();
 		}
 
 		c->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer.GetDeltaTime());
 
 		c->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 		
-		c->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer.GetDeltaTime());
+		//c->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer.GetDeltaTime());
 		c->Update();
 		
 		Render();
@@ -274,15 +274,9 @@ void V3Engine::Render()
 	Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("view", view);
 	Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("projection", projection);
 
-	glActiveTexture(GL_TEXTURE0);
-	Graphic::GetInstance()->gbuffer.gbufferShader->SetInt("texture_diffuse1", 0);
-	containrTexture->Use();
-
 	glBindVertexArray(cubeTwoVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
-
-	glActiveTexture(GL_TEXTURE0);
 
 	//For light
 	Graphic::GetInstance()->LightingPass();
@@ -355,9 +349,6 @@ bool V3Engine::Shutdown()
 
 	densityCube = nullptr;
 	delete densityCube;
-
-	containrTexture = nullptr;
-	delete containrTexture;
 
 	return true;
 }

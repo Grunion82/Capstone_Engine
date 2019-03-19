@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <SDL_log.h>
 
 enum class MessageType : unsigned short {
 

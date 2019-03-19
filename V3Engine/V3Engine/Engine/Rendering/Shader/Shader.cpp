@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include "../../Core/Systems/Debug.h"
+
 //Vertex and fragment
 Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 {
@@ -31,7 +33,13 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 		fragmentCode = fShaderStream.str();
 	}
 	catch (std::ifstream::failure e) {
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY READ" << std::endl;
+		std::string tempV = vertexPath;
+		std::string tempF = fragmentPath;
+
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY READ\nVERTEX: " << tempV << "\nFRAGMENT" << tempF << std::endl;
+
+		Debug::SetSeverity(MessageType::TYPE_ERROR);
+		Debug::Error("ERROR::SHADER::FILE_NOT_SUCCESFULLY READ\nVERTEX: " + tempV + "\nFRAGMENT" + tempF, __FILE__, __LINE__);
 		failed = true;
 	}
 	
@@ -57,6 +65,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILURE\n" << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error("ERROR::SHADER::VERTEX::COMPILATION_FAILURE\N", __FILE__, __LINE__);
 		}
 
 		//Fragment shader
@@ -69,6 +79,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILURE\n" << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILURE\n", __FILE__, __LINE__);
 		}
 
 		//Shader program
@@ -83,6 +95,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 		if (!success) {
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILURE\n" << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shaders linked to program, delete
@@ -129,6 +143,9 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLc
 	}
 	catch (std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY READ" << std::endl;
+		Debug::SetSeverity(MessageType::TYPE_ERROR);
+		Debug::Error("ERROR::SHADER::FILE_NOT_SUCCESSFULLY READ", __FILE__, __LINE__);
+
 		failed = true;
 	}
 
@@ -158,6 +175,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLc
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Fragment shader
@@ -170,6 +189,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLc
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Geometry
@@ -181,6 +202,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLc
 		if (!success) {
 			glGetShaderInfoLog(geometry, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shader program
@@ -197,6 +220,8 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath, const GLc
 		if (!success) {
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILURE\n" << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shaders linked to program, delete
@@ -238,6 +263,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath)
 	}
 	catch (std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY READ" << std::endl;
+		Debug::SetSeverity(MessageType::TYPE_ERROR);
+		Debug::Error("ERROR::SHADER::FILE_NOT_SUCCESSFULLY READ\n", __FILE__, __LINE__);
 		failed = true;
 	}
 
@@ -262,7 +289,9 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath)
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILURE\n" << infoLog << std::endl;
+			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Fragment shader
@@ -274,7 +303,9 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath)
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILURE\n" << infoLog << std::endl;
+			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shader program
@@ -289,6 +320,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath)
 		if (!success) {
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILURE\n" << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shaders linked to program, delete
@@ -335,6 +368,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 	}
 	catch (std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY READ" << std::endl;
+		Debug::SetSeverity(MessageType::TYPE_ERROR);
+		Debug::Error("ERROR::SHADER::FILE_NOT_SUCCESSFULLY READ", __FILE__, __LINE__);
 		failed = true;
 	}
 
@@ -367,6 +402,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Fragment shader
@@ -379,6 +416,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Geometry
@@ -390,6 +429,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 		if (!success) {
 			glGetShaderInfoLog(geometry, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILURE: " << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shader program
@@ -406,6 +447,8 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 		if (!success) {
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
 			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILURE\n" << infoLog << std::endl;
+			Debug::SetSeverity(MessageType::TYPE_ERROR);
+			Debug::Error(infoLog, __FILE__, __LINE__);
 		}
 
 		//Shaders linked to program, delete
