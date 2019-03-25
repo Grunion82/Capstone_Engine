@@ -133,29 +133,40 @@ void Input::Update(SDL_Event& e) {
 					joysticks[i]->Shutdown();
 					delete joysticks[i];
 					joysticks[i] = nullptr;
-					joysticks.erase(joysticks.begin() + i);
+					break;
+					//joysticks.erase(joysticks.begin() + i);
 				}
 			}
 			break;
 		case(SDL_CONTROLLERDEVICEADDED):
-			bool is = false;
+			if (joysticks.size() > 0) {
+				bool is = false;
 
-			for (unsigned int i = 0; i < joysticks.size(); i++) {
-				if (joysticks[i]->GetID() == SDL_JoystickGetDeviceInstanceID(e.cdevice.which)) {
-					is = true;
-					break;
+				//This is honestly only here for the initialize of controllers
+				//Should be removed later
+				for (unsigned int i = 0; i < joysticks.size(); i++) {
+					if (joysticks[i]) {
+						if (joysticks[i]->GetID() == SDL_JoystickGetDeviceInstanceID(e.cdevice.which)) {
+							is = true;
+							break;
+						}
+					}
+				}
+				if (!is) {
+					for (unsigned int i = 0; i < joysticks.size(); i++) {
+						if (joysticks[i] == nullptr) {
+							joysticks[i] = new GameController(SDL_GameControllerOpen(e.cdevice.which), 8000, 8000);
+							break;
+						}
+						else if ((i + 1) >= joysticks.size()) {
+							joysticks.push_back(new GameController(SDL_GameControllerOpen(e.cdevice.which), 8000, 8000));
+							break;
+						}
+					}
 				}
 			}
-			if (!is) {
-				for (unsigned int i = 0; i < joysticks.size(); i++) {
-					if (joysticks[i] == nullptr) {
-						joysticks.insert(joysticks.begin() + i, new GameController(SDL_GameControllerOpen(e.cdevice.which), 8000, 8000));
-					}
-					else if ((i + 1) >= joysticks.size()) {
-						joysticks.push_back(new GameController(SDL_GameControllerOpen(e.cdevice.which), 8000, 8000));
-						break;
-					}
-				}
+			else {
+				joysticks.push_back(new GameController(SDL_GameControllerOpen(e.cdevice.which), 8000, 8000));
 			}
 
 
@@ -171,7 +182,9 @@ void Input::Update(SDL_Event& e) {
 void Input::UpdateJoysticks(SDL_Event & e)
 {
 	for (unsigned int i = 0; i < joysticks.size(); i++) {
-		joysticks[i]->Update(e);
+		if (joysticks[i]) {
+			joysticks[i]->Update(e);
+		}
 	}
 }
 
@@ -662,13 +675,23 @@ void GameController::Update(SDL_Event& e)
 			}
 		}
 		break;
+		case(SDL_CONTROLLER_BUTTON_DPAD_DOWN):
+		case(SDL_CONTROLLER_BUTTON_DPAD_LEFT):
+		case(SDL_CONTROLLER_BUTTON_DPAD_RIGHT):
+		case(SDL_CONTROLLER_BUTTON_DPAD_UP):
+			break;
 		case(SDL_CONTROLLERBUTTONDOWN):
 		case(SDL_CONTROLLERBUTTONUP):
 				for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
 					joyButtons[i] = SDL_GameControllerGetButton(gameController, (SDL_GameControllerButton)i);
 					if (joyButtons[i] == 1) {
 						SDL_GameControllerButtonBind b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)i);
-						std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.button << ")" << std::endl;
+						if (b.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
+							std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.button << ")" << std::endl;
+						}
+						else if (b.bindType == SDL_CONTROLLER_BINDTYPE_HAT){
+							std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.hat.hat << "." << (int)b.value.hat.hat_mask << ")" << std::endl;
+						}
 					}
 				}
 				break;
@@ -859,9 +882,9 @@ void GameController::Rebind()
 {
 	SDL_Event e;
 	__int8 toRebind = -1;
-	std::string bs;
 	std::string bs1;
-	char type;
+	std::string bs2;
+	SDL_GameControllerButtonBind toRebindBind;
 
 	std::cout << "Rebind for controller " << id << std::endl;
 	std::cout << "Enter axis/button to rebind" << std::endl;
@@ -872,8 +895,13 @@ void GameController::Rebind()
 			//Set to rebind
 			if (e.type == SDL_CONTROLLERBUTTONDOWN && toRebind == -1 && e.cdevice.which == id) {
 				toRebind = e.cbutton.button;
-				std::cout << "Button set to remap: " << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind) << "(" << (int)toRebind << ")" << std::endl;
-				type = 'b';
+				toRebindBind = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)toRebind);
+				if (toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
+					std::cout << "Button set to remap: " << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind) << "(" << (int)toRebindBind.value.button << ")" << std::endl;
+				}
+				else {
+					std::cout << "Button set to remap: " << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind) << "(" << (int)toRebindBind.value.hat.hat << "." << (int)toRebindBind.value.hat.hat_mask << ")" << std::endl;
+				}
 			}
 			//Set to rebind
 			else if (e.type == SDL_CONTROLLERAXISMOTION && toRebind == -1 && e.cdevice.which == id) {
@@ -882,40 +910,86 @@ void GameController::Rebind()
 					e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT || e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && e.caxis.value > 1000 ) {
 					toRebind = e.caxis.axis;
 
-					std::cout << "Axis set to remap: " << SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)toRebind) << "(" << (int)SDL_GameControllerGetBindForAxis(gameController,(SDL_GameControllerAxis)toRebind).value.axis << ")" << std::endl;
-					type = 'a';
+					toRebindBind = SDL_GameControllerGetBindForAxis(gameController, (SDL_GameControllerAxis)toRebind);
+					std::cout << "Axis set to remap: " << SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)toRebind) << "(" << (int)toRebindBind.value.axis << ")" << std::endl;
+					
 				}
 			}
 			//Rebind for button
 			else if (e.type == SDL_CONTROLLERBUTTONDOWN && toRebind != -1 && e.cdevice.which == id) {
-
 				SDL_GameControllerButtonBind newbuttonBind = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)e.cbutton.button);
 
-				std::cout << "Remapping with button " << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)e.cbutton.button) << "(" << (int)newbuttonBind.value.button << ")" << std::endl;
+				if (newbuttonBind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
+					std::cout << "Remapping with button " << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)e.cbutton.button) << "(" << (int)newbuttonBind.value.button << ")" << std::endl;
+				}
+				else {
+					std::cout << "Remapping with button " << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)e.cbutton.button) << "(" << (int)newbuttonBind.value.hat.hat << "." << (int)newbuttonBind.value.hat.hat_mask << ")" << std::endl;
+				}
 
 				std::string newMapping = mapping;
 
-				bs = ",";
-				if (type == 'a') {
-					bs += SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)toRebind);
-				}
-				else {
-					bs += SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind);
-				}
-				bs += ":";
-				int b1 = newMapping.find(bs);
-
 				bs1 = ",";
-				bs1 += SDL_GameControllerGetStringForButton((SDL_GameControllerButton)e.cbutton.button);
+				if (toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+					bs1 += SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)toRebind);
+				}
+				else if(toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON || toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_HAT){
+					bs1 += SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind);
+				}
 				bs1 += ":";
-				int b2 = newMapping.find(bs1);
+				int b1 = newMapping.find(bs1);
 
-				newMapping.replace(b1 + bs.size(), 2,"b" + std::to_string((int)newbuttonBind.value.button));
-				if (type == 'a') {
-					newMapping.replace(b2 + bs1.size(), 2, type + std::to_string((int)SDL_GameControllerGetBindForAxis(gameController, (SDL_GameControllerAxis)toRebind).value.axis));
+				bs2 = ",";
+				bs2 += SDL_GameControllerGetStringForButton((SDL_GameControllerButton)e.cbutton.button);
+				bs2 += ":";
+				int b2 = newMapping.find(bs2);
+
+				//Replace to rebind
+				if (newbuttonBind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
+					if (toRebindBind.bindType != SDL_CONTROLLER_BINDTYPE_HAT) {
+						newMapping.replace(b1 + bs1.size(), 2, "b" + std::to_string((int)newbuttonBind.value.button));
+					}
+					else {
+						newMapping.replace(b1 + bs1.size(), 4, "b" + std::to_string((int)newbuttonBind.value.button));
+					}
+				}
+				else if (newbuttonBind.bindType == SDL_CONTROLLER_BINDTYPE_HAT) {
+					newMapping.replace(b1 + bs1.size(), 2, "h" + std::to_string((int)newbuttonBind.value.hat.hat));
+					if (toRebindBind.bindType != SDL_CONTROLLER_BINDTYPE_HAT) {
+						newMapping.replace(b1 + bs1.size() + 2, 1, "." + std::to_string((int)newbuttonBind.value.hat.hat_mask) + ",");
+					}
+					else {
+						newMapping.replace(b1 + bs1.size() + 2, 2, "." + std::to_string((int)newbuttonBind.value.hat.hat_mask));
+					}
+				}
+
+				b1 = newMapping.find(bs1);
+				b2 = newMapping.find(bs2);
+
+				//Replace new bind
+				if (toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+					if (newbuttonBind.bindType != SDL_CONTROLLER_BINDTYPE_HAT) {
+						newMapping.replace(b2 + bs2.size(), 2, "a" + std::to_string((int)toRebindBind.value.axis) + ",");
+					}
+					else {
+						newMapping.replace(b2 + bs2.size(), 4, "a" + std::to_string((int)toRebindBind.value.axis));
+					}
+				}
+				else if(toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON){
+					if (newbuttonBind.bindType != SDL_CONTROLLER_BINDTYPE_HAT) {
+						newMapping.replace(b2 + bs2.size(), 2, "b" + std::to_string((int)toRebindBind.value.button) + ",");
+					}
+					else {
+						newMapping.replace(b2 + bs2.size(), 4, "b" + std::to_string((int)toRebindBind.value.button));
+					}
 				}
 				else {
-					newMapping.replace(b2 + bs1.size(), 2, type + std::to_string((int)SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)toRebind).value.button));
+					newMapping.replace(b2 + bs2.size(), 2, "h" + std::to_string((int)toRebindBind.value.hat.hat));
+					if (newbuttonBind.bindType != SDL_CONTROLLER_BINDTYPE_HAT) {
+						newMapping.replace(b2 + bs2.size() + 2, 1, "." + std::to_string((int)toRebindBind.value.hat.hat_mask) + ",");
+					}
+					else {
+						newMapping.replace(b2 + bs2.size() + 2, 2, "." + std::to_string((int)toRebindBind.value.hat.hat_mask));
+					}
 				}
 
 				int thing = SDL_GameControllerAddMapping(newMapping.c_str());
@@ -947,27 +1021,42 @@ void GameController::Rebind()
 
 					std::string newMapping = mapping;
 
-					bs = ",";
-					if (type == 'a'){
-						bs += SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)toRebind);
-					}
-					else {
-						bs += SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind);
-					}
-					bs += ":";
-					int b1 = newMapping.find(bs);
-
 					bs1 = ",";
-					bs1 += SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)e.caxis.axis);
-					bs1 += ":";
-					int b2 = newMapping.find(bs1);
-
-					newMapping.replace(b1 + bs.size(), 2, "a" + std::to_string((int)newbuttonBind.value.axis));
-					if (type == 'a') {
-						newMapping.replace(b2 + bs1.size(), 2, type + std::to_string((int)SDL_GameControllerGetBindForAxis(gameController, (SDL_GameControllerAxis)toRebind).value.axis));
+					if (toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS){
+						bs1 += SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)toRebind);
 					}
 					else {
-						newMapping.replace(b2 + bs1.size(), 2, type + std::to_string((int)SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)toRebind).value.button));
+						bs1 += SDL_GameControllerGetStringForButton((SDL_GameControllerButton)toRebind);
+					}
+
+					bs1 += ":";
+					int b1 = newMapping.find(bs1);
+
+					bs2 = ",";
+					bs2 += SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)e.caxis.axis);
+					bs2 += ":";
+					int b2 = newMapping.find(bs2);
+
+					//Replace to rebind
+					if (toRebindBind.bindType != SDL_CONTROLLER_BINDTYPE_HAT) {
+						newMapping.replace(b1 + bs1.size(), 2, "a" + std::to_string((int)newbuttonBind.value.axis));
+					}
+					else {
+						newMapping.replace(b1 + bs1.size(), 4, "a" + std::to_string((int)newbuttonBind.value.axis));
+					}
+
+					b1 = newMapping.find(bs1);
+					b2 = newMapping.find(bs2);
+
+					//Replace new bind
+					if (toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+						newMapping.replace(b2 + bs2.size(), 2, "a" + std::to_string((int)toRebindBind.value.axis));
+					}
+					else if(toRebindBind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
+						newMapping.replace(b2 + bs2.size(), 2, "b" + std::to_string((int)toRebindBind.value.button));
+					}
+					else {
+						newMapping.replace(b2 + bs2.size(), 2, "h" + std::to_string((int)toRebindBind.value.hat.hat) + "." + std::to_string((int)toRebindBind.value.hat.hat_mask));
 					}
 
 					int thing = SDL_GameControllerAddMapping(newMapping.c_str());
