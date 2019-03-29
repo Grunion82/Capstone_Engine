@@ -1,5 +1,6 @@
 #ifndef GRAPHIC_H
 #define GRAPHIC_H
+
 #include <glew.h>
 #include <gl/GL.h>
 

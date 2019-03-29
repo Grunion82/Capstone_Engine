@@ -7,7 +7,6 @@
 class Window : public EventSystem
 {
 	std::vector<SDL_DisplayMode> windowResolutions;
-	~Window();
 
 	//The actual window
 	SDL_Window* window;
@@ -40,6 +39,7 @@ public:
 	Window(unsigned int width,unsigned int height);
 	//Window with specific parameters
 	Window(const char* name, unsigned int width, unsigned int height);
+	~Window() { Shutdown(); }
 
 
 	bool Init();
@@ -55,6 +55,8 @@ public:
 	inline SDL_DisplayMode GetCurrentResolution() { return currentDisplay; }
 	inline SDL_DisplayMode GetResolution(unsigned int index) { if (&windowResolutions[index] != nullptr) { return windowResolutions[index]; } }
 	inline SDL_GLContext GetContext() { return windowContext; }
+
+	inline void SetName(const char* name) { windowName = name; }
 
 	void Fullscreen();
 	void Borderless();

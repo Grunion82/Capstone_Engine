@@ -10,6 +10,9 @@ private:
 	V3Engine();
 	~V3Engine();
 	class Window* engineWindow;
+	class GameInterface* currentGame;
+
+	class Timer* timer;
 
 	static std::unique_ptr<V3Engine> engineInstance;
 public:
@@ -23,6 +26,9 @@ public:
 
 	static V3Engine* GetInstance();
 	void speak();
+
+	void NewGame(class GameInterface* game);
+	void Run();
 
 	bool Init();
 	void Update();
