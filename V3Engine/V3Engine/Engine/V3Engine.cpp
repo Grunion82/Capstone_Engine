@@ -10,6 +10,8 @@
 #include "Core/Systems/Camera.h"
 #include "Core/Game/GameInterface.h"
 
+#include "Math/PhysicsManager.h"
+
 #include "Rendering/Graphic.h"
 #include "Rendering/Shader/Shader.h"
 #include "Rendering/2D/Image.h"
@@ -59,6 +61,7 @@ void V3Engine::Run() {
 
 		EventManager::GetInstace()->Update();
 		currentGame->Update(timer->GetDeltaTime());
+		PhysicsManager::GetInstance()->Update(timer->GetDeltaTime());
 
 		if (Input::GetInstance()->WasKeyPressed(SDLK_ESCAPE)) {
 			break;
@@ -68,7 +71,7 @@ void V3Engine::Run() {
 
 		c->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 
-		//c->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer.GetDeltaTime());
+		//c->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
 		c->Update();
 
 		Render();
@@ -78,8 +81,9 @@ void V3Engine::Run() {
 	Shutdown();
 }
 
-void V3Engine::Render()
-{
+void V3Engine::Render() {
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	//Render
 	//Graphic::GetInstance()->Update();
 
@@ -119,7 +123,9 @@ void V3Engine::Render()
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);*/
 
-	currentGame->Render();
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	currentGame->Render(c);
 
 	engineWindow->Render();
 }

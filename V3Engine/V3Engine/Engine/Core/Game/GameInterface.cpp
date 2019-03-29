@@ -1,5 +1,7 @@
 #include "GameInterface.h"
 
+#include "../../Core/Systems/Camera.h"
+
 bool GameInterface::Init() {
 
 	return false;
@@ -9,8 +11,8 @@ void GameInterface::Update(const float DeltaTime) {
 	currentScene->Update(DeltaTime);
 }
 
-void GameInterface::Render() {
-	currentScene->Render();
+void GameInterface::Render(const Camera* camera) {
+	currentScene->Render(camera);
 }
 
 void GameInterface::Shutdown() {

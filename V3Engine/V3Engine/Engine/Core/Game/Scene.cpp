@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+#include "../../Core/Systems/Camera.h"
 #include "GameObject.h"
 
 Scene::Scene() {
@@ -24,11 +25,11 @@ void Scene::Update(float deltaTime) {
 	}
 }
 
-void Scene::Render() {
+void Scene::Render(const Camera* camera) {
 
 	for (auto go : gameObjects) {
 
-		go.second->Render();
+		go.second->Render(camera);
 	}
 }
 

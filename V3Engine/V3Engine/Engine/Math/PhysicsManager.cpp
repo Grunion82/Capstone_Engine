@@ -1,6 +1,8 @@
 #include "PhysicsManager.h"
 
-#include "../Rendering/3D/GameObject.h"
+#include <algorithm>
+
+#include "../Core/Game/GameObject.h"
 
 //Global instantiation of static attributes
 std::unique_ptr<PhysicsManager> PhysicsManager::physicsManagerInstance = nullptr;
@@ -19,7 +21,7 @@ PhysicsManager::~PhysicsManager() {
 //Updates Objects' RigidBodies
 void PhysicsManager::UpdateRigidBodies(float deltaTime) {
 	for (int i = 0; i < physicsObjects.size(); ++i) {
-		if(physicsObjects[i]->GetRigidBody()->isEnabled)
+		if (physicsObjects[i]->GetRigidBody()->isEnabled)
 			physicsObjects[i]->GetRigidBody()->Update(deltaTime);
 	}
 }
@@ -32,8 +34,9 @@ void PhysicsManager::CheckCollisions() {
 			//RTTI definition for collision detection modes
 
 			//Intersecting/Colliding colliders-- may need  "&& !foundCollision"
-			if (physicsObjects[i]->GetBoundingBox().Intersect(&physicsObjects[j]->GetBoundingBox())) {
+			if (dynamic_cast<BoundingBox*>(physicsObjects[i]->GetCollider())->Intersect(dynamic_cast<BoundingBox*>(physicsObjects[j]->GetCollider()))) {
 				printf("There was a collision\n");
+				//printf("get angle: %p\n", physicsObjects[i]->Update);
 				//printf("1 | 2 = %d\n", 1 | 2);
 				CalculateCollisionResponse(i, j);
 			}
@@ -44,17 +47,20 @@ void PhysicsManager::CheckCollisions() {
 
 //Calculates the response of the Collision between Objects
 void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Index) {
-	printf("%s and %s\n", physicsObjects[object1Index]->GetTag().c_str(), physicsObjects[object2Index]->GetTag().c_str());
+	printf("%s and %s\n", physicsObjects[object1Index]->GetName().c_str(), physicsObjects[object2Index]->GetName().c_str());
 
 	//Distance vector between positions
-	glm::vec3 distance = physicsObjects[object2Index]->GetPosition() - physicsObjects[object1Index]->GetPosition();
-	glm::vec3 normalizedDistance = glm::normalize(distance);
+	glm::vec3 position1 = physicsObjects[object1Index]->GetTransform().position;
+	glm::vec3 position2 = physicsObjects[object2Index]->GetTransform().position;
+
+	//Distance between the two objects' centers
+	glm::vec3 distance = position2 - position1;
 
 	//If the objects are still colliding but going away from each other, ignore response calculation
 	glm::vec3 newVelocity = physicsObjects[object2Index]->GetRigidBody()->velocity - physicsObjects[object1Index]->GetRigidBody()->velocity;
 	if (glm::dot(distance, newVelocity) < 0.0f) {
 		//Conservation of Momentum and Co-efficient of Restitution to find collision response
-		//Normalized Normal Vector
+		//Normalized Distance Vector
 		glm::vec3 nN = glm::normalize(distance);
 
 		//Initial Velocities of both Objects
@@ -87,8 +93,36 @@ void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Ind
 		//Sets the new velocities accordingly
 		if (physicsObjects[object1Index]->GetRigidBody()->isEnabled)
 			physicsObjects[object1Index]->GetRigidBody()->velocity = Vf1;
+
 		if (physicsObjects[object2Index]->GetRigidBody()->isEnabled)
 			physicsObjects[object2Index]->GetRigidBody()->velocity = Vf2;
+
+		//Down axis
+		glm::vec3 downAxis = glm::vec3(0.0f, -1.0f, 0.0f);
+
+		//Bottom of First object and Top of Second
+		float minObj1 = position1.y - dynamic_cast<BoundingBox*>(physicsObjects[object1Index]->GetCollider())->height / 2.0f;
+		float maxObj2 = position2.y + dynamic_cast<BoundingBox*>(physicsObjects[object2Index]->GetCollider())->height / 2.0f;
+		float temp = glm::dot(physicsObjects[object1Index]->GetRigidBody()->velocity, downAxis);
+		if (glm::dot(physicsObjects[object1Index]->GetRigidBody()->velocity, downAxis) < 0.0f && minObj1 < maxObj2) {
+			//Positional Correction- Sinking Objects
+			float inverseMassObj1 = (physicsObjects[object1Index]->GetRigidBody()->mass < 0.0f) ? 0.0f : 1.0f / physicsObjects[object1Index]->GetRigidBody()->mass;
+			float inverseMassObj2 = (physicsObjects[object2Index]->GetRigidBody()->mass < 0.0f) ? 0.0f : 1.0f / physicsObjects[object2Index]->GetRigidBody()->mass;
+
+			const float percent = 1.0f; //Reduce depth by Percent
+			const float slop = 0.1f; //Arbitrary threshold penetration must pass
+
+			const float penetration = maxObj2 - minObj1; //Penetration depth
+
+			glm::vec3 correction = std::max((penetration - slop), 0.0f) / (inverseMassObj1 + inverseMassObj2) * percent * nN; //Correction vector
+
+			physicsObjects[object1Index]->Translate((-inverseMassObj1) * correction);
+			if(physicsObjects[object1Index]->GetRigidBody()->velocity.y < 0.0f)
+				physicsObjects[object1Index]->GetRigidBody()->isEnabled = false;
+			//physicsObjects[object1Index]->GetRigidBody()->velocity = glm::vec3(physicsObjects[object1Index]->GetRigidBody()->velocity.x, 0.0f, physicsObjects[object1Index]->GetRigidBody()->velocity.z);
+			//physicsObjects[object2Index]->SetPosition(physicsObjects[object2Index]->GetPosition() + inverseMassObj2 * correction);
+
+		}
 	}
 }
 

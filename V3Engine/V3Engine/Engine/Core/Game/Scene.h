@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+#include "Skybox.h"
+
 class Scene {
 protected:
 	//Map of game objects within the scene
@@ -17,7 +19,7 @@ public:
 	//Standard 4 Init, Update, Render, and Shutdown
 	virtual bool Init();
 	virtual void Update(float deltaTime);
-	virtual void Render();
+	virtual void Render(const class Camera* camera);
 	virtual void Shutdown();
 
 	void SetName(std::string name);

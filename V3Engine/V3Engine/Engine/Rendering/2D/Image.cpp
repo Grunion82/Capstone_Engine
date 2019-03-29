@@ -6,8 +6,8 @@
 #include <glew.h>
 
 
-Cubemap::Cubemap(std::vector<const char*> f) : faces(f)
-{
+Cubemap::Cubemap(std::vector<const char*> f) : faces(f) {
+	Init();
 }
 
 Cubemap::~Cubemap()
@@ -31,7 +31,7 @@ bool Cubemap::Init()
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
 
-	//stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(false);
 
 	//Increment faces
 	for (GLuint i = 0; i < faces.size(); i++) {

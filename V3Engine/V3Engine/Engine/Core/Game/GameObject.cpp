@@ -1,5 +1,7 @@
 #include "GameObject.h"
 
+#include "../../Core/Systems/Camera.h"
+
 void GameObject::UpdateTransform() {
 	mat4 model;
 
@@ -15,6 +17,10 @@ GameObject::GameObject() {
 }
 
 GameObject::GameObject(const std::string name, const std::string tag, const __int16 layer, const vec3 p, const vec3 s, const vec3 r, const float a) {
+
+	model = nullptr;
+	collider = nullptr;
+	rigidBody = nullptr;
 
 	Name = name;
 	Tag = tag;
@@ -42,11 +48,24 @@ void GameObject::Update(float deltaTime) {
 	UpdateTransform();
 }
 
-void GameObject::Render() {
+void GameObject::Render(const Camera* camera) {
 
 }
 
 void GameObject::Shutdown() {
+
+	if (model) {
+		delete model;
+		model = nullptr;
+	}
+	if (collider) {
+		delete collider;
+		collider = nullptr;
+	}
+	if (rigidBody) {
+		delete rigidBody;
+		rigidBody = nullptr;
+	}
 
 	//delete Parent;
 	//Parent = nullptr;
@@ -82,7 +101,7 @@ void GameObject::Rotate(const float angle, vec3& axis) {
 	if (axis.length() != 1.0f) {
 		axis = normalize(axis);
 	}
-
+	transform.angle = angle;
 	Rotate(angle, axis.x, axis.y, axis.z);
 }
 

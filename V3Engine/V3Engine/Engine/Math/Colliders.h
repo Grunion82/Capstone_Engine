@@ -20,8 +20,15 @@ class Collider {
 protected:
 	ColliderType type;
 
+	class GameObject* referenceObject;
+
 public:
+	Collider() {}
+	virtual ~Collider() {}
+
 	glm::mat4 transform;
+
+	virtual void Update(float deltaTime) {}
 
 	inline virtual ColliderType GetType() const {
 		return type;
@@ -46,13 +53,8 @@ public:
 		transform = glm::mat4(1.0f);
 	}
 
-	inline BoundingBox(glm::vec3 min, glm::vec3 max, glm::mat4 trans) {
-		type = ColliderType::BOX;
-		minVert = min;
-		maxVert = max;
-		transform = trans;
-		CalculateDimensions();
-	}
+	BoundingBox(class GameObject* refObj, glm::vec3 min, glm::vec3 max);
+	~BoundingBox();
 
 	inline void CalculateDimensions() {
 
@@ -61,6 +63,8 @@ public:
 		length = maxVert.z - minVert.z;
 		//printf("Width: %.6f, Height: %.6f, Length: %.6f\n", width, height, length);
 	}
+
+	void Update(float deltaTime) override;
 
 	inline glm::vec3 GetTransformPoint(glm::vec3 point, glm::mat4 transformation) {
 		glm::vec3 scale;

@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 
-#include "../Rendering/3D/GameObject.h"
+#include "../Core/Game/GameObject.h"
+#include "PhysicsManager.h"
 
 //Default Constructor/Destructor
 RigidBody::RigidBody(GameObject* referenceObj, bool grav) {
@@ -13,6 +14,8 @@ RigidBody::RigidBody(GameObject* referenceObj, bool grav) {
 	transform = glm::mat4(1.0f);
 	referenceObject = referenceObj;
 
+	PhysicsManager::GetInstance()->AddPhysicsObject(referenceObject);
+
 }
 
 RigidBody::~RigidBody() {
@@ -21,8 +24,9 @@ RigidBody::~RigidBody() {
 
 //Updates transform with equations of motion (3D)
 void RigidBody::Update(const float deltaTime) {
-	if (isGravityEnabled) {
-		ApplyForce(glm::vec3(0.0f, GRAVITY_CONSTANT, 0.0f));
+	if (isGravityEnabled && acceleration.y > GRAVITY_CONSTANT) {
+		float difference = GRAVITY_CONSTANT - glm::clamp(acceleration.y, GRAVITY_CONSTANT, 0.0f);
+		ApplyForce(glm::vec3(0.0f, difference, 0.0f));
 	}
 
 	velocity += acceleration * deltaTime;
@@ -30,8 +34,8 @@ void RigidBody::Update(const float deltaTime) {
 	glm::vec3 displacement = (velocity * deltaTime) + 0.5f * (acceleration * (deltaTime * deltaTime));
 
 	//Update reference object and transform's values
-	referenceObject->SetPosition(referenceObject->GetPosition() + displacement);
-	transform = referenceObject->GetBoundingBox().transform;
+	referenceObject->Translate(displacement);
+	transform = referenceObject->GetTransform().TransformationMatrix;
 }
 
 //Sets is this RigidBody will use Gravity or not
@@ -59,4 +63,5 @@ float RigidBody::GetBounciness() const {
 //Apply a force to this RigidBody
 void RigidBody::ApplyForce(glm::vec3 force) {
 	acceleration += force / mass;
+	isEnabled = true;
 }

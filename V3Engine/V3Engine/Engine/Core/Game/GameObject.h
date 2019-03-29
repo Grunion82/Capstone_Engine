@@ -5,7 +5,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#include "../../Math/DList.h"
+#include "../../Rendering/3D/Model.h"
+#include "../../Math/Colliders.h"
+#include "../../Math/RigidBody.h"
 
 using namespace glm;
 
@@ -24,6 +26,10 @@ private:
 	GameObject();
 
 protected:
+	Model* model;
+	Collider* collider;
+	RigidBody* rigidBody;
+
 	Transform transform; 
 
 	//GameObject* Parent;
@@ -40,13 +46,13 @@ protected:
 public:
 
 	//Set of Constructors for instantiation 
-	GameObject(const std::string name = "GameObject", const std::string tag = "", const __int16 layer = 0, const vec3 p = vec3(0.0f, 0.0f, 0.0f), const vec3 s = vec3(1.0f), const vec3 r = vec3(0.0f, 1.0f, 0.0f), const float a = 0.0f);
+	GameObject(const std::string name, const std::string tag = "", const __int16 layer = 0, const vec3 p = vec3(0.0f, 0.0f, 0.0f), const vec3 s = vec3(1.0f), const vec3 r = vec3(0.0f, 1.0f, 0.0f), const float a = 0.0f);
 	virtual ~GameObject();
 
 	//Standard 4 Init, Update, Render, and Shutdown
 	virtual bool Init();
 	virtual void Update(float deltaTime);
-	virtual void Render();
+	virtual void Render(const class Camera* camera);
 	virtual void Shutdown();
 
 	//Returns member transform
@@ -77,6 +83,11 @@ public:
 	//Tag Setter and Getter
 	void SetTag(const std::string& tag);
 	std::string GetTag() const;
+
+	//Retrieve Various Components
+	inline Model* GetModel() { return model; }
+	inline Collider* GetCollider() { return collider; }
+	inline RigidBody* GetRigidBody() { return rigidBody; }
 
 	//Layer Setter and Getter
 	/*void SetLayer(const __int16 layer);
