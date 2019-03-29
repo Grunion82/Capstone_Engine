@@ -172,6 +172,7 @@ public:
 	//"Reset" values
 	void Update();
 	void Update(SDL_Event& e) override;
+	void UpdateJoysticks(SDL_Event &e);
 	bool Shutdown();
 	//SystemType getSystemType();
 	bool QuitRequested() { return requestedQuit; }
