@@ -2,26 +2,12 @@
 #define SCENE_H
 
 #include <vector>
-#include "../InmediateUI/InmediateUI.h"
-
-//Game scene 
-enum class GameScene :unsigned __int8 {
-
-	Main_Menu,
-	In_Game,
-	Win_Screen,
-	Lose_Screen
-
-
-
-};
 
 class Scene {
 protected:
 	//Vector of game objects within the scene
 	std::vector<class GameObject*> gameObjects;
-	//pointer to the current scene ui
-	InmediateUI* ui;
+
 public:
 	Scene();
 	virtual ~Scene();

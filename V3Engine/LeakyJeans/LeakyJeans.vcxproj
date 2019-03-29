@@ -143,15 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GUI\MainMenuUI.cpp" />
-    <ClCompile Include="GUI\OptionsMenu.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainMenu.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GUI\MainMenuUI.h" />
-    <ClInclude Include="GUI\OptionsMenu.h" />
-    <ClInclude Include="MainMenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
