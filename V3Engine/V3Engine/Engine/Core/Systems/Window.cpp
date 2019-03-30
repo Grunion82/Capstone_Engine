@@ -79,7 +79,17 @@ bool Window::Init()
 		return false;
 	}
 	windowContext = SDL_GL_CreateContext(window);
+	windowRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (windowRenderer == nullptr) {
+		printf("Renderer could not be created! %s", SDL_GetError());
+		Debug::SetSeverity(MessageType::TYPE_ERROR);
 	
+		std::string message = "Renderer could not be created!";
+		message += SDL_GetError();
+	
+		Debug::Error(message, __FILE__, __LINE__);
+	}
+
 	//Creating a double buffer
 	//Draw on back buffer display on front
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -161,9 +171,21 @@ bool Window::Shutdown()
 	if (window) {
 		success = false;
 	}
+	else {
+		window = nullptr;
+	}
 
 	windowResolutions.clear();
 	windowResolutions.shrink_to_fit();
+
+	SDL_DestroyRenderer(windowRenderer);
+	
+	if (windowRenderer) {
+		success = false;
+	}
+	else {
+		windowRenderer = nullptr;
+	}
 
 	CloseSDL();
 

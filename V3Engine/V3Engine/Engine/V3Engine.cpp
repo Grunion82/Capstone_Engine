@@ -1,7 +1,6 @@
 #include "V3Engine.h"
 
 #include <SDL.h>
-
 #include "Core/Managers/EventManager.h"
 #include "Core/Systems/Window.h"
 #include "Core/Systems/Input.h"
@@ -15,8 +14,9 @@
 
 std::unique_ptr<V3Engine> V3Engine::engineInstance = nullptr;
 
+std::vector<Camera*> c;
+
 Timer timer;
-Camera* c;
 
 glm::vec3 lightPos[] = { glm::vec3(0.0f,0.0f,10.0f), glm::vec3(0.0f,0.0f,-10.0f),glm::vec3(10.0f,0.0f,0.0f), glm::vec3(-10.0f,0.0f,0.0f) };
 glm::vec3 lightColor[] = { glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(0.2f, 0.8f, 0.2f),glm::vec3(0.2f, 0.2f, 0.8f) };
@@ -130,8 +130,7 @@ unsigned int numLights = 4;
 unsigned int cubeVAO, cubeVBO, densityVAO;
 unsigned int cubeTwoVAO, cubeTwoVBO, densityVBO;
 
-
-V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",800,600)) {
+V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",1024,768)) {
 	Debug::DebugInit();
 	timer.Start();
 	engineWindow->Init();
@@ -143,7 +142,10 @@ V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",800,600)) {
 	lampShader = new Shader("lampVert.glsl", "lampFrag.glsl");
 	densityCube = new Shader("density_volume_vertex.glsl","density_volume_fragment.glsl", "density_volume_geometry.glsl");
 
-	c = new Camera(engineWindow);
+	c.reserve(2);
+	c.push_back(new Camera(engineWindow));
+	c.push_back(new Camera(engineWindow));
+	c[1]->Translate(glm::vec3(0.0f, 0.0f, 15.0f));
 
 	//Cube 
 	glGenVertexArrays(1, &cubeVAO);
@@ -242,13 +244,16 @@ void V3Engine::speak() {
 			static_cast<GameController*>(Input::GetInstance()->GetJoystick(1))->Rebind();
 		}
 
-		c->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer.GetDeltaTime());
+		c[0]->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer.GetDeltaTime());
 
-		c->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
+		c[0]->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 		
 		//c->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer.GetDeltaTime());
-		c->Update();
-		
+		//c2->Controller(Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer.GetDeltaTime());
+
+		c[0]->Update();
+		c[1]->Update();
+
 		Render();
 	}
 
@@ -260,44 +265,66 @@ void V3Engine::Render()
 	//Render
 	Graphic::GetInstance()->Update();
 
-	//For geometry
-	Graphic::GetInstance()->GeometryPass();
+	for (unsigned int i = 0; i < c.size(); i++) {
+		//For geometry
+		Graphic::GetInstance()->GeometryPass();
 
-	glm::mat4 model = glm::mat4();
-	glm::mat4 view = c->GetViewMatrix();
-	glm::mat4 projection = c->GetProjectionMatrix();
+		if (i == 0) {
+			glViewport(0, engineWindow->GetHeight() / 2, engineWindow->GetWidth(), engineWindow->GetHeight() / 2);
+			//SDL_Rect topViewport;
+			//topViewport.x = 0;
+			//topViewport.y = 0;
+			//topViewport.w = engineWindow->GetWidth();
+			//topViewport.h = engineWindow->GetHeight();
+			//SDL_RenderSetViewport(engineWindow->GetRenderer(), &topViewport);
+		}
+		else {
+			glViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight() / 2);
+			//SDL_Rect bottomViewport;
+			//bottomViewport.x = 0;
+			//bottomViewport.y = engineWindow->GetHeight()/2;
+			//bottomViewport.w = engineWindow->GetWidth();
+			//bottomViewport.h = engineWindow->GetHeight();
+			//SDL_RenderSetViewport(engineWindow->GetRenderer(), &bottomViewport);
+		}
 
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -8.0f) - c->GetPosition());
+		glm::mat4 model = glm::mat4();
+		glm::mat4 view = c[i]->GetViewMatrix();
+		glm::mat4 projection = c[i]->GetProjectionMatrix();
 
-	//Graphic::GetInstance()->gbuffer.gbufferShader->Use();
-	Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("model", model);
-	Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("view", view);
-	Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("projection", projection);
+		//"Cube"
+		model = glm::translate(model, glm::vec3(0,0,-3.0f) - c[i]->GetPosition());
 
-	glBindVertexArray(cubeTwoVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
+		//Graphic::GetInstance()->gbuffer.gbufferShader->Use();
+		Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("model", model);
+		Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("view", view);
+		Graphic::GetInstance()->gbuffer.gbufferShader->SetMat4("projection", projection);
 
-	//For light
-	Graphic::GetInstance()->LightingPass();
+		glBindVertexArray(cubeTwoVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
 
-	//Set light properties
-	for (unsigned int i = 0; i < numLights; i++) {
-		Graphic::GetInstance()->gbuffer.lightShader->SetVec3("lights[" + std::to_string(i) + "].position", lightPos[i]);
-		Graphic::GetInstance()->gbuffer.lightShader->SetVec3("lights[" + std::to_string(i) + "].color", lightColor[i]);
-		float constant = 1.0f;
-		float linear = 0.7f;
-		float quadratic = 1.8f;
-		Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(i) + "].linear", linear);
-		Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(i) + "].quadratic", quadratic);
+		//For light
+		Graphic::GetInstance()->LightingPass();
 
-		float maxBrightness = std::fmaxf(std::fmaxf(lightColor[i].r, lightColor[i].g), lightColor[i].b);
-		float radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 5.0f) * maxBrightness))) / (2.0f * quadratic);
+		//Set light properties
+		for (unsigned int j = 0; j < numLights; j++) {
+			Graphic::GetInstance()->gbuffer.lightShader->SetVec3("lights[" + std::to_string(j) + "].position", lightPos[j]);
+			Graphic::GetInstance()->gbuffer.lightShader->SetVec3("lights[" + std::to_string(j) + "].color", lightColor[j]);
+			float constant = 1.0f;
+			float linear = 0.7f;
+			float quadratic = 1.8f;
+			Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(j) + "].linear", linear);
+			Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(j) + "].quadratic", quadratic);
 
-		Graphic::GetInstance()->gbuffer.lightShader->SetFloat("light[" + std::to_string(i) + "].radius", radius);
+			float maxBrightness = std::fmaxf(std::fmaxf(lightColor[j].r, lightColor[j].g), lightColor[j].b);
+			float radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 5.0f) * maxBrightness))) / (2.0f * quadratic);
+
+			Graphic::GetInstance()->gbuffer.lightShader->SetFloat("light[" + std::to_string(j) + "].radius", radius);
+		}
+		Graphic::GetInstance()->gbuffer.lightShader->SetVec3("viewPos", c[i]->GetPosition());
 	}
-	Graphic::GetInstance()->gbuffer.lightShader->SetVec3("viewPos", c->GetPosition());
-
+	//glViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight());
 	//Render to quad
 	Graphic::GetInstance()->Render();
 
@@ -311,20 +338,46 @@ void V3Engine::Render()
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	for (unsigned int i = 0; i < numLights; i++) {
-		model = glm::mat4();
-		model = glm::translate(model, lightPos[i] - c->GetPosition());
+	for (unsigned int i = 0; i < c.size(); i++) {
+		for (unsigned int j = 0; j < numLights; j++) {
+			if (i == 0) {
+				glViewport(0, engineWindow->GetHeight() / 2, engineWindow->GetWidth(), engineWindow->GetHeight() / 2);
+				//SDL_Rect topViewport;
+				//topViewport.x = 0;
+				//topViewport.y = 0;
+				//topViewport.w = engineWindow->GetWidth();
+				//topViewport.h = engineWindow->GetHeight();
+				//SDL_RenderSetViewport(engineWindow->GetRenderer(), &topViewport);
+			}
+			else {
+				glViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight() / 2);
+				//SDL_Rect bottomViewport;
+				//bottomViewport.x = 0;
+				//bottomViewport.y = engineWindow->GetHeight()/2;
+				//bottomViewport.w = engineWindow->GetWidth();
+				//bottomViewport.h = engineWindow->GetHeight();
+				//SDL_RenderSetViewport(engineWindow->GetRenderer(), &bottomViewport);
+			}
 
-		lampShader->Use();
-		lampShader->SetVec3("lightColor", lightColor[i]);
-		lampShader->SetMat4("model", model);
-		lampShader->SetMat4("view", view);
-		lampShader->SetMat4("projection", projection);
+			glm::mat4 model = glm::mat4();
+			glm::mat4 view = c[i]->GetViewMatrix();
+			glm::mat4 projection = c[i]->GetProjectionMatrix();
 
-		glBindVertexArray(cubeTwoVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
+			model = glm::translate(model, lightPos[j] - c[i]->GetPosition());
+
+			lampShader->Use();
+			lampShader->SetVec3("lightColor", lightColor[j]);
+			lampShader->SetMat4("model", model);
+			lampShader->SetMat4("view", view);
+			lampShader->SetMat4("projection", projection);
+
+			glBindVertexArray(cubeTwoVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glBindVertexArray(0);
+		}
 	}
+
+	//glViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight());
 
 	engineWindow->Render();
 }

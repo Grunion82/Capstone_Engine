@@ -11,7 +11,6 @@ Input::Input() : requestedQuit(false)
 {
 }
 
-
 Input * Input::GetInstance()
 {
 	if (instance) {
@@ -25,12 +24,12 @@ Input * Input::GetInstance()
 
 Input::~Input()
 {
-	Input::Shutdown();
+
 }
 
 bool Input::Init() {
 	//SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
-
+	
 	if (SDL_NumJoysticks() > 0) {
 		std::cout << "Number of mapping: " << SDL_GameControllerNumMappings() << std::endl;
 		std::wcout << std::endl;
@@ -192,8 +191,10 @@ bool Input::Shutdown() {
 	//Close if open
 	if (joysticks.size() > 0) {
 		for (unsigned int i = 0; i < joysticks.size(); i++) {
-			joysticks[i]->Shutdown();
-			joysticks[i] = nullptr;
+			if (joysticks[i]) {
+				joysticks[i]->Shutdown();
+				joysticks[i] = nullptr;
+			}
 		}
 		joysticks.clear();
 		joysticks.shrink_to_fit();
@@ -1228,4 +1229,3 @@ void GameController::Rebind(SDL_GameControllerButton button, SDL_GameControllerA
 
 	mapping = SDL_GameControllerMappingForGUID(SDL_JoystickGetGUID(joy));
 }
-
