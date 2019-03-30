@@ -59,6 +59,7 @@ public:
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, glm::vec3 orientation, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, glm::quat orientation, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
+	glm::mat4 GetViewMatrix() const { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
 	~Camera();
 	//For keyboard input
 	void Keyboard(float forward, float right, float deltaTime);
@@ -79,14 +80,14 @@ public:
 
 	//GETTERS
 
-	inline glm::vec3 GetPosition() { return Position; }
+	inline glm::vec3 GetPosition() const { return Position; }
 	//Get a perspective matrix based off this camera
 	glm::mat4 GetPerspective(Window& w, float near, float far);
 	//Get an orthographic matrix based off this camera
 	glm::mat4 GetOrtho(float left, float right, float bottom, float top);
 	//Get an orthographic matrix based off this camera
 	glm::mat4 GetOrtho(float left, float right, float bottom, float top, float near, float far);
-	inline glm::mat4 GetProjectionMatrix() { return cameraProjection; }
+	inline glm::mat4 GetProjectionMatrix() const { return cameraProjection; }
 	float GetFov() { return FOV; }
 
 	//SETTERS

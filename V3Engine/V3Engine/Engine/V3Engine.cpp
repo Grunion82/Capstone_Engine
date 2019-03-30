@@ -7,6 +7,9 @@
 #include "Core/Systems/Debug.h"
 #include "Core/Systems/Timer.h"
 #include "Core/Systems/Camera.h"
+#include "Core/Game/GameInterface.h"
+
+#include "Math/PhysicsManager.h"
 
 #include "Rendering/Graphic.h"
 #include "Rendering/Shader/Shader.h"
@@ -132,15 +135,13 @@ unsigned int cubeTwoVAO, cubeTwoVBO, densityVBO;
 
 V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",1024,768)) {
 	Debug::DebugInit();
-	timer.Start();
 	engineWindow->Init();
+	timer = new Timer();
+	timer->Start();
 	EventManager::GetInstace()->AddEventSystem<Window>(engineWindow);
 	Graphic::GetInstance()->InitOpenGL();
 	Input::GetInstance()->Init();
 	Graphic::GetInstance()->Init(engineWindow);
-	shader = new Shader("genericVert.glsl", "genericFrag.glsl");
-	lampShader = new Shader("lampVert.glsl", "lampFrag.glsl");
-	densityCube = new Shader("density_volume_vertex.glsl","density_volume_fragment.glsl", "density_volume_geometry.glsl");
 
 	c.reserve(2);
 	c.push_back(new Camera(engineWindow));
@@ -187,6 +188,7 @@ V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",1024,768)) {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 	glBindVertexArray(0);
 	*/
+	c = new Camera(engineWindow);
 }
 
 V3Engine::~V3Engine() {
@@ -203,45 +205,24 @@ V3Engine* V3Engine::GetInstance() {
 
 }
 
-void V3Engine::speak() {
-	
-	printf("Engine speaketh\n");
+void V3Engine::speak() {	
+	printf("Engine speaketh\n");	
+}
 
+void V3Engine::NewGame(GameInterface* game) {
+	currentGame = game;
+}
+
+void V3Engine::Run() {
 	while (!Input::GetInstance()->QuitRequested()) {
-		timer.UpdateFrameTicks();
+		timer->UpdateFrameTicks();
 
 		EventManager::GetInstace()->Update();
+		currentGame->Update(timer->GetDeltaTime());
+		PhysicsManager::GetInstance()->Update(timer->GetDeltaTime());
 
 		if (Input::GetInstance()->WasKeyPressed(SDLK_ESCAPE)) {
 			break;
-		}
-		/*
-		if (Input::GetInstance()->IsKeyDown(SDLK_w)) {
-			c->Keyboard(CameraMovement::FORWARD, timer.GetDeltaTime());
-			//printf("w\n");
-		}
-		if (Input::GetInstance()->IsKeyDown(SDLK_s)) {
-			c->Keyboard(CameraMovement::BACKWARD, timer.GetDeltaTime());
-			//printf("s\n");
-		}
-		if (Input::GetInstance()->IsKeyDown(SDLK_a)) {
-			c->Keyboard(CameraMovement::LEFT, timer.GetDeltaTime());
-			//printf("a\n");
-		}
-		if (Input::GetInstance()->IsKeyDown(SDLK_d)) {
-			c->Keyboard(CameraMovement::RIGHT, timer.GetDeltaTime());
-			//printf("d\n");
-		}*/
-
-		if (Input::GetInstance()->WasKeyPressed(SDLK_p)) {
-			engineWindow->Fullscreen();
-			Graphic::GetInstance()->WindowChange(engineWindow);
-		}
-		if (Input::GetInstance()->WasKeyPressed(SDLK_k)) {
-			static_cast<GameController*>(Input::GetInstance()->GetJoystick(0))->Rebind();
-		}
-		if (Input::GetInstance()->WasKeyPressed(SDLK_l)) {
-			static_cast<GameController*>(Input::GetInstance()->GetJoystick(1))->Rebind();
 		}
 
 		c[0]->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer.GetDeltaTime());
@@ -253,18 +234,27 @@ void V3Engine::speak() {
 
 		c[0]->Update();
 		c[1]->Update();
+		c->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer->GetDeltaTime());
+
+		c->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
+
+		//c->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
+		c->Update();
 
 		Render();
+		SDL_Delay(timer->GetSleepTime(90)); // 90 fps
 	}
 
 	Shutdown();
 }
 
-void V3Engine::Render()
-{
+void V3Engine::Render() {
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	//Render
-	Graphic::GetInstance()->Update();
+	//Graphic::GetInstance()->Update();
 
+<<<<<<< HEAD
 	for (unsigned int i = 0; i < c.size(); i++) {
 		//For geometry
 		Graphic::GetInstance()->GeometryPass();
@@ -316,6 +306,22 @@ void V3Engine::Render()
 			float quadratic = 1.8f;
 			Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(j) + "].linear", linear);
 			Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(j) + "].quadratic", quadratic);
+	//For geometry
+	//Graphic::GetInstance()->GeometryPass();
+
+	//For light
+	//Graphic::GetInstance()->LightingPass();
+
+	//Set light properties
+	/*for (unsigned int i = 0; i < numLights; i++) {
+		Graphic::GetInstance()->gbuffer.lightShader->SetVec3("lights[" + std::to_string(i) + "].position", lightPos[i]);
+		Graphic::GetInstance()->gbuffer.lightShader->SetVec3("lights[" + std::to_string(i) + "].color", lightColor[i]);
+		float constant = 1.0f;
+		float linear = 0.7f;
+		float quadratic = 1.8f;
+		Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(i) + "].linear", linear);
+		Graphic::GetInstance()->gbuffer.lightShader->SetFloat("lights[" + std::to_string(i) + "].quadratic", quadratic);
+>>>>>>> origin/grunion
 
 			float maxBrightness = std::fmaxf(std::fmaxf(lightColor[j].r, lightColor[j].g), lightColor[j].b);
 			float radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 5.0f) * maxBrightness))) / (2.0f * quadratic);
@@ -336,7 +342,7 @@ void V3Engine::Render()
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
+	glDisable(GL_BLEND);*/
 
 	for (unsigned int i = 0; i < c.size(); i++) {
 		for (unsigned int j = 0; j < numLights; j++) {
@@ -376,32 +382,29 @@ void V3Engine::Render()
 			glBindVertexArray(0);
 		}
 	}
+=======
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	currentGame->Render(c);
+>>>>>>> origin/grunion
 
 	//glViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight());
 
 	engineWindow->Render();
 }
 
-bool V3Engine::Shutdown()
-{
-	glDeleteVertexArrays(1, &cubeVAO);
-	glDeleteBuffers(1, &cubeVBO);
-	glDeleteVertexArrays(1, &cubeTwoVAO);
-	glDeleteBuffers(1, &cubeTwoVBO);
-	glDeleteVertexArrays(1, &densityVAO);
-	glDeleteBuffers(1, &densityVBO);
-
+bool V3Engine::Shutdown() {
 	EventManager::GetInstace()->Shutdown();
 	Graphic::GetInstance()->Shutdown();
 
-	shader = nullptr;
-	delete shader;
+	delete currentGame;
+	currentGame = nullptr;
 
-	lampShader = nullptr;
-	delete lampShader;
+	delete timer;
+	timer = nullptr;
 
-	densityCube = nullptr;
-	delete densityCube;
+	delete engineWindow;
+	engineWindow = nullptr;
 
 	return true;
 }

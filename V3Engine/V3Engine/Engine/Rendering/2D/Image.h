@@ -16,6 +16,8 @@ public:
 	void Use();
 	inline unsigned int ID() { return cubemapID; }
 	bool Init();
+
+	inline void SetFaces(std::vector<const char*> newFaces) { glDeleteTextures(1, &cubemapID); faces = newFaces; Init(); }
 };
 
 class Texture

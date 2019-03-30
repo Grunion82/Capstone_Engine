@@ -6,6 +6,17 @@
 int main(int argc, char* argv[]) {
 	V3Engine::GetInstance()->speak();
 	
+#include "LeakyJeans.h"
+
+int main(int argc, char* argv[]) {
+	V3Engine::GetInstance()->speak();
+	GameInterface* LJ = new LeakyJeans();
+
+
+	V3Engine::GetInstance()->NewGame(LJ);
+	V3Engine::GetInstance()->Run();
+
+>>>>>>> origin/grunion
 	getchar();
 	return 0;
 }

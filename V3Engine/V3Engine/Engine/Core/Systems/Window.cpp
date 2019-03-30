@@ -8,16 +8,12 @@ Window::Window(const char* name) : windowName(name), windowWidth(0), windowHeigh
 
 }
 
-Window::Window(unsigned int width, unsigned int height) : windowName("Window"),windowWidth(width)
+Window::Window(unsigned int width, unsigned int height) : windowName("Window"), windowWidth(width)
 {
 	
 }
 
 Window::Window(const char * name, unsigned int width, unsigned int height) : windowName(name), windowWidth(width), windowHeight(height)
-{
-}
-
-Window::~Window()
 {
 }
 

@@ -143,14 +143,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Game\GameInterface.h" />
+    <ClInclude Include="Engine\Core\Game\GameObject.h" />
+    <ClInclude Include="Engine\Core\Game\Skybox.h" />
     <ClInclude Include="Engine\Core\Managers\Manager.h" />
     <ClInclude Include="Engine\Core\Systems\Camera.h" />
     <ClInclude Include="Engine\Core\Systems\Debug.h" />
     <ClInclude Include="Engine\Core\Systems\EventSystem.h" />
     <ClInclude Include="Engine\Core\Systems\Input.h" />
     <ClInclude Include="Engine\Core\Systems\System.h" />
+    <ClInclude Include="Engine\Math\Colliders.h" />
+    <ClInclude Include="Engine\Math\PhysicsManager.h" />
+    <ClInclude Include="Engine\Math\RigidBody.h" />
     <ClInclude Include="Engine\Rendering\2D\Image.h" />
     <ClInclude Include="Engine\Rendering\2D\stb_image.h" />
+    <ClInclude Include="Engine\Rendering\3D\Mesh.h" />
+    <ClInclude Include="Engine\Rendering\3D\Model.h" />
+    <ClInclude Include="Engine\Rendering\3D\ModelLoader.h" />
     <ClInclude Include="Engine\Rendering\Shader\Shader.h" />
     <ClInclude Include="Engine\V3Engine.h" />
     <ClInclude Include="Engine\Core\Systems\Timer.h" />
@@ -161,10 +169,19 @@
     <ClInclude Include="Engine\Core\Managers\EventManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Game\GameInterface.cpp" />
+    <ClCompile Include="Engine\Core\Game\GameObject.cpp" />
+    <ClCompile Include="Engine\Core\Game\Skybox.cpp" />
     <ClCompile Include="Engine\Core\Systems\Camera.cpp" />
     <ClCompile Include="Engine\Core\Systems\Debug.cpp" />
     <ClCompile Include="Engine\Core\Systems\Input.cpp" />
+    <ClCompile Include="Engine\Math\Colliders.cpp" />
+    <ClCompile Include="Engine\Math\PhysicsManager.cpp" />
+    <ClCompile Include="Engine\Math\RigidBody.cpp" />
     <ClCompile Include="Engine\Rendering\2D\Image.cpp" />
+    <ClCompile Include="Engine\Rendering\3D\Mesh.cpp" />
+    <ClCompile Include="Engine\Rendering\3D\Model.cpp" />
+    <ClCompile Include="Engine\Rendering\3D\ModelLoader.cpp" />
     <ClCompile Include="Engine\Rendering\Shader\Shader.cpp" />
     <ClCompile Include="Engine\V3Engine.cpp" />
     <ClCompile Include="Engine\Core\Systems\Timer.cpp" />
