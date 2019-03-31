@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "Window.h"
 
+#include <glew.h>
+
 Camera::Camera(Window* window, float near, float far) : Position(0.0f,0.0f,0.0f), Forward(0.0f,0.0f,-1.0f), Up(0.0f,1.0f,0.0f), Right(1.0f,0.0f,0.0f), WorldUp(0.0f,1.0f,0.0f), 
 													    MovementSpeed(10.0f), ControllerSensitivity(CONTROLLER_SENSITIVITY),MouseSensitivity(MOUSE_SENSITIVITY), FOV(FIELD_OF_VIEW)
 {
@@ -8,6 +10,9 @@ Camera::Camera(Window* window, float near, float far) : Position(0.0f,0.0f,0.0f)
 	eulerAngle.x = PITCH;
 	eulerAngle.y = YAW;
 	eulerAngle.z = ROLL;
+	cameraViewport.x, cameraViewport.y = 0;
+	cameraViewport.w = window->GetWidth();
+	cameraViewport.h = window->GetHeight();
 }
 
 Camera::Camera(float left, float right, float bottom, float top, float near, float far) : Position(0.0f, 0.0f, 0.0f), Forward(0.0f, 0.0f, -1.0f), Up(0.0f, 1.0f, 0.0f), Right(1.0f, 0.0f, 0.0f), WorldUp(0.0f, 1.0f, 0.0f),
@@ -17,6 +22,10 @@ Camera::Camera(float left, float right, float bottom, float top, float near, flo
 	eulerAngle.x = PITCH;
 	eulerAngle.y = YAW;
 	eulerAngle.z = ROLL;
+	cameraViewport.x = left;
+	cameraViewport.y = bottom;
+	cameraViewport.w = right - left;
+	cameraViewport.h = top - bottom;
 }
 
 Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, 
@@ -28,6 +37,9 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraProjection = glm::perspective(FOV, (float)window->GetWidth() / (float)window->GetHeight(), near, far);
 	eulerAngle = orientation;
 	Quaternion = glm::quat(eulerAngle);
+	cameraViewport.x, cameraViewport.y = 0;
+	cameraViewport.w = window->GetWidth();
+	cameraViewport.h = window->GetHeight();
 }
 
 Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup,
@@ -39,6 +51,9 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraProjection = glm::perspective(FOV, (float)window->GetWidth() / (float)window->GetHeight(), near, far);
 	Quaternion = orientation;
 	eulerAngle = glm::eulerAngles(Quaternion);
+	cameraViewport.x, cameraViewport.y = 0;
+	cameraViewport.w = window->GetWidth();
+	cameraViewport.h = window->GetHeight();
 }
 Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, 
 			   glm::vec3 orientation, float movespeed, float sensitivity, float c_sensitivity, float fov, 
@@ -49,6 +64,10 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraProjection = glm::ortho(l, r, b, t, near, far);
 	eulerAngle = orientation;
 	Quaternion = glm::quat(eulerAngle);
+	cameraViewport.x = l;
+	cameraViewport.y = b;
+	cameraViewport.w = r - l;
+	cameraViewport.h = t - b;
 }
 Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup,
 			   glm::quat orientation, float movespeed, float sensitivity, float c_sensitivity, float fov,
@@ -59,6 +78,10 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraProjection = glm::ortho(l, r, b, t, near, far);
 	Quaternion = orientation;
 	eulerAngle = glm::eulerAngles(Quaternion);
+	cameraViewport.x = l;
+	cameraViewport.y = b;
+	cameraViewport.w = r - l;
+	cameraViewport.h = t - b;
 }
 bool Camera::Init()
 {
@@ -79,6 +102,7 @@ void Camera::Update()
 
 void Camera::Render()
 {
+	glViewport(cameraViewport.x, cameraViewport.y, cameraViewport.w, cameraViewport.h);
 }
 
 bool Camera::Shutdown()

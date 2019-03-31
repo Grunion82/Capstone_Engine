@@ -68,8 +68,8 @@ bool Quad::Shutdown()
 	//glDeleteVertexArrays(1, &quadVAO);
 	//glDeleteBuffers(1, &quadVBO);
 
-	quadShader = nullptr;
 	delete quadShader;
+	quadShader = nullptr;
 
 	return true;
 }
@@ -219,11 +219,11 @@ GBuffer::~GBuffer() {
 
 	//glDeleteTextures(GBUFFER_NUM_TEXTURES, textures);
 
-	lightShader = nullptr;
 	delete lightShader;
+	lightShader = nullptr;
 
-	gbufferShader = nullptr;
 	delete gbufferShader;
+	gbufferShader = nullptr;
 
 	//diffuse = nullptr;
 	//delete diffuse;
@@ -422,11 +422,11 @@ void GBuffer::SetReadBuffer(GBUFFER_TEXTURE_TYPE type)
 
 bool GBuffer::Shutdown()
 {
-	gbufferShader = nullptr;
 	delete gbufferShader;
+	gbufferShader = nullptr;
 	
-	lightShader = nullptr;
 	delete lightShader;
+	lightShader = nullptr;
 	
 	glDeleteFramebuffers(1, &FBO);
 	glDeleteRenderbuffers(1, &RBO);

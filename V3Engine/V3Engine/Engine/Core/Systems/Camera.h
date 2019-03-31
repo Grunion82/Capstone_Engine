@@ -13,6 +13,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <SDL_rect.h>
+
 
 
 class Window;
@@ -28,6 +30,8 @@ class Camera
 	glm::vec3 WorldUp;
 	glm::quat Quaternion;
 	glm::vec3 eulerAngle;
+
+	SDL_Rect cameraViewport;
 
 	//Euler angles
 	//float Pitch;
@@ -60,6 +64,10 @@ public:
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, glm::quat orientation, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
 	glm::mat4 GetViewMatrix() const { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
+
+	void SetCameraViewport(SDL_Rect& rect) { cameraViewport = rect; }
+	void SetCameraViewport(float x, float y, float w, float h) { cameraViewport.x = x; cameraViewport.y = y; cameraViewport.w = w; cameraViewport.h = h; }
+
 	~Camera();
 	//For keyboard input
 	void Keyboard(float forward, float right, float deltaTime);

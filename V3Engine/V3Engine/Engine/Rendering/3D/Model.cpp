@@ -23,8 +23,8 @@ Model::~Model() {
 		subMeshes.shrink_to_fit();
 	}
 
-	delete shaderProgram;
-	shaderProgram = nullptr;
+	//delete shaderProgram;
+	//shaderProgram = nullptr;
 
 	delete textureMap;
 	textureMap = nullptr;
@@ -56,10 +56,10 @@ void Model::AddMesh(Mesh* mesh_) {
 
 }
 
-void Model::SetShaderProgram(Shader* newShader) {
+void Model::SetShader(Shader* newShader) {
 	shaderProgram = newShader;
 	for (Mesh* m : subMeshes) {
-		m->SetShaderProgram(shaderProgram->ID);
+		m->SetShader(newShader);
 	}
 }
 

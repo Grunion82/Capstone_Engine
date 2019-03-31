@@ -12,7 +12,7 @@ Platform::Platform(const std::string& name, glm::vec3 position) : GameObject(nam
 
 	model = new Model(this, "Assets/Models/Platform.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/grass.jpg"));
-	model->SetShaderProgram(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));
+	model->SetShader(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));
 
 	rigidBody = new RigidBody(this);
 	rigidBody->isEnabled = false;

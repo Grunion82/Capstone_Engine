@@ -45,7 +45,7 @@ public:
 	void AddMesh(Mesh* mesh);
 
 	//Assigns the Shader program
-	void SetShaderProgram(Shader* newShader);
+	void SetShader(Shader* newShader);
 
 	//Assigns the Texture map
 	void SetTextureMap(Texture* newMap);

@@ -65,16 +65,28 @@ public:
 	void Translate(const vec3& value);
 	void Translate(const float x, const float y, const float z);
 
+	void SetPos(const vec3& value) { transform.position = value; }
+	void SetPos(const float x, const float y, const float z) { transform.position = glm::vec3(x, y, z); }
+
 	//Rotate Methods-- Axes must be nomralized
 	void Rotate(const vec3& value);
 	void Rotate(const float angle, vec3& axis);
 	void Rotate(const float x, const float y, const float z);
 	void Rotate(const float angle, const float x, const float y, const float z);
 
+	void SetRotate(const vec3& value) { transform.rotation = value; }
+	void SetRotate(const float angle, vec3& axis) { transform.rotation = glm::eulerAngles(glm::quat(angle, axis)); }
+	void SetRotate(const float x, const float y, const float z) { transform.rotation = glm::vec3(x, y, z); }
+	void SetRotate(const float angle, const float x, const float y, const float z) { transform.rotation = glm::eulerAngles(glm::quat(angle, glm::vec3(x, y, z))); }
+
 	//Scale Methods
 	void Scale(const vec3& value);
 	void Scale(const float x, const float y, const float z);
 	void Scale(const float value);
+
+	void SetScale(const vec3& value) { transform.scale = value; }
+	void SetScale(const float x, const float y, const float z) { transform.scale = glm::vec3(x, y, z); }
+	void SetScale(const float value) { transform.scale = glm::vec3(value, value, value); }
 
 	//Name Setter and Getter
 	void SetName(const std::string& name);
@@ -88,6 +100,8 @@ public:
 	inline Model* GetModel() { return model; }
 	inline Collider* GetCollider() { return collider; }
 	inline RigidBody* GetRigidBody() { return rigidBody; }
+
+	
 
 	//Layer Setter and Getter
 	/*void SetLayer(const __int16 layer);
