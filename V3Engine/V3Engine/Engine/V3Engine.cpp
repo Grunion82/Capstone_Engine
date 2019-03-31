@@ -231,8 +231,8 @@ void V3Engine::Run() {
 
 		c[0]->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 		
-		//c[0]->Controller(Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[0]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
-		//c[1]->Controller(Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoysticks()[1]->GetAxisDir(SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
+		c[0]->Controller(Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
+		c[1]->Controller(Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
 
 		for (unsigned int i = 0; i < c.size(); i++) {
 			c[i]->Update();
@@ -253,6 +253,7 @@ void V3Engine::Run() {
 
 void V3Engine::Render() {
 	Graphic::GetInstance()->Update();
+	//Graphic::GetInstance()->GeometryPass();
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -262,7 +263,10 @@ void V3Engine::Render() {
 	}
 
 	//Graphic::GetInstance()->Render();
-
+	//Graphic::GetInstance()->gbuffer.BindForReading();
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	//glBlitFramebuffer(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight(), 0, 0, engineWindow->GetWidth(), engineWindow->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	engineWindow->Render();
 }
 

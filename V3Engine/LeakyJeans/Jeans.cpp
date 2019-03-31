@@ -1,5 +1,7 @@
 #include "Jeans.h"
 
+#include "../V3Engine/Engine/Rendering/Graphic.h"
+
 #include <stdio.h>
 #include <Engine/Core/Systems/Camera.h>
 #include <Engine/Core/Systems/Input.h>
@@ -8,6 +10,7 @@ Jeans::Jeans() : GameObject("Jeans") {
 	model = new Model(this, "Assets/Models/cube.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/jeans.jpg"));
 	model->SetShader(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));
+	//model->SetShader(Graphic::GetInstance()->gbuffer.gbufferShader);
 
 	rigidBody = new RigidBody(this);
 	rigidBody->isEnabled = false;

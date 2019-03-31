@@ -22,9 +22,9 @@ Model::~Model() {
 		subMeshes.clear();
 		subMeshes.shrink_to_fit();
 	}
-
 	//delete shaderProgram;
 	//shaderProgram = nullptr;
+
 
 	delete textureMap;
 	textureMap = nullptr;

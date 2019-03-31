@@ -128,12 +128,14 @@ void Input::Update(SDL_Event& e) {
 			break;
 		case(SDL_CONTROLLERDEVICEREMOVED):
 			for (unsigned int i = 0; i < joysticks.size(); i++) {
-				if (joysticks[i]->GetID() == e.cdevice.which) {
-					joysticks[i]->Shutdown();
-					delete joysticks[i];
-					joysticks[i] = nullptr;
-					break;
-					//joysticks.erase(joysticks.begin() + i);
+				if (joysticks[i]) {
+					if (joysticks[i]->GetID() == e.cdevice.which) {
+						joysticks[i]->Shutdown();
+						delete joysticks[i];
+						joysticks[i] = nullptr;
+						break;
+						//joysticks.erase(joysticks.begin() + i);
+					}
 				}
 			}
 			break;
@@ -207,6 +209,37 @@ bool Input::Shutdown() {
 	oldMouseButtons.clear();
 
 	return true;
+}
+
+int Input::GetJoystickAxis(unsigned int index, unsigned int axis)
+{
+	if (joysticks.size() > 0) {
+		if (joysticks[index]) {
+			return joysticks[index]->joyAxis[axis];
+		}
+	}
+	return 0;
+}
+
+int Input::GetJoystickAxisDir(unsigned int index, unsigned int axis)
+{
+	if (joysticks.size() > 0) {
+		if (joysticks[index]) {
+			return joysticks[index]->joyAxisDir[axis];
+		}
+	}
+	return 0;
+}
+
+int Input::GetJoystickButton(unsigned int index, unsigned int button)
+{
+	if (joysticks.size() > 0) {
+		if (joysticks[index]) {
+			return joysticks[index]->joyButtons[button];
+		}
+	}
+
+	return 0;
 }
 
 bool Input::IsKeyDown(unsigned int key)

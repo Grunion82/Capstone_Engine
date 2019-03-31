@@ -181,6 +181,9 @@ public:
 
 	inline std::vector<Joystick*> GetJoysticks() { return joysticks; }
 	inline Joystick* GetJoystick(unsigned int index) { return joysticks[index]; }
+	int GetJoystickAxis(unsigned int index, unsigned int axis);
+	int GetJoystickAxisDir(unsigned int index, unsigned int axis);
+	int GetJoystickButton(unsigned int index, unsigned int button);
 
 	//KEYBOARD=======================================================
 
