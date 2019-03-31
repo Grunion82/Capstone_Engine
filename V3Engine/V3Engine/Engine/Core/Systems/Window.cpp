@@ -168,7 +168,7 @@ bool Window::Shutdown()
 
 bool Window::InitSDL() {
 	bool success = true;
-	SDL_SetHint("SDL_HINT_GAMECONTROLLERCONFIG", "1");
+	//SDL_SetHint("SDL_HINT_GAMECONTROLLERCONFIG", "1");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		success = false;
 	}
