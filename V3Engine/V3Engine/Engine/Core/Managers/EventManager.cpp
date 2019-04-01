@@ -14,10 +14,11 @@ EventManager::~EventManager()
 void EventManager::Update()
 {
 	SDL_Event e;
-
 	Input::GetInstance()->Update();
+	
 	while (SDL_PollEvent(&e) != 0) {
 		Input::GetInstance()->Update(e);
+		Input::GetInstance()->UpdateJoysticks(e);
 		for (unsigned int i = 0; i < eventSystems.size(); i++) {
 			eventSystems[i]->Update(e);
 		}

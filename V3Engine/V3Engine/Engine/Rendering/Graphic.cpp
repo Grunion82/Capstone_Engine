@@ -63,13 +63,25 @@ void Quad::Render()
 	glBindVertexArray(0);
 }
 
+void Quad::Render(Texture* colorBuffer)
+{
+	quadShader->Use();
+	glBindVertexArray(quadVAO);
+	glActiveTexture(GL_TEXTURE0);
+	colorBuffer->Use();
+	quadShader->SetInt("screenTexture", colorBuffer->ID());
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
+
+
 bool Quad::Shutdown()
 {
 	//glDeleteVertexArrays(1, &quadVAO);
 	//glDeleteBuffers(1, &quadVBO);
 
-	quadShader = nullptr;
 	delete quadShader;
+	quadShader = nullptr;
 
 	return true;
 }
@@ -147,7 +159,7 @@ void Graphic::Render()
 	//glClear(clearParameters);
 
 	//Render quad
-	quad.Render();
+	quad.Render(gbuffer.colorBuffer);
 }
 
 void Graphic::GeometryPass()
@@ -219,11 +231,11 @@ GBuffer::~GBuffer() {
 
 	//glDeleteTextures(GBUFFER_NUM_TEXTURES, textures);
 
-	lightShader = nullptr;
 	delete lightShader;
+	lightShader = nullptr;
 
-	gbufferShader = nullptr;
 	delete gbufferShader;
+	gbufferShader = nullptr;
 
 	//diffuse = nullptr;
 	//delete diffuse;
@@ -259,18 +271,19 @@ bool GBuffer::Init(unsigned int width, unsigned int height)
 	gbufferTextures[GBUFFER_TEXTURE_TYPE_POSITION] = new Texture(width,height,GL_RGB16F,GL_RGB,GL_TEXTURE_2D,GL_FLOAT,GL_REPEAT,GL_REPEAT,GL_NEAREST,GL_NEAREST);
 	gbufferTextures[GBUFFER_TEXTURE_TYPE_NORMAL] = new Texture(width, height, GL_RGB16F, GL_RGB, GL_TEXTURE_2D, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
 	gbufferTextures[GBUFFER_TEXTURE_TYPE_ALBEDOSPEC] = new Texture(width, height,GL_RGBA,GL_RGBA,GL_TEXTURE_2D,GL_UNSIGNED_BYTE,GL_REPEAT,GL_REPEAT,GL_NEAREST,GL_NEAREST);
-	
+	colorBuffer = new Texture(width,height,GL_RGBA16F,GL_RGBA,0,GL_TEXTURE_2D,GL_REPEAT,GL_REPEAT,GL_LINEAR,GL_LINEAR);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer->ID(), 0);
+	GLenum drawBuffer[GBUFFER_NUM_TEXTURES];
+
 	for (unsigned int i = 0; i < GBUFFER_NUM_TEXTURES; i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
 		gbufferTextures[i]->Use();
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, gbufferTextures[i]->ID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1 + i, GL_TEXTURE_2D, gbufferTextures[i]->ID(), 0);
+		drawBuffer[i] = GL_COLOR_ATTACHMENT1 + i;
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//Position, normal and albedo(diffuse and specular)
-	GLenum drawBuffers[GBUFFER_NUM_TEXTURES] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
-	
-	glDrawBuffers(GBUFFER_NUM_TEXTURES, drawBuffers);
+	glDrawBuffers(GBUFFER_NUM_TEXTURES, drawBuffer);
 
 	//For depth
 	glGenRenderbuffers(1, &RBO);
@@ -288,9 +301,9 @@ bool GBuffer::Init(unsigned int width, unsigned int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	gbufferShader = new Shader("gbufferVert.glsl", "gbufferFrag.glsl");
-	//gbufferShader->Use();
-	//gbufferShader->SetInt("texture_diffuse1", 0);
-	//gbufferShader->SetInt("texture_specular1", 1);
+	gbufferShader->Use();
+	gbufferShader->SetInt("texture_diffuse1", 0);
+	gbufferShader->SetInt("texture_specular1", 1);
 
 	lightShader = new Shader("lightVert.glsl", "lightFrag.glsl");
 	lightShader->Use();
@@ -422,11 +435,11 @@ void GBuffer::SetReadBuffer(GBUFFER_TEXTURE_TYPE type)
 
 bool GBuffer::Shutdown()
 {
-	gbufferShader = nullptr;
 	delete gbufferShader;
+	gbufferShader = nullptr;
 	
-	lightShader = nullptr;
 	delete lightShader;
+	lightShader = nullptr;
 	
 	glDeleteFramebuffers(1, &FBO);
 	glDeleteRenderbuffers(1, &RBO);

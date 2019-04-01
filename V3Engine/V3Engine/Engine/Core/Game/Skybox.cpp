@@ -22,7 +22,8 @@ Skybox::Skybox(std::vector<const char*> tempFaces, const char* filepath, Shader*
 
 	//Create Skybox Shader program and assign to the mesh
 	shaderProgram = newShader;
-	cubeMesh->SetShaderProgram(shaderProgram->ID);
+	//cubeMesh->SetShaderProgram(shaderProgram->ID);
+	cubeMesh->SetShader(shaderProgram);
 
 	//Set id
 	identity = glm::mat4(1.0f);
@@ -36,8 +37,8 @@ Skybox::~Skybox() {
 	delete cubeMap;
 	cubeMap = nullptr;
 
-	delete shaderProgram;
-	shaderProgram = nullptr;
+	//delete shaderProgram;
+	//shaderProgram = nullptr;
 }
 
 void Skybox::Update(float deltaTime) {

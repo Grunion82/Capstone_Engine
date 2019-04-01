@@ -2,6 +2,7 @@
 
 #include "../../Core/Game/GameObject.h"
 
+
 Model::Model(GameObject* refObj, const std::string& objPath_) : subMeshes(std::vector<Mesh*>()) {
 	referenceObject = refObj;
 	transform = referenceObject->GetTransform().TransformationMatrix;
@@ -22,9 +23,9 @@ Model::~Model() {
 		subMeshes.clear();
 		subMeshes.shrink_to_fit();
 	}
+	//delete shaderProgram;
+	//shaderProgram = nullptr;
 
-	delete shaderProgram;
-	shaderProgram = nullptr;
 
 	delete textureMap;
 	textureMap = nullptr;
@@ -43,6 +44,7 @@ void Model::Render(const Camera* camera_) {
 	glBindTexture(GL_TEXTURE_2D, textureMap->ID());
 	shaderProgram->Use();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	for (auto m : subMeshes) {
 		m->Render(camera_, transform);
 	}
@@ -56,10 +58,10 @@ void Model::AddMesh(Mesh* mesh_) {
 
 }
 
-void Model::SetShaderProgram(Shader* newShader) {
+void Model::SetShader(Shader* newShader) {
 	shaderProgram = newShader;
 	for (Mesh* m : subMeshes) {
-		m->SetShaderProgram(shaderProgram->ID);
+		m->SetShader(newShader);
 	}
 }
 
