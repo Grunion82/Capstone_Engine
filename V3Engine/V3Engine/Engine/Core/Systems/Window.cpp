@@ -97,7 +97,7 @@ bool Window::Init()
 	SDL_SetWindowGrab(window, SDL_TRUE);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
-	eventFlags = SDL_WINDOWEVENT | SDL_WINDOWEVENT_SHOWN | SDL_WINDOWEVENT_EXPOSED | SDL_WINDOWEVENT_FOCUS_GAINED | SDL_WINDOWEVENT_ENTER | SDL_WINDOWEVENT_HIDDEN | SDL_WINDOWEVENT_FOCUS_LOST | SDL_WINDOWEVENT_LEAVE | SDL_WINDOWEVENT_SIZE_CHANGED | SDL_WINDOWEVENT_RESIZED | SDL_WINDOWEVENT_MAXIMIZED | SDL_WINDOWEVENT_RESTORED;
+	eventFlags = SDL_WINDOWEVENT | SDL_WINDOWEVENT_SHOWN | SDL_WINDOWEVENT_EXPOSED | SDL_WINDOWEVENT_FOCUS_GAINED | SDL_WINDOWEVENT_ENTER | SDL_WINDOWEVENT_HIDDEN | SDL_WINDOWEVENT_FOCUS_LOST | SDL_WINDOWEVENT_LEAVE | SDL_WINDOWEVENT_SIZE_CHANGED | SDL_WINDOWEVENT_RESIZED | SDL_WINDOWEVENT_MAXIMIZED | SDL_WINDOWEVENT_RESTORED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_INPUT_GRABBED;
 
 	return true;
 }
@@ -107,12 +107,15 @@ void Window::Update(SDL_Event& e)
 	if((e.type & eventFlags) == e.type) {
 		switch (e.window.event)
 		{
-		case(SDL_WINDOWEVENT_SHOWN):
-		case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn?
-		case(SDL_WINDOWEVENT_ENTER)://Window has gained mouse focus
-		case(SDL_WINDOWEVENT_FOCUS_GAINED):
+		//case(SDL_WINDOW_INPUT_GRABBED):
+		//case(SDL_WINDOW_INPUT_FOCUS):
+		case(SDL_WINDOWEVENT_SHOWN)://Window has been shown, ex. alt + tab through applications
+		case(SDL_WINDOWEVENT_ENTER)://Window has gained mouse focus, mouse enters(hovers over) window
+		case(SDL_WINDOWEVENT_FOCUS_GAINED)://Window gained focused, this occurs before exposed
+		case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn, is "selected"
 			SDL_ShowCursor(SDL_DISABLE);
 			SDL_SetWindowGrab(window, SDL_TRUE);
+			SDL_CaptureMouse(SDL_TRUE);
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 			break;
 		case(SDL_WINDOWEVENT_HIDDEN):
@@ -120,6 +123,7 @@ void Window::Update(SDL_Event& e)
 		case(SDL_WINDOWEVENT_LEAVE)://Window has lost mouse focus
 			SDL_ShowCursor(SDL_ENABLE);
 			SDL_SetWindowGrab(window, SDL_FALSE);
+			SDL_CaptureMouse(SDL_FALSE);
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 			break;
 		case(SDL_WINDOWEVENT_SIZE_CHANGED)://The window size has changed, either as a result of an API call or through the system or user changing the window size

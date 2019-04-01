@@ -15,8 +15,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <SDL_rect.h>
 
-
-
 class Window;
 
 class Camera

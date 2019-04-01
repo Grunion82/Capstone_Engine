@@ -35,7 +35,7 @@ void PhysicsManager::CheckCollisions() {
 
 			//Intersecting/Colliding colliders-- may need  "&& !foundCollision"
 			if (dynamic_cast<BoundingBox*>(physicsObjects[i]->GetCollider())->Intersect(dynamic_cast<BoundingBox*>(physicsObjects[j]->GetCollider()))) {
-				printf("There was a collision\n");
+				//printf("There was a collision\n");
 				//printf("get angle: %p\n", physicsObjects[i]->Update);
 				//printf("1 | 2 = %d\n", 1 | 2);
 				CalculateCollisionResponse(i, j);
@@ -47,7 +47,7 @@ void PhysicsManager::CheckCollisions() {
 
 //Calculates the response of the Collision between Objects
 void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Index) {
-	printf("%s and %s\n", physicsObjects[object1Index]->GetName().c_str(), physicsObjects[object2Index]->GetName().c_str());
+	//printf("%s and %s\n", physicsObjects[object1Index]->GetName().c_str(), physicsObjects[object2Index]->GetName().c_str());
 
 	//Distance vector between positions
 	glm::vec3 position1 = physicsObjects[object1Index]->GetTransform().position;

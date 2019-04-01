@@ -100,6 +100,7 @@ public:
 	inline Model* GetModel() { return model; }
 	inline Collider* GetCollider() { return collider; }
 	inline RigidBody* GetRigidBody() { return rigidBody; }
+	inline glm::mat4 GetTransformMatrix() { return transform.TransformationMatrix; }
 
 	
 
