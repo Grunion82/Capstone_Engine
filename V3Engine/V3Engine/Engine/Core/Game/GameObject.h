@@ -25,6 +25,9 @@ private:
 	//Default constructor-- Do not use
 	GameObject();
 
+	friend class PhysicsManager;
+	friend class Collision;
+
 protected:
 	Model* model;
 	Collider* collider;
@@ -41,7 +44,12 @@ protected:
 
 	bool isActive;
 
+	//Updates the GameObjects transform after moving it
 	void UpdateTransform();
+	
+	virtual void CollisionEnter(GameObject* collisionObj);
+	virtual void CollisionStay(GameObject* collisionObj);
+	virtual void CollisionExit(GameObject* collisionObj);
 
 public:
 
@@ -96,9 +104,11 @@ public:
 	void SetTag(const std::string& tag);
 	std::string GetTag() const;
 
-	//Retrieve Various Components
+	//Retrieve Model Component
 	inline Model* GetModel() { return model; }
+	//Retrieve Collider Component
 	inline Collider* GetCollider() { return collider; }
+	//Retrieve Rigidbody Component
 	inline RigidBody* GetRigidBody() { return rigidBody; }
 	inline glm::mat4 GetTransformMatrix() { return transform.TransformationMatrix; }
 
