@@ -1,7 +1,5 @@
 #include "Jeans.h"
 
-#include "../V3Engine/Engine/Rendering/Graphic.h"
-
 #include <stdio.h>
 #include <Engine/Core/Systems/Camera.h>
 #include <Engine/Core/Systems/Input.h>
@@ -25,7 +23,6 @@ Jeans::Jeans(const std::string& name, glm::vec3 position) : GameObject(name) {
 	Tag = "Player";
 	hasJumped = false;
 
-<<<<<<< HEAD
 	model = new Model(this, "Assets/Models/cube.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/jeans.jpg"));
 	model->SetShader(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));

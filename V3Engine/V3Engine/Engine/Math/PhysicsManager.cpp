@@ -39,12 +39,6 @@ void PhysicsManager::CheckCollisions() {
 			//RTTI definition for collision detection modes
 
 			//Intersecting/Colliding colliders-- may need  "&& !foundCollision"
-<<<<<<< HEAD
-			if (dynamic_cast<BoundingBox*>(physicsObjects[i]->GetCollider())->Intersect(dynamic_cast<BoundingBox*>(physicsObjects[j]->GetCollider()))) {
-				//printf("There was a collision\n");
-				//printf("get angle: %p\n", physicsObjects[i]->Update);
-				//printf("1 | 2 = %d\n", 1 | 2);
-=======
 			if (dynamic_cast<BoundingBox*>(physicsObjects[i]->collider)->Intersect(dynamic_cast<BoundingBox*>(physicsObjects[j]->collider))) {
 				std::string signature = physicsObjects[i]->Name + physicsObjects[j]->Name;
 				if (collidingObjects.find(signature) == collidingObjects.end()) {
@@ -55,8 +49,6 @@ void PhysicsManager::CheckCollisions() {
 				else {
 					collidingObjects[signature].isActive = true;
 				}
-
->>>>>>> origin/grunion
 				CalculateCollisionResponse(i, j);
 			}
 
@@ -81,12 +73,6 @@ void PhysicsManager::CheckCollisions() {
 
 //Calculates the response of the Collision between Objects
 void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Index) {
-<<<<<<< HEAD
-	//printf("%s and %s\n", physicsObjects[object1Index]->GetName().c_str(), physicsObjects[object2Index]->GetName().c_str());
-
-=======
-	
->>>>>>> origin/grunion
 	//Distance vector between positions
 	glm::vec3 position1 = physicsObjects[object1Index]->transform.position;
 	glm::vec3 position2 = physicsObjects[object2Index]->transform.position;
