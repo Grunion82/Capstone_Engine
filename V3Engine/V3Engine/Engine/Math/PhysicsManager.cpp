@@ -49,7 +49,6 @@ void PhysicsManager::CheckCollisions() {
 				else {
 					collidingObjects[signature].isActive = true;
 				}
-
 				CalculateCollisionResponse(i, j);
 			}
 
@@ -74,7 +73,6 @@ void PhysicsManager::CheckCollisions() {
 
 //Calculates the response of the Collision between Objects
 void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Index) {
-	
 	//Distance vector between positions
 	glm::vec3 position1 = physicsObjects[object1Index]->transform.position;
 	glm::vec3 position2 = physicsObjects[object2Index]->transform.position;

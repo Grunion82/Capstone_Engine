@@ -172,6 +172,7 @@ public:
 	//"Reset" values
 	void Update();
 	void Update(SDL_Event& e) override;
+	void UpdateJoysticks(SDL_Event &e);
 	bool Shutdown();
 	//SystemType getSystemType();
 	bool QuitRequested() { return requestedQuit; }
@@ -180,6 +181,9 @@ public:
 
 	inline std::vector<Joystick*> GetJoysticks() { return joysticks; }
 	inline Joystick* GetJoystick(unsigned int index) { return joysticks[index]; }
+	int GetJoystickAxis(unsigned int index, unsigned int axis);
+	int GetJoystickAxisDir(unsigned int index, unsigned int axis);
+	int GetJoystickButton(unsigned int index, unsigned int button);
 
 	//KEYBOARD=======================================================
 

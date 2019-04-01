@@ -14,6 +14,9 @@ Mesh::Mesh(SubMesh subMesh_) : VAO(0), VBO(0) {
 Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+
+	delete meshShader;
+	meshShader = nullptr;
 }
 
 void Mesh::GenerateBuffers() {
@@ -86,7 +89,6 @@ void Mesh::GenerateBuffers() {
 }
 
 void Mesh::Render(const Camera* camera, const glm::mat4 modelMatrix) {
-
 	/*glUniform1i(diffuseMapLoc, 0);//tells the shader we using the first texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, subMesh.material.diffuseMap);
@@ -115,17 +117,12 @@ void Mesh::Render(const Camera* camera, const glm::mat4 modelMatrix) {
 		//glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexList.size());
 	}*/
 
-	modelLocation = glGetUniformLocation(shaderProgram, "model");
-	viewLocation = glGetUniformLocation(shaderProgram, "view");
-	projLocation = glGetUniformLocation(shaderProgram, "proj");//projection matrix
-	viewPositionLoc = glGetUniformLocation(shaderProgram, "eyePos");
-
 	glBindVertexArray(VAO);
 
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-	glUniform3f(viewPositionLoc, camera->GetPosition().x, camera->GetPosition().y, camera->GetPosition().z);
-	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
-	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
+	meshShader->SetMat4("model", modelMatrix);
+	meshShader->SetVec3("eyePos", camera->GetPosition());
+	meshShader->SetMat4("view", camera->GetViewMatrix());
+	meshShader->SetMat4("proj", camera->GetProjectionMatrix());
 
 	glDrawArrays(GL_TRIANGLES, 0, subMesh.vertexList.size());
 

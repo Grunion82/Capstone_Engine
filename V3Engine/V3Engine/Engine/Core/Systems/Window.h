@@ -3,13 +3,16 @@
 
 #include "EventSystem.h"
 #include <vector>
+#include <SDL_image.h>
 
 class Window : public EventSystem
 {
 	std::vector<SDL_DisplayMode> windowResolutions;
 
 	//The actual window
-	SDL_Window* window;
+	SDL_Window* window = nullptr;
+	//Window renderer	
+	SDL_Renderer* windowRenderer = nullptr;
 	//The current display mode
 	SDL_DisplayMode currentDisplay;
 	//The context of the window
@@ -55,6 +58,7 @@ public:
 	inline SDL_DisplayMode GetCurrentResolution() { return currentDisplay; }
 	inline SDL_DisplayMode GetResolution(unsigned int index) { if (&windowResolutions[index] != nullptr) { return windowResolutions[index]; } }
 	inline SDL_GLContext GetContext() { return windowContext; }
+	inline SDL_Renderer* GetRenderer() { return windowRenderer; }
 
 	inline void SetName(const char* name) { windowName = name; }
 

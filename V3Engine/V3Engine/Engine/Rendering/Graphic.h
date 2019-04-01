@@ -21,6 +21,7 @@ public:
 	//Call this before any graphics rendering
 	//void Update();
 	void Render();
+	void Render(Texture* colorBuffer);
 	bool Shutdown();
 };
 
@@ -55,6 +56,8 @@ public:
 	void LightPass();
 	void GeometryPass();
 	bool Shutdown();
+
+	Texture* colorBuffer;
 private:
 	//Textures for position, normal, and albedo specular
 	Texture* gbufferTextures[GBUFFER_NUM_TEXTURES];
