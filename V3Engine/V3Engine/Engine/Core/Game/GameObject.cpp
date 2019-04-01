@@ -3,13 +3,29 @@
 #include "../../Core/Systems/Camera.h"
 
 void GameObject::UpdateTransform() {
-	mat4 model;
+	mat4 newTransform;
 
-	model = glm::translate(model, transform.position);
-	model = glm::rotate(model, transform.angle, transform.rotation);
-	model = glm::scale(model, transform.scale);
+	newTransform = glm::translate(newTransform, transform.position);
+	newTransform = glm::rotate(newTransform, transform.angle, transform.rotation);
+	newTransform = glm::scale(newTransform, transform.scale);
 
-	transform.TransformationMatrix = model;
+	transform.TransformationMatrix = newTransform;
+	if (model)
+		model->Update(0);
+	if (collider)
+		collider->Update(0);
+}
+
+void GameObject::CollisionEnter(GameObject* collisionObj) {
+
+}
+
+void GameObject::CollisionStay(GameObject* collisionObj) {
+
+}
+
+void GameObject::CollisionExit(GameObject* collisionObj) {
+
 }
 
 GameObject::GameObject() {
@@ -89,6 +105,7 @@ void GameObject::Translate(const vec3& value) {
 void GameObject::Translate(const float x, const float y, const float z) {
 
 	transform.position += vec3(x, y, z);
+	UpdateTransform();
 }
 
 void GameObject::Rotate(const vec3& value) {
@@ -108,6 +125,7 @@ void GameObject::Rotate(const float angle, vec3& axis) {
 void GameObject::Rotate(const float x, const float y, const float z) {
 	
 	transform.rotation += vec3(x, y, z);
+	UpdateTransform();
 }
 
 void GameObject::Rotate(const float angle, const float x, const float y, const float z) {
@@ -118,6 +136,7 @@ void GameObject::Rotate(const float angle, const float x, const float y, const f
 	}
 
 	transform.rotation += vec3(angle * tempAxis.x, angle * tempAxis.y, angle * tempAxis.z);
+	UpdateTransform();
 }
 
 void GameObject::Scale(const vec3& value) {
@@ -130,11 +149,13 @@ void GameObject::Scale(const float x, const float y, const float z) {
 	transform.scale.x *= x;
 	transform.scale.y *= y;
 	transform.scale.z *= z;
+	UpdateTransform();
 }
 
 void GameObject::Scale(const float value) {
 
 	transform.scale *= value;
+	UpdateTransform();
 }
 
 void GameObject::SetName(const std::string& name) {
