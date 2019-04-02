@@ -27,9 +27,11 @@ MainMenu::MainMenu() {
 	Shader* skyboxShader = new Shader("Assets/SkyboxMap/skyboxVert.glsl", "Assets/SkyboxMap/skyboxFrag.glsl");
 
 	skybox = new Skybox(tempFaces, "Assets/SkyboxMap/cube.obj", skyboxShader);
-	AddGameObject(new Jeans("Jeans", glm::vec3(0.0f, 5.0f, -15.0f)));
-	AddGameObject(new Platform("Platform1", glm::vec3(0.0f, -5.0f, -15.0f)));
-	gameObjects["Jeans"]->SetCamera(c[0]);
+	AddGameObject(new Jeans("Jeans", glm::vec3(0.0f, 10.0f, -15.0f)));
+	gameObjects["Jeans"]->AddChild(new GameObject("Camera","",0,glm::vec3(0.0f,10.0f,-15.0f)));
+	gameObjects["Jeans"]->GetChild(0)->AttachCamera(c[0]);
+	//gameObjects["Jeans"]->SetCamera(c[0]);
+	AddGameObject(new Platform("Platform1", glm::vec3(0.0f, -10.0f, -15.0f)));
 }
 
 
@@ -59,6 +61,8 @@ void MainMenu::Update(float deltaTime) {
 	for (auto go : gameObjects) {
 		go.second->Update(deltaTime);
 	}
+
+	std::cout << gameObjects["Jeans"]->GetChild(0)->GetTransform().position.x << "," << gameObjects["Jeans"]->GetChild(0)->GetTransform().position.y << "," << gameObjects["Jeans"]->GetChild(0)->GetTransform().position.z << std::endl;
 
 }
 

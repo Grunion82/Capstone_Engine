@@ -23,6 +23,7 @@ class Camera
 	glm::mat4 cameraProjection = glm::mat4();
 
 	glm::vec3 Position;
+	glm::vec3 localPosition;
 	glm::vec3 Forward;
 	glm::vec3 Up;
 	glm::vec3 Right;
@@ -107,6 +108,7 @@ public:
 	void SetQuaternion(glm::quat quaternion) { Quaternion = quaternion; }
 	void SetFov(float fov) { FOV = fov; }
 	void Translate(glm::vec3 position) { Position += position; }
+
 	void Rotate(glm::vec3 rotation) { eulerAngle += rotation; }
 	void Rotate(float x, float y, float z) { eulerAngle.x += x; eulerAngle += y; eulerAngle += z;}
 	void Rotate(glm::quat rotation) { Quaternion += rotation; }

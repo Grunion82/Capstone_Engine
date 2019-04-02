@@ -130,6 +130,11 @@ glm::mat4 Camera::GetOrtho(float left, float right, float bottom, float top, flo
 void Camera::AttachTo(GameObject * object)
 {
 	attachedTo = object;
+
+	mat4 inverseMatrix = mat4();
+
+	inverseMatrix = glm::translate(inverseMatrix, object->GetTransform().position);
+	localPosition = vec3(inverseMatrix * glm::vec4(Position, 1.0f));
 }
 
 void Camera::Keyboard(float forward, float right, float deltaTime)
