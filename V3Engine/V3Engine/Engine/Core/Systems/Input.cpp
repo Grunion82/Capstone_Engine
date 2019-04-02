@@ -11,7 +11,6 @@ Input::Input() : requestedQuit(false)
 {
 }
 
-
 Input * Input::GetInstance()
 {
 	if (instance) {
@@ -25,12 +24,12 @@ Input * Input::GetInstance()
 
 Input::~Input()
 {
-	Input::Shutdown();
+
 }
 
 bool Input::Init() {
 	//SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
-
+	
 	if (SDL_NumJoysticks() > 0) {
 		std::cout << "Number of mapping: " << SDL_GameControllerNumMappings() << std::endl;
 		std::wcout << std::endl;
@@ -71,7 +70,7 @@ bool Input::Init() {
 		}
 	}
 	
-	eventFlags = SDL_KEYDOWN | SDL_KEYUP | SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP | SDL_MOUSEWHEEL | SDL_TEXTINPUT | SDL_CONTROLLERDEVICEADDED | SDL_CONTROLLERDEVICEREMOVED;
+	eventFlags = SDL_KEYDOWN | SDL_KEYUP | SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP | SDL_MOUSEWHEEL | SDL_TEXTINPUT | SDL_CONTROLLERDEVICEADDED | SDL_CONTROLLERDEVICEREMOVED | SDL_WINDOW_MOUSE_CAPTURE;
 
 	return true;
 }
@@ -129,14 +128,20 @@ void Input::Update(SDL_Event& e) {
 			break;
 		case(SDL_CONTROLLERDEVICEREMOVED):
 			for (unsigned int i = 0; i < joysticks.size(); i++) {
-				if (joysticks[i]->GetID() == e.cdevice.which) {
-					joysticks[i]->Shutdown();
-					delete joysticks[i];
-					joysticks[i] = nullptr;
-					break;
-					//joysticks.erase(joysticks.begin() + i);
+				if (joysticks[i]) {
+					if (joysticks[i]->GetID() == e.cdevice.which) {
+						joysticks[i]->Shutdown();
+						delete joysticks[i];
+						joysticks[i] = nullptr;
+						break;
+						//joysticks.erase(joysticks.begin() + i);
+					}
 				}
 			}
+			break;
+		case(SDL_WINDOW_MOUSE_CAPTURE):
+			mouseMotionX = 0;
+			mouseMotionY = 0;
 			break;
 		case(SDL_CONTROLLERDEVICEADDED):
 			if (joysticks.size() > 0) {
@@ -192,8 +197,10 @@ bool Input::Shutdown() {
 	//Close if open
 	if (joysticks.size() > 0) {
 		for (unsigned int i = 0; i < joysticks.size(); i++) {
-			joysticks[i]->Shutdown();
-			joysticks[i] = nullptr;
+			if (joysticks[i]) {
+				joysticks[i]->Shutdown();
+				joysticks[i] = nullptr;
+			}
 		}
 		joysticks.clear();
 		joysticks.shrink_to_fit();
@@ -206,6 +213,37 @@ bool Input::Shutdown() {
 	oldMouseButtons.clear();
 
 	return true;
+}
+
+int Input::GetJoystickAxis(unsigned int index, unsigned int axis)
+{
+	if (joysticks.size() > 0) {
+		if (joysticks[index]) {
+			return joysticks[index]->joyAxis[axis];
+		}
+	}
+	return 0;
+}
+
+int Input::GetJoystickAxisDir(unsigned int index, unsigned int axis)
+{
+	if (joysticks.size() > 0) {
+		if (joysticks[index]) {
+			return joysticks[index]->joyAxisDir[axis];
+		}
+	}
+	return 0;
+}
+
+int Input::GetJoystickButton(unsigned int index, unsigned int button)
+{
+	if (joysticks.size() > 0) {
+		if (joysticks[index]) {
+			return joysticks[index]->joyButtons[button];
+		}
+	}
+
+	return 0;
 }
 
 bool Input::IsKeyDown(unsigned int key)
@@ -1228,4 +1266,3 @@ void GameController::Rebind(SDL_GameControllerButton button, SDL_GameControllerA
 
 	mapping = SDL_GameControllerMappingForGUID(SDL_JoystickGetGUID(joy));
 }
-

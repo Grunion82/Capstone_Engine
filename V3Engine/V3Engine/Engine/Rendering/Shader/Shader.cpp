@@ -460,7 +460,7 @@ Shader::Shader(std::string& vertexPath, std::string& fragmentPath, std::string& 
 
 Shader::~Shader()
 {
-
+	glDeleteProgram(ID);
 }
 
 /*Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)

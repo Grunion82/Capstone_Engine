@@ -19,6 +19,7 @@ public:
 	virtual bool Init();
 	virtual void Update(const float DeltaTime);
 	virtual void Render(const class Camera* camera);
+	virtual void Render();
 	virtual void Shutdown();
 
 	void SetCurrentScene(std::string name);

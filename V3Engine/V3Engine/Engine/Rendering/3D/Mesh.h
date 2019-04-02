@@ -25,7 +25,7 @@ private:
 	GLuint VAO, VBO;
 	SubMesh subMesh;
 	void GenerateBuffers();
-	GLuint shaderProgram;
+	class Shader* meshShader;
 	GLuint modelLocation, viewLocation, projLocation, viewPositionLoc;
 	//GLuint lightPosLoc, lightAmbientLoc, lightDiffuseLoc, lightColourLoc;
 	//GLuint diffuseMapLoc, shininessLoc, transparencyLoc, ambientLoc, diffuseLoc, specularLoc;
@@ -35,7 +35,7 @@ public:
 	~Mesh();
 	void Render(const class Camera* camera, const glm::mat4 modelMatrix);
 
-	inline void SetShaderProgram(GLuint newShader) { shaderProgram = newShader; }
+	inline void SetShader(Shader* shader) { meshShader = shader; }
 };
 
 #endif // !MESH_H

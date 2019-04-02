@@ -16,5 +16,5 @@ BoundingBox::~BoundingBox() {
 }
 
 void BoundingBox::Update(float deltaTime) {
-	transform = referenceObject->GetTransform().TransformationMatrix;
+	transform = referenceObject->GetTransformMatrix();
 }

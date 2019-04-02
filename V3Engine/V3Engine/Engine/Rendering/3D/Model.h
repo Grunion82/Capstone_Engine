@@ -36,7 +36,7 @@ public:
 	~Model();
 
 	//Updates the Model
-	virtual  void Update(float deltaTime);
+	virtual void Update(float deltaTime);
 
 	//Renders the Model
 	virtual void Render(const class Camera* camera);
@@ -45,13 +45,13 @@ public:
 	void AddMesh(Mesh* mesh);
 
 	//Assigns the Shader program
-	void SetShaderProgram(Shader* newShader);
+	void SetShader(Shader* newShader);
 
 	//Assigns the Texture map
 	void SetTextureMap(Texture* newMap);
 
 	//Retrieves the model transform
-	inline glm::mat4 GetTransForm() const { return transform; }
+	inline glm::mat4 GetTransform() const { return transform; }
 	//Retrieves the Shader program
 	inline Shader* GetShader() const { return shaderProgram; }
 	//Retrieves the Texture map

@@ -29,6 +29,7 @@ public:
 
 	void NewGame(class GameInterface* game);
 	void Run();
+	Window* GetEngineWindow() { return engineWindow; }
 
 	bool Init();
 	void Update();
