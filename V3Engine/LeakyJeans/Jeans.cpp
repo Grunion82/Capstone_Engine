@@ -22,6 +22,7 @@ Jeans::Jeans() : GameObject("Jeans") {
 Jeans::Jeans(const std::string& name, glm::vec3 position) : GameObject(name) {
 	Tag = "Player";
 	hasJumped = false;
+	speed = 10.0f;
 
 	model = new Model(this, "Assets/Models/jeans.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/jeansbasecolor.png"));
@@ -46,8 +47,14 @@ void Jeans::Update(float deltaTime) {
 		rigidBody->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
 		hasJumped = true;
 	}
-	if (Input::GetInstance()->WasKeyPressed(SDLK_RIGHT))
-		rigidBody->ApplyForce(glm::vec3(5.0f, 0.0f, 0.0f));
+	if (Input::GetInstance()->IsKeyDown(SDLK_RIGHT))
+		Translate(glm::vec3(speed * deltaTime, 0.0f, 0.0f));
+	if (Input::GetInstance()->IsKeyDown(SDLK_LEFT))
+		Translate(glm::vec3(-speed * deltaTime, 0.0f, 0.0f));
+	if (Input::GetInstance()->IsKeyDown(SDLK_UP))
+		Translate(glm::vec3(0.0f, 0.0f, -speed * deltaTime));
+	if (Input::GetInstance()->IsKeyDown(SDLK_DOWN))
+		Translate(glm::vec3(0.0f, 0.0f, speed * deltaTime));
 
 	UpdateTransform();
 }
@@ -62,9 +69,11 @@ void Jeans::CollisionEnter(GameObject* collisionObj) {
 }
 
 void Jeans::CollisionStay(GameObject* collisionObj) {
-
+	//printf("stay\n");
 }
 
-void Jeans::CollisionExit(GameObject * collisionObj) {
-
+void Jeans::CollisionExit(GameObject* collisionObj) {
+	//printf("exit\n");
+	if (collisionObj->GetTag() == "Platform")
+		hasJumped = true;
 }

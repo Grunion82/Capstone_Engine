@@ -17,8 +17,11 @@ MainMenu::MainMenu() {
 	Shader* skyboxShader = new Shader("Assets/SkyboxMap/skyboxVert.glsl", "Assets/SkyboxMap/skyboxFrag.glsl");
 
 	skybox = new Skybox(tempFaces, "Assets/SkyboxMap/cube.obj", skyboxShader);
-	AddGameObject(new Jeans("Jeans", glm::vec3(0.0f, 10.0f, -15.0f)));
+	AddGameObject(new Jeans("Jeans", glm::vec3(0.0f, 15.0f, -15.0f)));
 	AddGameObject(new Platform("Platform1", glm::vec3(0.0f, 0.0f, -15.0f)));
+	AddGameObject(new Platform("Platform2", glm::vec3(0.0f, 5.0f, -30.0f)));
+	AddGameObject(new Platform("Platform3", glm::vec3(-13.0f, 10.0f, -45.0f)));
+	AddGameObject(new Platform("Platform4", glm::vec3(0.0f, 12.0f, -15.0f)));
 }
 
 
