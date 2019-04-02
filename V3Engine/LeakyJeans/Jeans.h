@@ -5,6 +5,7 @@
 class Jeans : public GameObject {
 private:
 	bool hasJumped;
+	float speed;
 
 public:
 	Jeans();

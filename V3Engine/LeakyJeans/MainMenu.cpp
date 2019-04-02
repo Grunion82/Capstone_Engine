@@ -32,6 +32,9 @@ MainMenu::MainMenu() {
 	gameObjects["Jeans"]->GetChild(0)->AttachCamera(c[0]);
 	//gameObjects["Jeans"]->SetCamera(c[0]);
 	AddGameObject(new Platform("Platform1", glm::vec3(0.0f, -10.0f, -15.0f)));
+	AddGameObject(new Platform("Platform2", glm::vec3(0.0f, 5.0f, -30.0f)));
+	AddGameObject(new Platform("Platform3", glm::vec3(-13.0f, 10.0f, -45.0f)));
+	AddGameObject(new Platform("Platform4", glm::vec3(0.0f, 12.0f, -15.0f)));
 }
 
 
