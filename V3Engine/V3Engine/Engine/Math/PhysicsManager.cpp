@@ -82,7 +82,7 @@ void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Ind
 
 	//If the objects are still colliding but going away from each other, ignore response calculation
 	glm::vec3 newVelocity = physicsObjects[object2Index]->rigidBody->velocity - physicsObjects[object1Index]->rigidBody->velocity;
-	if (glm::dot(distance, newVelocity) < 0.0f) {
+	if (glm::dot(distance, newVelocity) < 0.0f || !(physicsObjects[object1Index]->isActive & physicsObjects[object2Index]->isActive)) {
 		//Conservation of Momentum and Co-efficient of Restitution to find collision response
 		//Normalized Distance Vector
 		glm::vec3 nN = glm::normalize(distance);
@@ -141,8 +141,8 @@ void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Ind
 			glm::vec3 correction = std::max((penetration - slop), 0.0f) / (inverseMassObj1 + inverseMassObj2) * percent * nN; //Correction vector
 
 			physicsObjects[object1Index]->Translate((-inverseMassObj1) * correction);
-			if(physicsObjects[object1Index]->rigidBody->velocity.y < 0.0f)
-				physicsObjects[object1Index]->rigidBody->isEnabled = false;
+			//if(physicsObjects[object1Index]->rigidBody->velocity.y < 0.0f)
+				//physicsObjects[object1Index]->rigidBody->isEnabled = false;
 
 		}
 	}

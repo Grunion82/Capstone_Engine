@@ -5,8 +5,8 @@
 #include <Engine/Core/Systems/Input.h>
 
 Jeans::Jeans() : GameObject("Jeans") {
-	model = new Model(this, "Assets/Models/cube.obj");
-	model->SetTextureMap(new Texture("Assets/Textures/jeans.jpg"));
+	model = new Model(this, "Assets/Models/jeans.obj");
+	model->SetTextureMap(new Texture("Assets/Textures/jeansbasecolor.png"));
 	model->SetShader(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));
 	//model->SetShader(Graphic::GetInstance()->gbuffer.gbufferShader);
 
@@ -23,8 +23,8 @@ Jeans::Jeans(const std::string& name, glm::vec3 position) : GameObject(name) {
 	Tag = "Player";
 	hasJumped = false;
 
-	model = new Model(this, "Assets/Models/cube.obj");
-	model->SetTextureMap(new Texture("Assets/Textures/jeans.jpg"));
+	model = new Model(this, "Assets/Models/jeans.obj");
+	model->SetTextureMap(new Texture("Assets/Textures/jeansbasecolor.png"));
 	model->SetShader(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));
 
 	rigidBody = new RigidBody(this, true);
@@ -46,6 +46,8 @@ void Jeans::Update(float deltaTime) {
 		rigidBody->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
 		hasJumped = true;
 	}
+	if (Input::GetInstance()->WasKeyPressed(SDLK_RIGHT))
+		rigidBody->ApplyForce(glm::vec3(5.0f, 0.0f, 0.0f));
 
 	rigidBody->ApplyForce(glm::vec3(Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a),0.0f,-(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s))));
 
