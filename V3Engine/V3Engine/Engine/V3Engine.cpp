@@ -17,7 +17,7 @@
 
 std::unique_ptr<V3Engine> V3Engine::engineInstance = nullptr;
 
-std::vector<Camera*> c;
+//std::vector<Camera*> c;
 
 Timer timer;
 
@@ -143,12 +143,12 @@ V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",1024,768)) {
 	Input::GetInstance()->Init();
 	Graphic::GetInstance()->Init(engineWindow);
 
-	c.reserve(2);
-	c.push_back(new Camera(engineWindow));
-	c.push_back(new Camera(engineWindow));
-	c[0]->SetCameraViewport(0, engineWindow->GetHeight() / 2, engineWindow->GetWidth(), engineWindow->GetHeight()/2);
-	c[1]->Translate(glm::vec3(0.0f, 0.0f, 15.0f));
-	c[1]->SetCameraViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight()/2);
+	//c.reserve(2);
+	//c.push_back(new Camera(engineWindow));
+	//c.push_back(new Camera(engineWindow));
+	//c[0]->SetCameraViewport(0, engineWindow->GetHeight() / 2, engineWindow->GetWidth(), engineWindow->GetHeight()/2);
+	//c[1]->Translate(glm::vec3(0.0f, 0.0f, 15.0f));
+	//c[1]->SetCameraViewport(0, 0, engineWindow->GetWidth(), engineWindow->GetHeight()/2);
 
 
 	//Cube 
@@ -227,16 +227,17 @@ void V3Engine::Run() {
 			break;
 		}
 
-		c[0]->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer->GetDeltaTime());
+		//c[0]->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer->GetDeltaTime());
 
-		c[0]->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
+		//c[0]->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 		
-		c[0]->Controller(Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
-		c[1]->Controller(Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
+		//c[0]->Controller(Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
+		//c[1]->Controller(Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTY), timer->GetDeltaTime());
 
-		for (unsigned int i = 0; i < c.size(); i++) {
-			c[i]->Update();
-		}
+		//for (unsigned int i = 0; i < c.size(); i++) {
+		//	c[i]->Update();
+		//}
+
 		//c->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), timer->GetDeltaTime());
 
 		//c->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
@@ -257,10 +258,10 @@ void V3Engine::Render() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	for (unsigned int i = 0; i < c.size(); i++) {
-		c[i]->Render();
-		currentGame->Render(c[i]);
-	}
+	//for (unsigned int i = 0; i < c.size(); i++) {
+		//c[i]->Render();
+		currentGame->Render();
+	//}
 
 	//Graphic::GetInstance()->Render();
 	//Graphic::GetInstance()->gbuffer.BindForReading();

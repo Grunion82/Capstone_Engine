@@ -25,8 +25,15 @@ void Scene::Update(float deltaTime) {
 	}
 }
 
-void Scene::Render(const Camera* camera) {
+void Scene::Render() {
+	if (sceneCamera) {
+		for (auto go : gameObjects) {
+			go.second->Render(sceneCamera);
+		}
+	}
+}
 
+void Scene::Render(const Camera* camera) {
 	for (auto go : gameObjects) {
 		go.second->Render(camera);
 	}

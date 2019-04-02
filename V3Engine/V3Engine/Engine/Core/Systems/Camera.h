@@ -16,6 +16,7 @@
 #include <SDL_rect.h>
 
 class Window;
+class GameObject;
 
 class Camera
 {
@@ -30,6 +31,7 @@ class Camera
 	glm::vec3 eulerAngle;
 
 	SDL_Rect cameraViewport;
+	GameObject* attachedTo;
 
 	//Euler angles
 	//float Pitch;
@@ -95,6 +97,7 @@ public:
 	glm::mat4 GetOrtho(float left, float right, float bottom, float top, float near, float far);
 	inline glm::mat4 GetProjectionMatrix() const { return cameraProjection; }
 	float GetFov() { return FOV; }
+	GameObject* GetAttachedTo() { return attachedTo; }
 
 	//SETTERS
 
@@ -107,5 +110,6 @@ public:
 	void Rotate(glm::vec3 rotation) { eulerAngle += rotation; }
 	void Rotate(float x, float y, float z) { eulerAngle.x += x; eulerAngle += y; eulerAngle += z;}
 	void Rotate(glm::quat rotation) { Quaternion += rotation; }
+	void AttachTo(GameObject* object);
 };
 #endif // !CAMERA_H

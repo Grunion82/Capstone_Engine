@@ -8,6 +8,7 @@
 #include "../../Rendering/3D/Model.h"
 #include "../../Math/Colliders.h"
 #include "../../Math/RigidBody.h"
+#include "../../Core/Systems/Camera.h"
 
 using namespace glm;
 
@@ -32,6 +33,7 @@ protected:
 	Model* model;
 	Collider* collider;
 	RigidBody* rigidBody;
+	Camera* camera;
 
 	Transform transform; 
 
@@ -66,6 +68,10 @@ public:
 	//Returns member transform
 	Transform GetTransform() const;
 
+	Camera* GetCamera() { return camera; }
+
+	void SetCamera(Camera* c) { camera = c; if (camera) { camera->AttachTo(this); } }
+
 	//Sets the GameObject to be active or not
 	void SetActive(const bool active);
 
@@ -83,9 +89,9 @@ public:
 	void Rotate(const float angle, const float x, const float y, const float z);
 
 	void SetRotate(const vec3& value) { transform.rotation = value; }
-	void SetRotate(const float angle, vec3& axis) { transform.rotation = glm::eulerAngles(glm::quat(angle, axis)); }
+	void SetRotate(const float angle, vec3& axis) { transform.rotation = eulerAngles(glm::quat(angle, axis)); }
 	void SetRotate(const float x, const float y, const float z) { transform.rotation = glm::vec3(x, y, z); }
-	void SetRotate(const float angle, const float x, const float y, const float z) { transform.rotation = glm::eulerAngles(glm::quat(angle, glm::vec3(x, y, z))); }
+	void SetRotate(const float angle, const float x, const float y, const float z) { transform.rotation = glm::eulerAngles(quat(angle, vec3(x, y, z))); }
 
 	//Scale Methods
 	void Scale(const vec3& value);
@@ -95,6 +101,8 @@ public:
 	void SetScale(const vec3& value) { transform.scale = value; }
 	void SetScale(const float x, const float y, const float z) { transform.scale = glm::vec3(x, y, z); }
 	void SetScale(const float value) { transform.scale = glm::vec3(value, value, value); }
+
+	void AttachCamera(Camera* c) { camera = c; }
 
 	//Name Setter and Getter
 	void SetName(const std::string& name);
@@ -110,7 +118,7 @@ public:
 	inline Collider* GetCollider() { return collider; }
 	//Retrieve Rigidbody Component
 	inline RigidBody* GetRigidBody() { return rigidBody; }
-	inline glm::mat4 GetTransformMatrix() { return transform.TransformationMatrix; }
+	inline mat4 GetTransformMatrix() { return transform.TransformationMatrix; }
 
 	
 

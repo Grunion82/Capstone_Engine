@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "Window.h"
 
+#include "../Game/GameObject.h"
+
 #include <glew.h>
 
 Camera::Camera(Window* window, float near, float far) : Position(0.0f,0.0f,0.0f), Forward(0.0f,0.0f,-1.0f), Up(0.0f,1.0f,0.0f), Right(1.0f,0.0f,0.0f), WorldUp(0.0f,1.0f,0.0f), 
@@ -123,6 +125,11 @@ glm::mat4 Camera::GetOrtho(float left, float right, float bottom, float top)
 glm::mat4 Camera::GetOrtho(float left, float right, float bottom, float top, float near, float far)
 {
 	return glm::ortho(left, right, bottom, top, near, far);
+}
+
+void Camera::AttachTo(GameObject * object)
+{
+	attachedTo = object;
 }
 
 void Camera::Keyboard(float forward, float right, float deltaTime)

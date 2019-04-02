@@ -1,11 +1,12 @@
 #include "GameObject.h"
 
-#include "../../Core/Systems/Camera.h"
-
 void GameObject::UpdateTransform() {
-	mat4 newTransform;
+	mat4 newTransform = glm::mat4();
 
 	newTransform = glm::translate(newTransform, transform.position);
+	mat4 translateInverse = glm::mat4();
+	translateInverse = glm::translate(newTransform, transform.position);
+	translateInverse = glm::inverse(translateInverse);
 	newTransform = glm::rotate(newTransform, transform.angle, transform.rotation);
 	newTransform = glm::scale(newTransform, transform.scale);
 
@@ -14,6 +15,8 @@ void GameObject::UpdateTransform() {
 		model->Update(0);
 	if (collider)
 		collider->Update(0);
+	if (camera)
+		camera->Translate(transform.position);
 }
 
 void GameObject::CollisionEnter(GameObject* collisionObj) {
@@ -37,6 +40,7 @@ GameObject::GameObject(const std::string name, const std::string tag, const __in
 	model = nullptr;
 	collider = nullptr;
 	rigidBody = nullptr;
+	camera = nullptr;
 
 	Name = name;
 	Tag = tag;
@@ -98,8 +102,11 @@ void GameObject::SetActive(const bool active) {
 }
 
 void GameObject::Translate(const vec3& value) {
-
-	Translate(value.x, value.y, value.z);
+	transform.position += value;
+	if (camera) {
+		camera->SetPosition(value);
+	}
+	UpdateTransform();
 }
 
 void GameObject::Translate(const float x, const float y, const float z) {

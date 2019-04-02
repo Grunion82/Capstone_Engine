@@ -39,7 +39,7 @@ void RigidBody::Update(const float deltaTime) {
 }
 
 //Sets is this RigidBody will use Gravity or not
-void RigidBody::SetGravity(bool willUseGravity) {
+void RigidBody::SetUseGravity(bool willUseGravity) {
 	isGravityEnabled = willUseGravity;
 }
 

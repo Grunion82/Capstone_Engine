@@ -47,6 +47,8 @@ void Jeans::Update(float deltaTime) {
 		hasJumped = true;
 	}
 
+	rigidBody->ApplyForce(glm::vec3(Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a),0.0f,-(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s))));
+
 	UpdateTransform();
 }
 

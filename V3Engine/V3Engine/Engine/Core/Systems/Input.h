@@ -7,6 +7,9 @@
 #include <map>
 #include <vector>
 
+#ifndef JOYSTICK_H
+#define JOYSTICK_H
+
 class Joystick : public EventSystem {
 public:
 	//For axis
@@ -75,6 +78,10 @@ public:
 	virtual bool WasButtonReleased(unsigned int button);
 
 };
+#endif 
+
+#ifndef GAME_CONTROLLER_H
+#define GAME_CONTROLLER_H
 
 class GameController : public Joystick {
 	//The actual game controller - has an inner SDL_Joystick
@@ -125,6 +132,7 @@ public:
 	void Rebind(SDL_GameControllerButton button, SDL_GameControllerButton button1);
 	void Rebind(SDL_GameControllerButton button, SDL_GameControllerAxis axis);
 };
+#endif // !GAME_CONTROLLER_H
 
 class Input : public EventSystem
 {	
