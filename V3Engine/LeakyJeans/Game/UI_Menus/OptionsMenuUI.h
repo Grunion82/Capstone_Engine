@@ -15,5 +15,8 @@ public:
 	void Update(const float deltaTime_);
 	void WindowStyle(ImGuiStyle* ref);
 	float CalculateDisplayChange(float initial_, float final_);
+
+
+	std::vector<SDL_DisplayMode> windowRes;
 };
 #endif // !OPTIONSMENU_H

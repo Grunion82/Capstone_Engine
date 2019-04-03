@@ -45,15 +45,13 @@ bool Window::Init()
 	windowParameters = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
 	if (windowWidth != 0 && windowHeight != 0) {
-			if (windowResolutions.size() > 0) {
-			windowResolutions[12].h = 576;
-			windowResolutions[12].w = 1024;
-			currentDisplay = windowResolutions[12];
-			windowWidth = currentDisplay.w;
-			windowHeight = currentDisplay.h;
+		for (unsigned int i = 0; i < windowResolutions.size(); i++) {
+			if (windowResolutions[i].w == windowWidth && windowResolutions[i].h == windowHeight) {
+				currentDisplay = windowResolutions[i];
+			}
 		}
+
 		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
-	
 	}
 	else {
 		int displays = SDL_GetNumVideoDisplays();
@@ -107,8 +105,9 @@ bool Window::Init()
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	eventFlags = SDL_WINDOWEVENT | SDL_WINDOWEVENT_SHOWN | SDL_WINDOWEVENT_EXPOSED | SDL_WINDOWEVENT_FOCUS_GAINED | SDL_WINDOWEVENT_ENTER | SDL_WINDOWEVENT_HIDDEN | SDL_WINDOWEVENT_FOCUS_LOST | SDL_WINDOWEVENT_LEAVE | SDL_WINDOWEVENT_SIZE_CHANGED | SDL_WINDOWEVENT_RESIZED | SDL_WINDOWEVENT_MAXIMIZED | SDL_WINDOWEVENT_RESTORED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_INPUT_GRABBED;
-	MouseShowCursor = true;
-
+	MouseShowCursor = true; 
+	SDL_Surface* surface = IMG_Load("Assets/Textures/Logos/pants.png");
+	SDL_SetWindowIcon(window, surface);
 	return true;
 }
 
@@ -124,8 +123,8 @@ void Window::Update(SDL_Event& e)
 		case(SDL_WINDOWEVENT_FOCUS_GAINED)://Window gained focused, this occurs before exposed
 		case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn, is "selected"
 			ShowCursor();
+				
 			
-
 			break;
 		case(SDL_WINDOWEVENT_HIDDEN):
 		case(SDL_WINDOWEVENT_FOCUS_LOST):
@@ -140,6 +139,7 @@ void Window::Update(SDL_Event& e)
 		case(SDL_WINDOWEVENT_RESIZED):
 			windowWidth = e.window.data1;
 			windowHeight = e.window.data2;
+
 			glViewport(0, 0, windowWidth, windowHeight);
 			//screenSurface = SDL_GetWindowSurface(window);
 			break;
@@ -162,11 +162,12 @@ void Window::Update(SDL_Event& e)
 			case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
 			*/
 
+			
+
 		default:
 			break;
 		}
 	}
-
 }
 inline void Window::ShowCursor() {
 	
@@ -226,12 +227,16 @@ bool Window::Shutdown()
 void Window::SetWindowResolution(int index) {
 	if (windowResolutions.size() < 0 && index < windowResolutions.size()) {
 		currentDisplay = windowResolutions[index];
+		SDL_SetWindowSize(window, currentDisplay.w, currentDisplay.h);
 	}
 }
 
 void Window::SetWindowResolution(SDL_DisplayMode display) {
-	currentDisplay = display;
+
+		currentDisplay = display;
+		SDL_SetWindowSize(window, currentDisplay.w, currentDisplay.h);
 }
+
 
 
 bool Window::InitSDL() {
@@ -273,13 +278,12 @@ void Window::Borderless()
 	if (!borderless) {
 		windowParameters |= SDL_WINDOW_BORDERLESS;
 		borderless = true;
-		b = SDL_TRUE;
-		
+		b = SDL_FALSE;
 	}
 	else {
 		windowParameters ^= SDL_WINDOW_BORDERLESS;
 		borderless = false;
-		b = SDL_FALSE;
+		b = SDL_TRUE;
 	}
 	SDL_SetWindowBordered(window, b);
 }

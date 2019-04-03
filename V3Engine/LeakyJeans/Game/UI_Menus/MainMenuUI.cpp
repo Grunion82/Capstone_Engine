@@ -103,7 +103,7 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 
 	if (no_move)            window_flags |= ImGuiWindowFlags_NoMove;
 	if (no_resize)			window_flags |= ImGuiWindowFlags_NoResize;
-	//window_flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+
 	if (auto_resize)		window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 	if (no_collapse)        window_flags |= ImGuiWindowFlags_NoCollapse;
 	if (!no_menu)           window_flags |= ImGuiWindowFlags_MenuBar;

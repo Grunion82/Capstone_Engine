@@ -44,7 +44,7 @@ public:
 	//access to the engine ui state
 	GameState UIstate;
 	//ImguiIO
-	
+	//SDL_DisplayMode* ActualResolution;
 	SDL_Window *window;
 	ImGuiIO io;
 	ImVec2* ActualResolution;

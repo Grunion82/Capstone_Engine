@@ -133,7 +133,7 @@ unsigned int numLights = 4;
 unsigned int cubeVAO, cubeVBO, densityVAO;
 unsigned int cubeTwoVAO, cubeTwoVBO, densityVBO;
 
-V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",1024,768)) {
+V3Engine::V3Engine() : engineWindow(new Window("Leaky Jeans",800,600)) {
 	Debug::DebugInit();
 	engineWindow->Init();
 	timer = new Timer();

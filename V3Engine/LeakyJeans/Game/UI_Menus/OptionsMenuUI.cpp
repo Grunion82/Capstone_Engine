@@ -1,15 +1,8 @@
 #include "OptionsMenuUI.h"
 #include <array>
-static float r = 0.0f;
-static float g = 0.0f;
-static float b = 0.0f;
-static float f = 0.0f;
+#include <iostream>
+#include <string>
 
-//image test
-static float up = 0.0f;
-static float left = 0.0f;
-static float down = 0.0f;
-static float right = 0.0f;
 
 OptionsMenuUI::OptionsMenuUI()
 {
@@ -31,7 +24,7 @@ OptionsMenuUI::~OptionsMenuUI()
 
 void OptionsMenuUI::imGuiScene(const char * frame_name_)
 {
-
+		
 		//Flags for the window
 		static bool no_resize = true;
 		static bool no_move = true;//this might cause issues when the window change w and h 
@@ -39,59 +32,58 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 		static bool auto_resize = true;
 		static bool no_menu = true;
 		static bool no_titlebar = true;
-		static bool no_scrollbarr = false;
+		static bool no_scrollbarr = true;
 		//options menu 
-		static bool Windowed = true;
-		static bool FullScreen = false;
+		static bool VsYnc= w->GetIsVsync();
+		static bool FullScreen = w->GetIsFullscreen();
+		static bool BorderLess = w->GetIsBorderless();
 		static int ControllerSensitivity = 5.0;
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
-		//UI FOR EDITIING
-		static float ue_slider = 0.0;
-		static float ue_Slider = 0.0f;
-		static bool ue_Bool = false;
-		static bool ue_Bool_2 = false;
-		static bool ue_Bool_3 = false;
-		static bool ue_Bool_4 = false;
+		//setting the size of our window
+		ImVec2 size = ImVec2(w->GetCurrentResolution().w, w->GetCurrentResolution().h);
+#pragma region Set Up Resolutions
+		//vector for all the resolutions available to the screen
+		static std::vector<std::string> ResolutionStrings;
+		static int currentResolutionIndex = 0;
+		for (int i = 0; i < w->GetWindowResolutions().size(); i++) {
+			if (windowRes.size() > 0) {
+				bool doesNotHave = true;
 
-		ImGui::SliderFloat("", &ue_Slider, 0.0f, 1024.0f);
-		ImGui::SliderFloat("##2", &ue_slider, 0.0f, 576.0f);
-		ImGui::Checkbox("mybool", &ue_Bool);
-		ImGui::Checkbox("mybool_1", &ue_Bool_2);
-		ImGui::Checkbox("mybool_2", &ue_Bool_3);
-		ImGui::Checkbox("mybool_3", &ue_Bool_4);
+				for (int j = 0; j < windowRes.size(); j++) {
+					if (windowRes[j].w == w->GetWindowResolutions()[i].w && windowRes[j].h == w->GetWindowResolutions()[i].h) {
+						doesNotHave = false;
+						break;
+					}
+				}
+				if (doesNotHave) { //set default resolution
+					windowRes.push_back(w->GetWindowResolutions()[i]);
+					if (windowRes[windowRes.size()-1].w == w->GetCurrentResolution().w && windowRes[windowRes.size() - 1].h == w->GetCurrentResolution().h) {
+						currentResolutionIndex = windowRes.size() - 1;
+					}
+					//transform the resolutions into character arrays
+					ResolutionStrings.push_back(std::to_string(w->GetWindowResolutions()[i].w) + "X" + std::to_string(w->GetWindowResolutions()[i].h));
+				}
+			}
+			else {
+				windowRes.push_back(w->GetWindowResolutions()[i]);
+				if (windowRes[windowRes.size() - 1].w == w->GetCurrentResolution().w && windowRes[windowRes.size() - 1].h == w->GetCurrentResolution().h) {
+					currentResolutionIndex = windowRes.size() - 1;
+				}
 
-		//end of testing UI
-		//resolutions		
-		static ImVec2 Resolutions[] = { ImVec2(1024, 576) , ImVec2(1152,648),ImVec2(1280,720),ImVec2(1920,1080)};//chage this for a vector and take all the resolutions
+				ResolutionStrings.push_back(std::to_string(w->GetWindowResolutions()[i].w) + "X" + std::to_string(w->GetWindowResolutions()[i].h));
 
-		//setting the size and position of our window
-		ImVec2 size = ImVec2(w->GetCurrentResolution().w, w->GetCurrentResolution().h);//window size -> later update this with the width and height from the window
+			}
 
-		ImVec2 defaultSize = ImVec2(1024, 576);
-		
-
-		if (ActualResolution == nullptr) {
-			ActualResolution = &defaultSize;
 		}
-		size = *ActualResolution;
-		Resolutions[0] = ImVec2(1024, 576);
+#pragma endregion 
 
-
-		Resolutions[1].x = w->GetWindowResolutions()[16].w;
-		Resolutions[1].y = w->GetWindowResolutions()[16].h;
-
-		Resolutions[2].x = w->GetWindowResolutions()[8].w;
-		Resolutions[2].y = w->GetWindowResolutions()[8].h;
-
-		Resolutions[3].x = w->GetWindowResolutions()[0].w;
-		Resolutions[3].y = w->GetWindowResolutions()[0].h;
 		
-			float AspectRatio = CalculateDisplayChange(defaultSize.x, size.x);
-
+			float AspectRatio = CalculateDisplayChange(800, size.x);
+			//std::cout << AspectRatio << std::endl;
 			ImVec2 buttonSize = ImVec2(150.0f * AspectRatio, 50 * AspectRatio);
 			ImVec2 pos = ImVec2(0, 0);
 			ImVec2 widgetPos = ImVec2(0, 0);
@@ -109,8 +101,6 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 
 			//flags go here
 			if (no_scrollbarr)       window_flags |= ImGuiWindowFlags_NoScrollbar;
-			//if (no_move)            window_flags |= ImGuiWindowFlags_NoMove;
-			//if (no_resize)			window_flags |= ImGuiWindowFlags_NoResize;
 			if (auto_resize)		window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			if (no_collapse)        window_flags |= ImGuiWindowFlags_NoCollapse;
 			if (!no_menu)           window_flags |= ImGuiWindowFlags_MenuBar;
@@ -139,60 +129,47 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 			
 			widgetPos = ImVec2(size.x/3.3, size.y / 5.5);
 			ImGui::SetCursorPos(widgetPos);
-			const char* items[] = { "1024X576", "1152X648", "1280X720", "1920X1080" };
+			
 
-			static const char* item_current = items[0];            // Here our selection is a single pointer stored outside the object.
+			static const char* item_current = ResolutionStrings[currentResolutionIndex].c_str();            // Here our selection is a single pointer stored outside the object.
 			if (ImGui::BeginCombo("Resolution", item_current)) // The second parameter is the label previewed before opening the combo.
 			{
 				ImGui::SameLine(); ImGui::Text("^ Press the arrow again to apply changes");
-				for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-				{
-					bool is_selected = (item_current == items[n]);
-					if (ImGui::Selectable(items[n], is_selected)) {
-						item_current = items[n];
 
+				int temp = 0;
+
+				for (int n = 0; n < ResolutionStrings.size(); n++)
+				{
+					bool is_selected = (item_current == ResolutionStrings[n]);
+					if (ImGui::Selectable(ResolutionStrings[n].c_str(), is_selected)) {
+						item_current = ResolutionStrings[n].c_str();
+						
 					}
 					if (is_selected) {
 						ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-						switch (n)
-						{
-
-						case 0:
-							ActualResolution = &Resolutions[0];
-							w->SetWindowResolution(0);
-							break;
-						case 1:
-							ActualResolution = &Resolutions[1];
-							
-							break;
-						case 2:
-							ActualResolution = &Resolutions[2];
-							
-							break;
-						case 3:
-							ActualResolution = &Resolutions[3];
-							
-							break;
-						default:
-							//ActualResolution = &Resolutions[0];
-							break;
-						}
-						
+						temp = n;
 					}
-					
 				}
 				ImGui::EndCombo();
+				currentResolutionIndex = temp;
+				w->SetWindowResolution(windowRes[currentResolutionIndex]);
 			}
 
 			widgetPos = ImVec2(size.x /3.3, size.y/4);
 			ImGui::SetCursorPos(widgetPos);
 
-			ImGui::Checkbox("Windowed", &Windowed);
+			
+			if (ImGui::Checkbox("Borderless", &BorderLess)) { w->Borderless(); }
 
-			//widgetPos = ImVec2(size.x / 1.3, size.y / 1.7);
-			//ImGui::SetWindowPos(widgetPos);
 
-			ImGui::SameLine(); ImGui::Checkbox("FullScreen", &FullScreen);
+			ImGui::SameLine();
+			
+			if (ImGui::Checkbox("FullScreen", &FullScreen)) { w->Fullscreen(); }
+
+			ImGui::SameLine();
+
+			if (ImGui::Checkbox("Vsync", &VsYnc)) { w->VSync(); }
+
 			widgetPos = ImVec2(size.x / 3.3, size.y / 3);
 			ImGui::SetCursorPos(widgetPos);
 			ImGui::SliderInt("Controller Sensitivity", &ControllerSensitivity, 1, 10, "%d");
@@ -296,7 +273,7 @@ void OptionsMenuUI::WindowStyle(ImGuiStyle* ref) {
 float OptionsMenuUI::CalculateDisplayChange(float initial_, float final_) {
 	float change;
 
-	return change = initial_ / final_;
+	return change = final_ / initial_;
 
 }
 
