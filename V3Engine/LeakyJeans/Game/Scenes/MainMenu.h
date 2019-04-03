@@ -2,11 +2,16 @@
 #define MAINMENU_H
 
 #include <Engine/Core/Game/Scene.h>
+#include "../UI_Menus/MainMenuUI.h"
+#include "../UI_Menus/OptionsMenuUI.h"
 
 class MainMenu : public Scene {
 private:
-	Skybox* skybox;
-	std::vector<Camera*>c;
+	//Skybox* skybox;
+	//std::vector<Camera*>c;
+	InmediateUI * iu;
+	GameState uiState;
+	Window* w;
 public:
 	MainMenu();
 	~MainMenu();

@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <map>
-
+//#include "../Systems/Window.h"
+#include "../../Rendering/2D/TextureHandler.h"
 #include "Skybox.h"
 
 class Scene {
@@ -12,6 +13,7 @@ protected:
 	//Map of game objects within the scene
 	std::map<std::string, class GameObject*> gameObjects;
 	std::string Name;
+	
 
 public:
 	Scene();

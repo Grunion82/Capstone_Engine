@@ -275,7 +275,7 @@ bool V3Engine::Shutdown() {
 	EventManager::GetInstace()->Shutdown();
 	Graphic::GetInstance()->Shutdown();
 
-	delete currentGame;
+	
 	currentGame = nullptr;
 
 	delete timer;
