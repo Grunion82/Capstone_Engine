@@ -28,7 +28,7 @@ public:
 	void Update(const float deltaTime);
 
 	//Sets is this RigidBody will use Gravity or not
-	void SetGravity(bool willUseGravity);
+	void SetUseGravity(bool willUseGravity);
 
 	//Sets this RigidBody's mass
 	void SetMass(float m);

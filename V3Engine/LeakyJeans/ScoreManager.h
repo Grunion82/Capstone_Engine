@@ -21,6 +21,7 @@ public:
 	ScoreManager& operator=(ScoreManager&&) = delete;
 
 	static ScoreManager* GetInstance();
+	static float GetTimeElapsed() { return timeElapsed;  }
 
 	void Update(float deltaTime);
 	float CalculateScore(float wetnessValue);

@@ -37,7 +37,7 @@ Jeans::Jeans(const std::string& name, glm::vec3 position) : GameObject(name) {
 
 	collider = new BoundingBox(this, model->GetMinVert(), model->GetMaxVert());
 
-	transform.position = position;
+	startPos = transform.position = position;
 	UpdateTransform();
 }
 
@@ -45,37 +45,41 @@ Jeans::~Jeans() {
 
 }
 
+void Jeans::MoveJeans(glm::vec3 displacement, float time) {
+	if (displacement.length() >= 1.0f) {
+		Translate(displacement * speed * time);
+		waterLevel -= drainRatio * time;
+	}
+}
+
 void Jeans::Update(float deltaTime) {
 
-	if (Input::GetInstance()->WasKeyPressed(SDLK_SPACE) && !hasJumped) {
-		rigidBody->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
-		hasJumped = true;
-	}
-	if (Input::GetInstance()->IsKeyDown(SDLK_RIGHT)) {
-		Translate(glm::vec3(speed * deltaTime, 0.0f, 0.0f));
-		waterLevel -= drainRatio * deltaTime;
-	}
-	if (Input::GetInstance()->IsKeyDown(SDLK_LEFT)) {
-		Translate(glm::vec3(-speed * deltaTime, 0.0f, 0.0f));
-		waterLevel -= drainRatio * deltaTime;
-	}
-	if (Input::GetInstance()->IsKeyDown(SDLK_UP)) {
-		Translate(glm::vec3(0.0f, 0.0f, -speed * deltaTime));
-		waterLevel -= drainRatio * deltaTime;
-	}
-	if (Input::GetInstance()->IsKeyDown(SDLK_DOWN)) {
-		Translate(glm::vec3(0.0f, 0.0f, speed * deltaTime));
-		waterLevel -= drainRatio * deltaTime;
-	}
+	if (ScoreManager::GetTimeElapsed() > 4.0f)
+		rigidBody->isEnabled = true;
 
 	waterLevel = glm::clamp(waterLevel, 0.0f, MAX_WATER_LEVEL);
 	speed = MAX_SPEED - (waterLevel / 10.0f);
-
+	
 	UpdateTransform();
+
+	if (childObjects.size() > 0) {
+		for (unsigned int i = 0; i < childObjects.size(); i++) {
+			if (childObjects[i]) {
+				childObjects[i]->Update(deltaTime);
+			}
+		}
+	}
 }
 
 void Jeans::Render(const Camera* camera) {
 	model->Render(camera);
+	if (childObjects.size() > 0) {
+		for (unsigned int i = 0; i < childObjects.size(); i++) {
+			if (childObjects[i]) {
+				childObjects[i]->Render(camera);
+			}
+		}
+	}
 }
 
 void Jeans::CollisionEnter(GameObject* collisionObj) {
@@ -87,7 +91,12 @@ void Jeans::CollisionEnter(GameObject* collisionObj) {
 	if (collisionObj->GetTag() == "Flag") {
 		printf("final score: %f\n", ScoreManager::GetInstance()->CalculateScore(waterLevel));
 	}
-
+	if (collisionObj->GetTag() == "DeathBox") {
+		printf("hit box\n");
+		rigidBody->velocity = glm::vec3(0.0f);
+		Translate(startPos - transform.position);
+		UpdateTransform();
+	}
 }
 
 void Jeans::CollisionStay(GameObject* collisionObj) {

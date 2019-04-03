@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "Window.h"
 
+#include "../Game/GameObject.h"
+
 #include <glew.h>
 
 Camera::Camera(Window* window, float near, float far) : Position(0.0f,0.0f,0.0f), Forward(0.0f,0.0f,-1.0f), Up(0.0f,1.0f,0.0f), Right(1.0f,0.0f,0.0f), WorldUp(0.0f,1.0f,0.0f), 
@@ -68,6 +70,12 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraViewport.y = b;
 	cameraViewport.w = r - l;
 	cameraViewport.h = t - b;
+
+	glm::mat4 inverseMatrix = glm::mat4();
+	inverseMatrix = glm::translate(inverseMatrix, Position);
+	inverseMatrix = glm::inverse(inverseMatrix);
+
+	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
 }
 Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup,
 			   glm::quat orientation, float movespeed, float sensitivity, float c_sensitivity, float fov,
@@ -82,6 +90,12 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraViewport.y = b;
 	cameraViewport.w = r - l;
 	cameraViewport.h = t - b;
+
+	glm::mat4 inverseMatrix = glm::mat4();
+	inverseMatrix = glm::translate(inverseMatrix, Position);
+	inverseMatrix = glm::inverse(inverseMatrix);
+
+	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
 }
 bool Camera::Init()
 {
@@ -98,6 +112,13 @@ void Camera::Update()
 	Forward = glm::normalize(forward);
 	Right = glm::normalize(glm::cross(Forward, WorldUp));
 	Up = glm::normalize(glm::cross(Right, Forward));
+
+	glm::mat4 inverseMatrix = glm::mat4();
+	inverseMatrix = glm::translate(inverseMatrix, Position);
+	inverseMatrix = glm::inverse(inverseMatrix);
+
+	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
+
 }
 
 void Camera::Render()
@@ -123,6 +144,16 @@ glm::mat4 Camera::GetOrtho(float left, float right, float bottom, float top)
 glm::mat4 Camera::GetOrtho(float left, float right, float bottom, float top, float near, float far)
 {
 	return glm::ortho(left, right, bottom, top, near, far);
+}
+
+void Camera::AttachTo(GameObject * object)
+{
+	attachedTo = object;
+
+	mat4 inverseMatrix = mat4();
+
+	inverseMatrix = glm::translate(inverseMatrix, object->GetTransform().position);
+	localPosition = vec3(inverseMatrix * glm::vec4(Position, 1.0f));
 }
 
 void Camera::Keyboard(float forward, float right, float deltaTime)

@@ -8,6 +8,7 @@
 
 class Scene {
 protected:
+	class Camera* sceneCamera;
 	//Map of game objects within the scene
 	std::map<std::string, class GameObject*> gameObjects;
 	std::string Name;
@@ -20,6 +21,7 @@ public:
 	virtual bool Init();
 	virtual void Update(float deltaTime);
 	virtual void Render(const class Camera* camera);
+	virtual void Render();
 	virtual void Shutdown();
 
 	void SetName(std::string name);

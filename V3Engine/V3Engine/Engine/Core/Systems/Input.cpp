@@ -217,7 +217,7 @@ bool Input::Shutdown() {
 
 int Input::GetJoystickAxis(unsigned int index, unsigned int axis)
 {
-	if (joysticks.size() > 0) {
+	if (joysticks.size() > 0 && index < joysticks.size()) {
 		if (joysticks[index]) {
 			return joysticks[index]->joyAxis[axis];
 		}
@@ -227,7 +227,7 @@ int Input::GetJoystickAxis(unsigned int index, unsigned int axis)
 
 int Input::GetJoystickAxisDir(unsigned int index, unsigned int axis)
 {
-	if (joysticks.size() > 0) {
+	if (joysticks.size() > 0 && index < joysticks.size()) {
 		if (joysticks[index]) {
 			return joysticks[index]->joyAxisDir[axis];
 		}
@@ -237,7 +237,7 @@ int Input::GetJoystickAxisDir(unsigned int index, unsigned int axis)
 
 int Input::GetJoystickButton(unsigned int index, unsigned int button)
 {
-	if (joysticks.size() > 0) {
+	if (joysticks.size() > 0 && index < joysticks.size()) {
 		if (joysticks[index]) {
 			return joysticks[index]->joyButtons[button];
 		}

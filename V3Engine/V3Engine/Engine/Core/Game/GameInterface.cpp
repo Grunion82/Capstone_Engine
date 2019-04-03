@@ -15,6 +15,11 @@ void GameInterface::Render(const Camera* camera) {
 	currentScene->Render(camera);
 }
 
+void GameInterface::Render()
+{
+	currentScene->Render();
+}
+
 void GameInterface::Shutdown() {
 	if (scenes.size() > 0) {
 		for (auto sc : scenes) {
