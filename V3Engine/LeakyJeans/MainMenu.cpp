@@ -11,8 +11,9 @@ MainMenu::MainMenu() {
 	c.push_back(new Camera(V3Engine::GetInstance()->GetEngineWindow()));
 	c.push_back(new Camera(V3Engine::GetInstance()->GetEngineWindow()));
 	c[0]->SetCameraViewport(0, V3Engine::GetInstance()->GetEngineWindow()->GetHeight() / 2, V3Engine::GetInstance()->GetEngineWindow()->GetWidth(), V3Engine::GetInstance()->GetEngineWindow()->GetHeight()/2);
-	c[1]->Translate(glm::vec3(0.0f, 0.0f, 15.0f));
+	c[0]->SetPosition(glm::vec3(0.0f, 10.0f, 0.0f));
 	c[1]->SetCameraViewport(0, 0, V3Engine::GetInstance()->GetEngineWindow()->GetWidth(), V3Engine::GetInstance()->GetEngineWindow()->GetHeight()/2);
+	c[1]->SetPosition(glm::vec3(0.0f, 25.0f, 0.0f));
 
 	Name = "Main Menu";
 
@@ -30,11 +31,14 @@ MainMenu::MainMenu() {
 	AddGameObject(new Jeans("Jeans", glm::vec3(0.0f, 10.0f, -15.0f)));
 	gameObjects["Jeans"]->AddChild(new GameObject("Camera","",0,glm::vec3(0.0f,10.0f,-15.0f)));
 	gameObjects["Jeans"]->GetChild(0)->AttachCamera(c[0]);
+	AddGameObject(new Jeans("Jeans2", glm::vec3(0.0f, 25.0f, -15.0f)));
+	gameObjects["Jeans2"]->AddChild(new GameObject("Camera", "", 0, glm::vec3(0.0f, 25.0f, -15.0f)));
+	gameObjects["Jeans2"]->GetChild(0)->AttachCamera(c[1]);
 	//gameObjects["Jeans"]->SetCamera(c[0]);
-	AddGameObject(new Platform("Platform1", glm::vec3(0.0f, -10.0f, -15.0f)));
+	AddGameObject(new Platform("Platform1", glm::vec3(0.0f, -15.0f, -15.0f)));
 	AddGameObject(new Platform("Platform2", glm::vec3(0.0f, 5.0f, -30.0f)));
 	AddGameObject(new Platform("Platform3", glm::vec3(-13.0f, 10.0f, -45.0f)));
-	AddGameObject(new Platform("Platform4", glm::vec3(0.0f, 12.0f, -15.0f)));
+	AddGameObject(new Platform("Platform4", glm::vec3(0.0f, 15.0f, -15.0f)));
 }
 
 
@@ -51,11 +55,26 @@ MainMenu::~MainMenu() {
 void MainMenu::Update(float deltaTime) {
 	//c[0]->Keyboard(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s), Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a), deltaTime);
 
-	c[0]->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
+	//c[0]->MouseMovement(Input::GetInstance()->GetMouseMotionX(), Input::GetInstance()->GetMouseMotionY(), true);
 	
-	c[0]->Controller(Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTY), deltaTime);
-	c[1]->Controller(Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTY), deltaTime);
+	//c[0]->Controller(Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(0,SDL_CONTROLLER_AXIS_RIGHTY), deltaTime);
+	//c[1]->Controller(Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_LEFTY), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTX), Input::GetInstance()->GetJoystickAxisDir(1,SDL_CONTROLLER_AXIS_RIGHTY), deltaTime);
 	
+	if (Input::GetInstance()->GetJoystickButton(0,SDL_CONTROLLER_BUTTON_A) && !static_cast<Jeans*>(gameObjects["Jeans"])->CanJump()) {
+		gameObjects["Jeans"]->GetRigidBody()->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
+		static_cast<Jeans*>(gameObjects["Jeans"])->SetHasJump(true);
+
+	}
+	if (Input::GetInstance()->GetJoystickButton(1, SDL_CONTROLLER_BUTTON_A) && !static_cast<Jeans*>(gameObjects["Jeans2"])->CanJump()) {
+		gameObjects["Jeans2"]->GetRigidBody()->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
+
+		static_cast<Jeans*>(gameObjects["Jeans2"])->SetHasJump(true);
+	}
+
+	gameObjects["Jeans"]->Translate(glm::vec3(Input::GetInstance()->GetJoystickAxisDir(0, SDL_CONTROLLER_AXIS_LEFTX),0.0f, Input::GetInstance()->GetJoystickAxisDir(0, SDL_CONTROLLER_AXIS_LEFTY)));
+	gameObjects["Jeans2"]->Translate(glm::vec3(Input::GetInstance()->GetJoystickAxisDir(1, SDL_CONTROLLER_AXIS_LEFTX), 0.0f, Input::GetInstance()->GetJoystickAxisDir(1, SDL_CONTROLLER_AXIS_LEFTY)));
+
+
 	for (unsigned int i = 0; i < c.size(); i++) {
 		c[i]->Update();
 	}
@@ -64,9 +83,6 @@ void MainMenu::Update(float deltaTime) {
 	for (auto go : gameObjects) {
 		go.second->Update(deltaTime);
 	}
-
-	std::cout << gameObjects["Jeans"]->GetChild(0)->GetTransform().position.x << "," << gameObjects["Jeans"]->GetChild(0)->GetTransform().position.y << "," << gameObjects["Jeans"]->GetChild(0)->GetTransform().position.z << std::endl;
-
 }
 
 void MainMenu::Render(const Camera* camera) {

@@ -244,7 +244,7 @@ void PhysicsManager::CalculateCollisionResponse(int object1Index, int object2Ind
 		if (physicsObjects[object2Index]->rigidBody->isEnabled && isSystemActive)
 			physicsObjects[object2Index]->rigidBody->velocity = Vf2;
 		
-		if(physicsObjects[object1Index]->collider->isTrigger & physicsObjects[object2Index]->collider->isTrigger)
+		if(!physicsObjects[object1Index]->collider->isTrigger && !physicsObjects[object2Index]->collider->isTrigger)
 			PositionalCorrection(object1Index, object2Index);
 	}
 }

@@ -90,6 +90,7 @@ public:
 	//GETTERS
 
 	inline glm::vec3 GetPosition() const { return Position; }
+	inline glm::vec3 GetLocalPosition() { return localPosition; }
 	//Get a perspective matrix based off this camera
 	glm::mat4 GetPerspective(Window& w, float near, float far);
 	//Get an orthographic matrix based off this camera
@@ -99,15 +100,19 @@ public:
 	inline glm::mat4 GetProjectionMatrix() const { return cameraProjection; }
 	float GetFov() { return FOV; }
 	GameObject* GetAttachedTo() { return attachedTo; }
+	inline float GetMovementSpeed() { return MovementSpeed; }
+	inline float GetMouseSensitivity() { return MouseSensitivity; }
+	inline float GetControllerSensitivity() { return ControllerSensitivity; }
 
 	//SETTERS
 
 	void SetSensitivity(float sensitivity) { MouseSensitivity = sensitivity; }
 	void SetPosition(glm::vec3 position) { Position = position; }
+	void SetLocalPosition(glm::vec3 localP) { localPosition = localP; }
 	void SetEulerAngle(glm::vec3 rotation) { eulerAngle = rotation; }
 	void SetQuaternion(glm::quat quaternion) { Quaternion = quaternion; }
 	void SetFov(float fov) { FOV = fov; }
-	void Translate(glm::vec3 position) { Position += position; }
+	void Translate(glm::vec3 position) { Position += position; localPosition += position; }
 
 	void Rotate(glm::vec3 rotation) { eulerAngle += rotation; }
 	void Rotate(float x, float y, float z) { eulerAngle.x += x; eulerAngle += y; eulerAngle += z;}

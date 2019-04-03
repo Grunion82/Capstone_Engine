@@ -12,6 +12,11 @@ public:
 	Jeans(const std::string& name, glm::vec3 position);
 	~Jeans();
 
+	bool CanJump() { return hasJumped; }
+	void SetHasJump(bool value) { hasJumped = true; }
+	float JeanSpeed() { return speed; }
+	void SetJeanSpeed(float value) { speed = value; }
+
 	void Update(float deltaTime) override;
 	void Render(const class Camera* camera) override;
 

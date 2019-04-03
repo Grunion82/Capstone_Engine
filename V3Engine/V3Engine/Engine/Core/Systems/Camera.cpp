@@ -70,6 +70,12 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraViewport.y = b;
 	cameraViewport.w = r - l;
 	cameraViewport.h = t - b;
+
+	glm::mat4 inverseMatrix = glm::mat4();
+	inverseMatrix = glm::translate(inverseMatrix, Position);
+	inverseMatrix = glm::inverse(inverseMatrix);
+
+	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
 }
 Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup,
 			   glm::quat orientation, float movespeed, float sensitivity, float c_sensitivity, float fov,
@@ -84,6 +90,12 @@ Camera::Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, 
 	cameraViewport.y = b;
 	cameraViewport.w = r - l;
 	cameraViewport.h = t - b;
+
+	glm::mat4 inverseMatrix = glm::mat4();
+	inverseMatrix = glm::translate(inverseMatrix, Position);
+	inverseMatrix = glm::inverse(inverseMatrix);
+
+	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
 }
 bool Camera::Init()
 {
@@ -100,6 +112,13 @@ void Camera::Update()
 	Forward = glm::normalize(forward);
 	Right = glm::normalize(glm::cross(Forward, WorldUp));
 	Up = glm::normalize(glm::cross(Right, Forward));
+
+	glm::mat4 inverseMatrix = glm::mat4();
+	inverseMatrix = glm::translate(inverseMatrix, Position);
+	inverseMatrix = glm::inverse(inverseMatrix);
+
+	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
+
 }
 
 void Camera::Render()

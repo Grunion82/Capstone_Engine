@@ -22,7 +22,6 @@ Jeans::Jeans() : GameObject("Jeans") {
 Jeans::Jeans(const std::string& name, glm::vec3 position) : GameObject(name) {
 	Tag = "Player";
 	hasJumped = false;
-	speed = 10.0f;
 
 	model = new Model(this, "Assets/Models/jeans.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/jeansbasecolor.png"));
@@ -42,21 +41,12 @@ Jeans::~Jeans() {
 }
 
 void Jeans::Update(float deltaTime) {
-	//transform.angle += 1.0f * deltaTime;
-	if (Input::GetInstance()->WasKeyPressed(SDLK_SPACE) && !hasJumped) {
-		rigidBody->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
-		hasJumped = true;
-	}
-	if (Input::GetInstance()->IsKeyDown(SDLK_RIGHT))
-		Translate(glm::vec3(speed * deltaTime, 0.0f, 0.0f));
-	if (Input::GetInstance()->IsKeyDown(SDLK_LEFT))
-		Translate(glm::vec3(-speed * deltaTime, 0.0f, 0.0f));
-	if (Input::GetInstance()->IsKeyDown(SDLK_UP))
-		Translate(glm::vec3(0.0f, 0.0f, -speed * deltaTime));
-	if (Input::GetInstance()->IsKeyDown(SDLK_DOWN))
-		Translate(glm::vec3(0.0f, 0.0f, speed * deltaTime));
-
-	rigidBody->ApplyForce(glm::vec3(Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a),0.0f,-(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s))));
+	//if (Input::GetInstance()->WasKeyPressed(SDLK_SPACE) && !hasJumped) {
+	//	rigidBody->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
+	//	hasJumped = true;
+	//
+	//}
+	//Translate(glm::vec3(Input::GetInstance()->IsKeyDown(SDLK_d) - Input::GetInstance()->IsKeyDown(SDLK_a),0.0f,-(Input::GetInstance()->IsKeyDown(SDLK_w) - Input::GetInstance()->IsKeyDown(SDLK_s))));
 
 	UpdateTransform();
 

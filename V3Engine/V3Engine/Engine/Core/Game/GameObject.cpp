@@ -9,12 +9,12 @@ void GameObject::UpdateTransform() {
 
 	transform.TransformationMatrix = newTransform;
 
-	mat4 translateInverse = glm::mat4();
-	translateInverse = glm::translate(newTransform, transform.position);
-	translateInverse = glm::inverse(translateInverse);
+	newTransform = glm::mat4();
+	newTransform = glm::translate(newTransform, transform.localPosition);
+	newTransform = glm::rotate(newTransform, transform.localAngle, transform.localRotation);
+	newTransform = glm::scale(newTransform, transform.localScale);
 
-	if (camera) {
-	}
+	transform.LocalTransformationMatrix = newTransform;
 
 	if (model)
 		model->Update(0);
@@ -48,11 +48,33 @@ GameObject::GameObject(const std::string name, const std::string tag, const __in
 	Name = name;
 	Tag = tag;
 	Layer = layer;
+
 	transform.position = p;
 	transform.scale = s;
 	transform.rotation = r;
 	transform.angle = a;
+
+	mat4 localMat = mat4();
+
+	localMat = mat4();
+	localMat = glm::translate(localMat, transform.position);
+	localMat = glm::inverse(localMat);
+	transform.localPosition = vec3(localMat * vec4(transform.position,1.0f));
+
+	localMat = mat4();
+	localMat = glm::rotate(localMat,transform.angle,transform.rotation);
+	localMat = glm::inverse(localMat);
+	transform.localRotation = vec3(localMat * vec4(transform.rotation,1.0f));
+
+	localMat = mat4();
+	localMat = glm::scale(localMat, transform.scale);
+	localMat = glm::inverse(localMat);
+	transform.localScale = vec3(localMat * vec4(transform.scale, 1.0f));
+	transform.localAngle = 0.0f;
+
 	UpdateTransform();
+
+
 }
 
 //Clean up pointers
@@ -133,6 +155,11 @@ void GameObject::SetActive(const bool active) {
 
 void GameObject::Translate(const vec3& value) {
 	transform.position += value;
+	LocalTranslate(value);
+
+	if (camera) {
+		camera->Translate(value);
+	}
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -145,6 +172,7 @@ void GameObject::Translate(const vec3& value) {
 
 void GameObject::Translate(const float x, const float y, const float z) {
 	transform.position += vec3(x, y, z);
+	LocalTranslate(x, y, z);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -159,31 +187,32 @@ void GameObject::LocalTranslate(const vec3 & value)
 {
 	transform.localPosition += value;
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->Translate(value);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->Translate(value);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::LocalTranslate(const float x, const float y, const float z)
 {
 	transform.localPosition += vec3(x, y, z);
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->LocalTranslate(x, y, z);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->LocalTranslate(x, y, z);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::Rotate(const vec3& value) {
 
 	transform.rotation += value;
+	LocalRotate(value);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -201,6 +230,7 @@ void GameObject::Rotate(const float angle, vec3& axis) {
 	}
 	transform.angle = angle;
 	transform.rotation += angle * axis;
+	LocalRotate(angle, axis);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -212,8 +242,8 @@ void GameObject::Rotate(const float angle, vec3& axis) {
 }
 
 void GameObject::Rotate(const float x, const float y, const float z) {
-	
 	transform.rotation += vec3(x, y, z);
+	LocalRotate(x, y, z);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -225,13 +255,13 @@ void GameObject::Rotate(const float x, const float y, const float z) {
 }
 
 void GameObject::Rotate(const float angle, const float x, const float y, const float z) {
-	
 	vec3 tempAxis = vec3(x, y, z);
 	if (tempAxis.length() != 1.0f) {
 		tempAxis = normalize(tempAxis);
 	}
 
 	transform.rotation += angle * tempAxis;
+	LocalRotate(angle, x, y, z);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -243,50 +273,46 @@ void GameObject::Rotate(const float angle, const float x, const float y, const f
 }
 
 void GameObject::LocalRotate(const vec3& value) {
-
 	transform.localRotation += value;
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->Rotate(value);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->Rotate(value);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::LocalRotate(const float angle, vec3& axis) {
-
 	if (axis.length() != 1.0f) {
 		axis = normalize(axis);
 	}
 	transform.localAngle = angle;
 	transform.localRotation += angle * axis;
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->LocalRotate(angle, axis);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->LocalRotate(angle, axis);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::LocalRotate(const float x, const float y, const float z) {
-
 	transform.localRotation += vec3(x, y, z);
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->LocalRotate(x, y, z);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->LocalRotate(x, y, z);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::LocalRotate(const float angle, const float x, const float y, const float z) {
-
 	vec3 tempAxis = vec3(x, y, z);
 	if (tempAxis.length() != 1.0f) {
 		tempAxis = normalize(tempAxis);
@@ -294,17 +320,18 @@ void GameObject::LocalRotate(const float angle, const float x, const float y, co
 
 	transform.localRotation += angle * tempAxis;
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->Rotate(angle, x, y, z);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->Rotate(angle, x, y, z);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::Scale(const vec3& value) {
 	transform.scale *= value;
+	LocalScale(value);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -319,6 +346,7 @@ void GameObject::Scale(const float x, const float y, const float z) {
 	transform.scale.x *= x;
 	transform.scale.y *= y;
 	transform.scale.z *= z;
+	LocalScale(x, y, z);
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
@@ -331,6 +359,8 @@ void GameObject::Scale(const float x, const float y, const float z) {
 
 void GameObject::Scale(const float value) {
 	transform.scale *= value;
+	LocalScale(value);
+
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {
 			if (childObjects[i]) {
@@ -344,13 +374,13 @@ void GameObject::LocalScale(const vec3 & value)
 {
 	transform.scale *= value;
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->Scale(value);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->Scale(value);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::LocalScale(const float x, const float y, const float z)
@@ -359,25 +389,25 @@ void GameObject::LocalScale(const float x, const float y, const float z)
 	transform.scale.y *= y;
 	transform.scale.z *= z;
 
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->Scale(x, y, z);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->Scale(x, y, z);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::LocalScale(const float value)
 {
 	transform.scale *= value;
-	if (childObjects.size() > 0) {
-		for (unsigned int i = 0; i < childObjects.size(); i++) {
-			if (childObjects[i]) {
-				childObjects[i]->Scale(value);
-			}
-		}
-	}
+	//if (childObjects.size() > 0) {
+	//	for (unsigned int i = 0; i < childObjects.size(); i++) {
+	//		if (childObjects[i]) {
+	//			childObjects[i]->Scale(value);
+	//		}
+	//	}
+	//}
 }
 
 void GameObject::SetName(const std::string& name) {
