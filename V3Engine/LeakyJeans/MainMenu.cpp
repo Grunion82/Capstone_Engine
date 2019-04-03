@@ -36,7 +36,7 @@ MainMenu::MainMenu() {
 	Shader* skyboxShader = new Shader("Assets/SkyboxMap/skyboxVert.glsl", "Assets/SkyboxMap/skyboxFrag.glsl");
 
 	skybox = new Skybox(tempFaces, "Assets/SkyboxMap/cube.obj", skyboxShader);
-	   
+#pragma region Jeans Start-Up   
 	AddGameObject(new Jeans("Jeans", glm::vec3(-5.0f, jeansStartY, -15.0f)));
 	gameObjects["Jeans"]->GetRigidBody()->isEnabled = false;
 	gameObjects["Jeans"]->AddChild(new GameObject("Camera", "", 0, glm::vec3(-5.0f, jeansStartY, -15.0f)));
@@ -46,37 +46,57 @@ MainMenu::MainMenu() {
 	gameObjects["Jeans2"]->GetRigidBody()->isEnabled = false;
 	gameObjects["Jeans2"]->AddChild(new GameObject("Camera", "", 0, glm::vec3(5.0f, jeansStartY, -15.0f)));
 	gameObjects["Jeans2"]->GetChild(0)->AttachCamera(c[1]);
-
+#pragma endregion The initialization code for both Jeans objects
+	
+#pragma region DeathBox Start-Up
 	AddGameObject(new DeathBox("DeathBox1"));
+#pragma endregion The initialization code for the DeathBox
 
+#pragma region Stage 1
 	AddGameObject(new Platform("Platform1", glm::vec3(-5.0f, 0.0f, -15.0f)));
 	AddGameObject(new Platform("Platform5", glm::vec3(5.0f, 0.0f, -15.0f)));
+#pragma endregion
 
+#pragma region Stage 2
 	AddGameObject(new Platform("Platform2", glm::vec3(0.0f, 5.0f, -30.0f)));
 	AddGameObject(new Spikes("Spikes1", glm::vec3(0.0f, 5.0f, -30.0f)));
+#pragma endregion
 
+#pragma region Stage 3
 	AddGameObject(new Platform("Platform3", glm::vec3(-13.0f, 10.0f, -45.0f)));
 	AddGameObject(new HydrationStation("HydrationStation1", glm::vec3(-13.0f, 10.25f, -45.0f)));
+#pragma endregion
 
+#pragma region Stage 4
 	AddGameObject(new Platform("Platform4", glm::vec3(0.0f, 5.0f, -60.0f)));
 	AddGameObject(new Spikes("Spikes2", glm::vec3(-2.0f, 5.0f, -60.0f)));
 	AddGameObject(new Spikes("Spikes3", glm::vec3(2.0f, 5.0f, -60.0f)));
+#pragma endregion
 
+#pragma region Stage 5
 	AddGameObject(new Platform("Platform6", glm::vec3(-7.0f, 5.0f, -75.0f)));
 	AddGameObject(new Platform("Platform7", glm::vec3(7.0f, 8.0f, -75.0f)));
 	AddGameObject(new Spikes("Spikes4", glm::vec3(7.0f, 8.0f, -75.0f)));
+#pragma endregion
 
+#pragma region Stage 6
 	AddGameObject(new Platform("Platform8", glm::vec3(-12.0f, 9.0f, -90.0f)));
 	AddGameObject(new Spikes("Spikes5", glm::vec3(-12.0f, 9.0f, -90.0f)));
 	AddGameObject(new Platform("Platform9", glm::vec3(7.0f, 0.0f, -90.0f)));
+	AddGameObject(new HydrationStation("HydrationStation2", glm::vec3(7.0f, 0.0f, -90.0f)));
+#pragma endregion
 
+#pragma region Stage 7
 	AddGameObject(new Platform("Platform10", glm::vec3(-5.0f, 3.0f, -105.0f)));
 	AddGameObject(new Spikes("Spikes6", glm::vec3(-5.0f, 3.0f, -105.0f)));
 	AddGameObject(new Platform("Platform11", glm::vec3(5.0f, 3.0f, -105.0f)));
-	AddGameObject(new Spikes("Spikes6", glm::vec3(5.0f, 3.0f, -105.0f)));
+	AddGameObject(new Spikes("Spikes7", glm::vec3(5.0f, 3.0f, -105.0f)));
+#pragma endregion
 
+#pragma region Stage 8/Final
 	AddGameObject(new Platform("Platform12", glm::vec3(0.0f, 0.0f, -130.0f)));
 	AddGameObject(new Flag("FinishFlag", glm::vec3(0.0f, 0.1f, -130.0f)));
+#pragma endregion
 }
 
 

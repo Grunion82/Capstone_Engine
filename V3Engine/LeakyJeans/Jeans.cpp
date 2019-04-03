@@ -92,7 +92,6 @@ void Jeans::CollisionEnter(GameObject* collisionObj) {
 		printf("final score: %f\n", ScoreManager::GetInstance()->CalculateScore(waterLevel));
 	}
 	if (collisionObj->GetTag() == "DeathBox") {
-		printf("hit box\n");
 		rigidBody->velocity = glm::vec3(0.0f);
 		Translate(startPos - transform.position);
 		UpdateTransform();
