@@ -143,17 +143,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Flag.cpp" />
+    <ClCompile Include="HydrationStation.cpp" />
     <ClCompile Include="Jeans.cpp" />
     <ClCompile Include="LeakyJeans.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Platform.cpp" />
+    <ClCompile Include="ScoreManager.cpp" />
+    <ClCompile Include="Spikes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Flag.h" />
+    <ClInclude Include="HydrationStation.h" />
     <ClInclude Include="Jeans.h" />
     <ClInclude Include="LeakyJeans.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Platform.h" />
+    <ClInclude Include="ScoreManager.h" />
+    <ClInclude Include="Spikes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

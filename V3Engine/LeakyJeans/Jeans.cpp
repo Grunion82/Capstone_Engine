@@ -4,6 +4,8 @@
 #include <Engine/Core/Systems/Camera.h>
 #include <Engine/Core/Systems/Input.h>
 
+#include "ScoreManager.h"
+
 Jeans::Jeans() : GameObject("Jeans") {
 	model = new Model(this, "Assets/Models/jeans.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/jeansbasecolor.png"));
@@ -22,14 +24,16 @@ Jeans::Jeans() : GameObject("Jeans") {
 Jeans::Jeans(const std::string& name, glm::vec3 position) : GameObject(name) {
 	Tag = "Player";
 	hasJumped = false;
-	speed = 10.0f;
+
+	speed = MAX_SPEED;
+	drainRatio = 1.0f;
+	waterLevel = MAX_WATER_LEVEL;
 
 	model = new Model(this, "Assets/Models/jeans.obj");
 	model->SetTextureMap(new Texture("Assets/Textures/jeansbasecolor.png"));
 	model->SetShader(new Shader("Assets/Shaders/vertexShader.glsl", "Assets/Shaders/fragmentShader.glsl"));
 
 	rigidBody = new RigidBody(this, true);
-	//rigidBody->SetBounciness(0.5f);
 
 	collider = new BoundingBox(this, model->GetMinVert(), model->GetMaxVert());
 
@@ -42,19 +46,30 @@ Jeans::~Jeans() {
 }
 
 void Jeans::Update(float deltaTime) {
-	//transform.angle += 1.0f * deltaTime;
+
 	if (Input::GetInstance()->WasKeyPressed(SDLK_SPACE) && !hasJumped) {
 		rigidBody->ApplyForce(glm::vec3(0.0f, 125.0f, 0.0f));
 		hasJumped = true;
 	}
-	if (Input::GetInstance()->IsKeyDown(SDLK_RIGHT))
+	if (Input::GetInstance()->IsKeyDown(SDLK_RIGHT)) {
 		Translate(glm::vec3(speed * deltaTime, 0.0f, 0.0f));
-	if (Input::GetInstance()->IsKeyDown(SDLK_LEFT))
+		waterLevel -= drainRatio * deltaTime;
+	}
+	if (Input::GetInstance()->IsKeyDown(SDLK_LEFT)) {
 		Translate(glm::vec3(-speed * deltaTime, 0.0f, 0.0f));
-	if (Input::GetInstance()->IsKeyDown(SDLK_UP))
+		waterLevel -= drainRatio * deltaTime;
+	}
+	if (Input::GetInstance()->IsKeyDown(SDLK_UP)) {
 		Translate(glm::vec3(0.0f, 0.0f, -speed * deltaTime));
-	if (Input::GetInstance()->IsKeyDown(SDLK_DOWN))
+		waterLevel -= drainRatio * deltaTime;
+	}
+	if (Input::GetInstance()->IsKeyDown(SDLK_DOWN)) {
 		Translate(glm::vec3(0.0f, 0.0f, speed * deltaTime));
+		waterLevel -= drainRatio * deltaTime;
+	}
+
+	waterLevel = glm::clamp(waterLevel, 0.0f, MAX_WATER_LEVEL);
+	speed = MAX_SPEED - (waterLevel / 10.0f);
 
 	UpdateTransform();
 }
@@ -66,14 +81,26 @@ void Jeans::Render(const Camera* camera) {
 void Jeans::CollisionEnter(GameObject* collisionObj) {
 	if (collisionObj->GetTag() == "Platform")
 		hasJumped = false;
+	if (collisionObj->GetTag() == "Spikes") {
+		drainRatio += 5.0f;
+	}
+	if (collisionObj->GetTag() == "Flag") {
+		printf("final score: %f\n", ScoreManager::GetInstance()->CalculateScore(waterLevel));
+	}
+
 }
 
 void Jeans::CollisionStay(GameObject* collisionObj) {
-	//printf("stay\n");
+	if (collisionObj->GetTag() == "HydrationStation") {
+		waterLevel += 0.3f;
+	}
 }
 
 void Jeans::CollisionExit(GameObject* collisionObj) {
-	//printf("exit\n");
 	if (collisionObj->GetTag() == "Platform")
 		hasJumped = true;
+}
+
+int Jeans::GetWaterLevel() const {
+	return waterLevel;
 }

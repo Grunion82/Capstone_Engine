@@ -123,6 +123,7 @@ void Mesh::Render(const Camera* camera, const glm::mat4 modelMatrix) {
 	meshShader->SetVec3("eyePos", camera->GetPosition());
 	meshShader->SetMat4("view", camera->GetViewMatrix());
 	meshShader->SetMat4("proj", camera->GetProjectionMatrix());
+	meshShader->SetVec3("lightPos", glm::vec3(0.0f, 75.0f, 25.0f));
 
 	glDrawArrays(GL_TRIANGLES, 0, subMesh.vertexList.size());
 

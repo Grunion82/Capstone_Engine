@@ -3,6 +3,8 @@
 in vec3 Normal;
 in vec2 TexCoords;
 in vec3 FragPosition;
+in vec3 eyeVec;
+in vec3 lightDir;
 
 out vec4 color;
 
@@ -10,21 +12,20 @@ uniform sampler2D textureMap;
 uniform vec3 viewPosition;
 
 void main() {
-	//ambient
-	//vec3 ambient = material.ambient * texture(material.diffuseMap, TexCoords).rgb *	light.lightColor;
-
 	//diffuse
-	//vec3 norm = normalize(Normal);
-	//vec3 lightDir = normalize(light.lightPos - FragPosition);
-	//float diff = max(dot(norm, lightDir), 0.0);
-	//vec3 diffuse = (diff * material.diffuse) * texture(material.diffuseMap,	TexCoords).rgb * light.lightColor;
+	vec4 kd = texture(textureMap, TexCoords);
 
-	//specular
-	//vec3 viewDir = normalize(viewPosition - FragPosition);
-	//vec3 reflectDir = reflect(-lightDir, norm);
-	//float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	//vec3 specular = (spec * material.specular) * light.lightColor;
+	//specular 
+	vec4 ks = vec4(1.0f, 1.0f, 1.0f, 0.0f);	
 
-	//vec3 result = ambient + diffuse + specular;
-	color = texture(textureMap, TexCoords);
+	//ambient
+	vec4 ka = 0.1f * kd;	
+
+	//Blinn-Phong Shading
+	vec3 halfWayVec = normalize(lightDir + eyeVec);
+	float diff = max(dot(Normal, lightDir), 0.0f);
+	float spec = max(dot(Normal, halfWayVec), 0.0f);
+	
+
+	color = ka + (diff * kd) + (spec * ks);
 }
