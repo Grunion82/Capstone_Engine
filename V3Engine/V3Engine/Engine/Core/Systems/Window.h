@@ -5,6 +5,7 @@
 #include <vector>
 #include <SDL_image.h>
 
+
 class Window : public EventSystem
 {
 	std::vector<SDL_DisplayMode> windowResolutions;
@@ -35,7 +36,10 @@ class Window : public EventSystem
 	bool InitSDL();
 	bool CloseSDL();
 
+	SDL_DisplayMode Default;
 public:
+
+	bool MouseShowCursor = true;
 	//Generic window will assume 800x600
 	Window(const char* name);
 	//Generic window based off resolution
@@ -52,15 +56,25 @@ public:
 
 	inline SDL_Surface* GetScreenSurface() { return SDL_GetWindowSurface(window); }
 	inline SDL_Window* GetWindow() { return window; }
+
 	inline int GetWidth() { return windowWidth; }
 	inline int GetHeight() { return windowHeight; }
+
 	inline std::vector<SDL_DisplayMode> GetWindowResolutions() { return windowResolutions; }
 	inline SDL_DisplayMode GetCurrentResolution() { return currentDisplay; }
+
+	void SetWindowResolution(int index);
+	void SetWindowResolution(SDL_DisplayMode display);
+
+	bool GetIsBorderless() { return borderless; }
+	bool GetIsVsync() { return vsync; }
+	bool GetIsFullscreen() { return fullscreen; }
+
 	inline SDL_DisplayMode GetResolution(unsigned int index) { if (&windowResolutions[index] != nullptr) { return windowResolutions[index]; } }
 	inline SDL_GLContext GetContext() { return windowContext; }
 	inline SDL_Renderer* GetRenderer() { return windowRenderer; }
-
 	inline void SetName(const char* name) { windowName = name; }
+	inline void ShowCursor();
 
 	void Fullscreen();
 	void Borderless();

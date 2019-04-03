@@ -4,7 +4,7 @@
 
 #include "Debug.h"
 
-Window::Window(const char* name) : windowName(name), windowWidth(0), windowHeight(0) {
+Window::Window(const char* name) : windowName(name), windowWidth(0), windowHeight(0)  {
 
 }
 
@@ -22,6 +22,7 @@ bool Window::Init()
 	if (!InitSDL()) {
 		return false;
 	}
+
 
 	SDL_DisplayMode mode;
 	//int display_mode_count = SDL_GetNumVideoDisplays();//For current display
@@ -44,6 +45,12 @@ bool Window::Init()
 	windowParameters = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
 	if (windowWidth != 0 && windowHeight != 0) {
+		for (unsigned int i = 0; i < windowResolutions.size(); i++) {
+			if (windowResolutions[i].w == windowWidth && windowResolutions[i].h == windowHeight) {
+				currentDisplay = windowResolutions[i];
+			}
+		}
+
 		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
 	}
 	else {
@@ -64,8 +71,8 @@ bool Window::Init()
 			currentDisplay = current;
 		}
 		else {
-			windowWidth = 800;
-			windowHeight = 600;
+			windowWidth = 1024;
+			windowHeight = 576;
 		}
 
 		window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, windowParameters);
@@ -93,12 +100,14 @@ bool Window::Init()
 	//V-sync
 	SDL_GL_SetSwapInterval(vsync);
 	//Remove mouse cursor and capture in window
-	SDL_ShowCursor(SDL_DISABLE);
-	SDL_SetWindowGrab(window, SDL_TRUE);
-	SDL_SetRelativeMouseMode(SDL_TRUE);
+	//SDL_ShowCursor(SDL_DISABLE);
+	//SDL_SetWindowGrab(window, SDL_TRUE);
+	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	eventFlags = SDL_WINDOWEVENT | SDL_WINDOWEVENT_SHOWN | SDL_WINDOWEVENT_EXPOSED | SDL_WINDOWEVENT_FOCUS_GAINED | SDL_WINDOWEVENT_ENTER | SDL_WINDOWEVENT_HIDDEN | SDL_WINDOWEVENT_FOCUS_LOST | SDL_WINDOWEVENT_LEAVE | SDL_WINDOWEVENT_SIZE_CHANGED | SDL_WINDOWEVENT_RESIZED | SDL_WINDOWEVENT_MAXIMIZED | SDL_WINDOWEVENT_RESTORED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_INPUT_GRABBED;
-
+	MouseShowCursor = true; 
+	SDL_Surface* surface = IMG_Load("Assets/Textures/Logos/pants.png");
+	SDL_SetWindowIcon(window, surface);
 	return true;
 }
 
@@ -113,10 +122,9 @@ void Window::Update(SDL_Event& e)
 		case(SDL_WINDOWEVENT_ENTER)://Window has gained mouse focus, mouse enters(hovers over) window
 		case(SDL_WINDOWEVENT_FOCUS_GAINED)://Window gained focused, this occurs before exposed
 		case(SDL_WINDOWEVENT_EXPOSED)://Window is exposed and needs to be redrawn, is "selected"
-			SDL_ShowCursor(SDL_DISABLE);
-			SDL_SetWindowGrab(window, SDL_TRUE);
-			SDL_CaptureMouse(SDL_TRUE);
-			SDL_SetRelativeMouseMode(SDL_TRUE);
+			ShowCursor();
+				
+			
 			break;
 		case(SDL_WINDOWEVENT_HIDDEN):
 		case(SDL_WINDOWEVENT_FOCUS_LOST):
@@ -125,11 +133,13 @@ void Window::Update(SDL_Event& e)
 			SDL_SetWindowGrab(window, SDL_FALSE);
 			SDL_CaptureMouse(SDL_FALSE);
 			SDL_SetRelativeMouseMode(SDL_FALSE);
+			
 			break;
 		case(SDL_WINDOWEVENT_SIZE_CHANGED)://The window size has changed, either as a result of an API call or through the system or user changing the window size
 		case(SDL_WINDOWEVENT_RESIZED):
 			windowWidth = e.window.data1;
 			windowHeight = e.window.data2;
+
 			glViewport(0, 0, windowWidth, windowHeight);
 			//screenSurface = SDL_GetWindowSurface(window);
 			break;
@@ -152,11 +162,33 @@ void Window::Update(SDL_Event& e)
 			case(SDL_WINDOWEVENT_RESTORED)://Window has been set back to normal position and size
 			*/
 
+			
+
 		default:
 			break;
 		}
 	}
 }
+inline void Window::ShowCursor() {
+	
+	if (MouseShowCursor) {
+
+		SDL_ShowCursor(SDL_ENABLE);
+		SDL_CaptureMouse(SDL_FALSE);
+		SDL_SetWindowGrab(window, SDL_FALSE);
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		
+	}
+	else {
+
+		SDL_ShowCursor(SDL_DISABLE);
+		SDL_CaptureMouse(SDL_TRUE);
+		SDL_SetWindowGrab(window, SDL_TRUE);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+
+	}
+}
+
 
 void Window::Render()
 {
@@ -192,12 +224,28 @@ bool Window::Shutdown()
 	return success;
 }
 
+void Window::SetWindowResolution(int index) {
+	if (windowResolutions.size() < 0 && index < windowResolutions.size()) {
+		currentDisplay = windowResolutions[index];
+		SDL_SetWindowSize(window, currentDisplay.w, currentDisplay.h);
+	}
+}
+
+void Window::SetWindowResolution(SDL_DisplayMode display) {
+
+		currentDisplay = display;
+		SDL_SetWindowSize(window, currentDisplay.w, currentDisplay.h);
+}
+
+
+
 bool Window::InitSDL() {
 	bool success = true;
 	//SDL_SetHint("SDL_HINT_GAMECONTROLLERCONFIG", "1");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		success = false;
 	}
+
 
 	return success;
 }
@@ -230,13 +278,12 @@ void Window::Borderless()
 	if (!borderless) {
 		windowParameters |= SDL_WINDOW_BORDERLESS;
 		borderless = true;
-		b = SDL_TRUE;
-		
+		b = SDL_FALSE;
 	}
 	else {
 		windowParameters ^= SDL_WINDOW_BORDERLESS;
 		borderless = false;
-		b = SDL_FALSE;
+		b = SDL_TRUE;
 	}
 	SDL_SetWindowBordered(window, b);
 }

@@ -1,0 +1,9 @@
+diff a/V3Engine/LeakyJeans/Game/Scenes/Game.cpp b/V3Engine/LeakyJeans/Game/Scenes/Game.cpp	(rejected hunks)
+@@ -0,6 +0,7 @@
+ 
+ Game::Game()
+ {
++>>>>>>> Capstone_Engine/nicolas:V3Engine/LeakyJeans/Game/Scenes/Game.cpp
+ 
+ 	c.reserve(2);
+ 	c.push_back(new Camera(V3Engine::GetInstance()->GetEngineWindow()));
