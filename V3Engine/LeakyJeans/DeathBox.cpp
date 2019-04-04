@@ -8,7 +8,7 @@ DeathBox::DeathBox(const std::string& name) : GameObject(name) {
 	rigidBody = new RigidBody(this, false);
 	rigidBody->isEnabled = false;
 
-	collider = new BoundingBox(this, glm::vec3(-55.0f, -10.0f, -150.0f) , glm::vec3(55.0f, 10.0f, 150.0f));
+	collider = new BoundingBox(this, glm::vec3(FLT_MIN, -10.0f, FLT_MIN) , glm::vec3(FLT_MAX, 10.0f, FLT_MAX));
 	collider->isTrigger = true;
 
 	transform.position = glm::vec3(0.0f, -25.0f, -50.0f);

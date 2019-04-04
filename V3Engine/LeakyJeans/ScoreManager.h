@@ -22,6 +22,7 @@ public:
 
 	static ScoreManager* GetInstance();
 	static float GetTimeElapsed() { return timeElapsed;  }
+	void ResetTime() { timeElapsed = 0.0f; }
 
 	void Update(float deltaTime);
 	float CalculateScore(float wetnessValue);

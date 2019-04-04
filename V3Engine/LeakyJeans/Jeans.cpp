@@ -13,6 +13,7 @@ Jeans::Jeans() : GameObject("Jeans") {
 	//model->SetShader(Graphic::GetInstance()->gbuffer.gbufferShader);
 
 	rigidBody = new RigidBody(this);
+	rigidBody->isEnabled = false;
 
 	collider = new BoundingBox(this, model->GetMinVert(), model->GetMinVert());
 
@@ -52,10 +53,20 @@ void Jeans::MoveJeans(glm::vec3 displacement, float time) {
 }
 
 void Jeans::Update(float deltaTime) {
+
+	if (ScoreManager::GetTimeElapsed() > 1.0f)
+		rigidBody->isEnabled = true;
+
 	waterLevel = glm::clamp(waterLevel, 0.0f, MAX_WATER_LEVEL);
 	speed = MAX_SPEED - (waterLevel / 10.0f);
 	
 	UpdateTransform();
+	if (transform.position.y < -50.0f) {
+		rigidBody->velocity = glm::vec3(0.0f);
+		Translate(startPos - transform.position);
+		UpdateTransform();
+	}
+
 
 	if (childObjects.size() > 0) {
 		for (unsigned int i = 0; i < childObjects.size(); i++) {

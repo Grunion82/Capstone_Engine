@@ -4,6 +4,7 @@
 #include<Engine/V3Engine.h>
 
 #include "../../../V3Engine/Engine/Core/Game/GameInterface.h"
+#include "../../ScoreManager.h"
 
 
 MainMenuUI::MainMenuUI(GameInterface* ref)
@@ -93,7 +94,7 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 	}
 	//calculate aspect ration in case display changes; 
 	//calculates the windows change so we can relate that number with all the elements exposed in the UI/// NOTE: I CAN CREATE AN ENUM WITH ALL THE RESOLUTIONS
-	float AspectRatio = CalculateDisplayChange(defaultSize.x, size.x);
+	float AspectRatio = CalculateDisplayChange(800, size.x);
 
 	
 	ImVec2 buttonSize = ImVec2(150.0f * AspectRatio, 50 * AspectRatio);
@@ -139,7 +140,6 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 	float my_EngineLogo_w = TextureHandler::GetTextureData("EngineLogo")->width/ 5 * (AspectRatio - 0.1);
 	float my_EngineLogo_h = TextureHandler::GetTextureData("EngineLogo")->height/ 5 * (AspectRatio - 0.1);
 
-	std::cout << AspectRatio << std::endl;
 	//std::cout <<"size.x = " << size.x << std::endl;
 
 	//font size
@@ -211,8 +211,10 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 
 	widgetPos = ImVec2(size.x * 7/10, size.y * 1/4 - buttonSize.y/2);
 	ImGui::SetCursorPos(widgetPos);
-	if (ImGui::Button("   Play", buttonSize))
+	if (ImGui::Button("   Play", buttonSize)) {
 		gameRef->SetState(GameState::In_Game);
+		ScoreManager::GetInstance()->ResetTime();
+	}
 
 	widgetPos = ImVec2(size.x * 7 / 10, size.y * 1/2 - buttonSize.y/2);
 	ImGui::SetCursorPos(widgetPos);

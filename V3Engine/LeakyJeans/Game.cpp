@@ -38,10 +38,12 @@ Game::Game() {
 	skybox = new Skybox(tempFaces, "Assets/SkyboxMap/cube.obj", skyboxShader);
 #pragma region Jeans Start-Up   
 	AddGameObject(new Jeans("Jeans", glm::vec3(-5.0f, jeansStartY, -15.0f)));
+	gameObjects["Jeans"]->GetRigidBody()->isEnabled = false;
 	gameObjects["Jeans"]->AddChild(new GameObject("Camera", "", 0, glm::vec3(-5.0f, jeansStartY, -15.0f)));
 	gameObjects["Jeans"]->GetChild(0)->AttachCamera(c[0]);
 
 	AddGameObject(new Jeans("Jeans2", glm::vec3(5.0f, jeansStartY, -15.0f)));
+	gameObjects["Jeans2"]->GetRigidBody()->isEnabled = false;
 	gameObjects["Jeans2"]->AddChild(new GameObject("Camera", "", 0, glm::vec3(5.0f, jeansStartY, -15.0f)));
 	gameObjects["Jeans2"]->GetChild(0)->AttachCamera(c[1]);
 #pragma endregion The initialization code for both Jeans objects
@@ -95,6 +97,8 @@ Game::Game() {
 	AddGameObject(new Platform("Platform12", glm::vec3(0.0f, 0.0f, -130.0f)));
 	AddGameObject(new Flag("FinishFlag", glm::vec3(0.0f, 0.1f, -130.0f)));
 #pragma endregion
+
+	//ScoreManager::ResetTime();
 }
 
 
@@ -126,6 +130,12 @@ void Game::Update(float deltaTime) {
 
 
 	for (unsigned int i = 0; i < c.size(); i++) {
+		if (V3Engine::GetInstance()->GetEngineWindow()->resizeCamera) {
+			c[0]->SetCameraViewport(0, V3Engine::GetInstance()->GetEngineWindow()->GetHeight() / 2, V3Engine::GetInstance()->GetEngineWindow()->GetWidth(), V3Engine::GetInstance()->GetEngineWindow()->GetHeight() / 2);
+			c[1]->SetCameraViewport(0, 0, V3Engine::GetInstance()->GetEngineWindow()->GetWidth(), V3Engine::GetInstance()->GetEngineWindow()->GetHeight() / 2);
+
+			V3Engine::GetInstance()->GetEngineWindow()->resizeCamera = false;
+		}
 		c[i]->Update();
 	}
 

@@ -6,7 +6,7 @@
 #include <glew.h>
 
 Camera::Camera(Window* window, float near, float far) : Position(0.0f,0.0f,0.0f), Forward(0.0f,0.0f,-1.0f), Up(0.0f,1.0f,0.0f), Right(1.0f,0.0f,0.0f), WorldUp(0.0f,1.0f,0.0f), 
-													    MovementSpeed(10.0f), ControllerSensitivity(CONTROLLER_SENSITIVITY),MouseSensitivity(MOUSE_SENSITIVITY), FOV(FIELD_OF_VIEW)
+													    MovementSpeed(10.0f), ControllerSensitivity(CONTROLLER_SENSITIVITY),MouseSensitivity(MOUSE_SENSITIVITY), FOV(FIELD_OF_VIEW), windowToRender(window)
 {
 	cameraProjection = glm::perspective(FOV, (float)window->GetWidth() / (float)window->GetHeight(), near, far);
 	eulerAngle.x = PITCH;
@@ -118,7 +118,6 @@ void Camera::Update()
 	inverseMatrix = glm::inverse(inverseMatrix);
 
 	localPosition = vec3(inverseMatrix * vec4(Position, 1.0f));
-
 }
 
 void Camera::Render()

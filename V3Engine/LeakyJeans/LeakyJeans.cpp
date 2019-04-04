@@ -21,6 +21,10 @@ LeakyJeans::~LeakyJeans() {
 void LeakyJeans::Update(float deltaTime) {
 	currentScene->Update(deltaTime);
 
+	if (Input::GetInstance()->GetJoystickButton(0, SDL_CONTROLLER_BUTTON_START) || Input::GetInstance()->GetJoystickButton(1, SDL_CONTROLLER_BUTTON_START)) {
+		type = GameState::Main_Menu;
+	}
+
 	switch (type) {
 	case GameState::Main_Menu: 
 		SetCurrentScene("Main Menu");
