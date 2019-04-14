@@ -1,12 +1,13 @@
 #include "OptionsMenu.h"
 
+#include "../../../V3Engine/Engine/Core/Game/GameInterface.h"
 
 
-OptionsMenu::OptionsMenu()
+OptionsMenu::OptionsMenu(GameInterface* ref)
 {
-
+	Name = "Options Menu";
 	//create init inmediateUI*
-	iu = new OptionsMenuUI();
+	iu = new OptionsMenuUI(ref);
 
 	iu->Initialize();
 

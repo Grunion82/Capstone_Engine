@@ -13,7 +13,8 @@ private:
 	GameState uiState;
 	Window* w;
 public:
-	OptionsMenu();
+	OptionsMenu(){}
+	OptionsMenu(class GameInterface* ref);
 	~OptionsMenu();
 
 	void Update(float deltaTime) override;

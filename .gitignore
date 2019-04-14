@@ -318,3 +318,7 @@ ASALocalRun/
 
 # MSBuild Binary and Structured Log
 *.binlog
+
+# Image related file extensions
+*.jpg
+*.png

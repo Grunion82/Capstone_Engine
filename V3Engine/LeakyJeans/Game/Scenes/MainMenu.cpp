@@ -4,15 +4,16 @@
 #include "../Platform.h"
 #include "../V3Engine/Engine/Core/Systems/Window.h"
 #include "../V3Engine/Engine/Core/Systems/Input.h"
+#include "../../../V3Engine/Engine/Core/Game/GameInterface.h"
 #include "../V3Engine/Engine/V3Engine.h"
 
 
-MainMenu::MainMenu() {
+MainMenu::MainMenu(GameInterface* ref) {
 
-
+	Name = "Main Menu";
 	
 	//create init inmediateUI*
-	iu = new MainMenuUI();
+	iu = new MainMenuUI(ref);
 
 	iu->Initialize();
 

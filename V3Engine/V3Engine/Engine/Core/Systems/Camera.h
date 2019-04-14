@@ -21,8 +21,10 @@ class GameObject;
 class Camera
 {
 	glm::mat4 cameraProjection = glm::mat4();
+	Window* windowToRender;
 
 	glm::vec3 Position;
+	glm::vec3 localPosition;
 	glm::vec3 Forward;
 	glm::vec3 Up;
 	glm::vec3 Right;
@@ -64,6 +66,8 @@ public:
 	Camera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, glm::vec3 right, glm::vec3 worldup, glm::quat orientation, float movespeed, float sensitivity, float c_sensitivity, float fov, float l, float r, float b, float t, float near, float far);
 	glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
 	glm::mat4 GetViewMatrix() const { return glm::lookAt(Position, Position + Forward, Up); /*position,pointing forward(-Z axis),up*/}
+	Window* GetWindowToRender() { return windowToRender; }
+	void SetWindowToRender(Window* toRender) { windowToRender = toRender; }
 
 	void SetCameraViewport(SDL_Rect& rect) { cameraViewport = rect; }
 	void SetCameraViewport(float x, float y, float w, float h) { cameraViewport.x = x; cameraViewport.y = y; cameraViewport.w = w; cameraViewport.h = h; }
@@ -89,6 +93,7 @@ public:
 	//GETTERS
 
 	inline glm::vec3 GetPosition() const { return Position; }
+	inline glm::vec3 GetLocalPosition() { return localPosition; }
 	//Get a perspective matrix based off this camera
 	glm::mat4 GetPerspective(Window& w, float near, float far);
 	//Get an orthographic matrix based off this camera
@@ -98,15 +103,20 @@ public:
 	inline glm::mat4 GetProjectionMatrix() const { return cameraProjection; }
 	float GetFov() { return FOV; }
 	GameObject* GetAttachedTo() { return attachedTo; }
+	inline float GetMovementSpeed() { return MovementSpeed; }
+	inline float GetMouseSensitivity() { return MouseSensitivity; }
+	inline float GetControllerSensitivity() { return ControllerSensitivity; }
 
 	//SETTERS
 
 	void SetSensitivity(float sensitivity) { MouseSensitivity = sensitivity; }
 	void SetPosition(glm::vec3 position) { Position = position; }
+	void SetLocalPosition(glm::vec3 localP) { localPosition = localP; }
 	void SetEulerAngle(glm::vec3 rotation) { eulerAngle = rotation; }
 	void SetQuaternion(glm::quat quaternion) { Quaternion = quaternion; }
 	void SetFov(float fov) { FOV = fov; }
-	void Translate(glm::vec3 position) { Position += position; }
+	void Translate(glm::vec3 position) { Position += position; localPosition += position; }
+
 	void Rotate(glm::vec3 rotation) { eulerAngle += rotation; }
 	void Rotate(float x, float y, float z) { eulerAngle.x += x; eulerAngle += y; eulerAngle += z;}
 	void Rotate(glm::quat rotation) { Quaternion += rotation; }

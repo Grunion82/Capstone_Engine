@@ -14,6 +14,9 @@
 #include "../../Resources/Libraries/imgui/imgui_impl_sdl.h"
 #include "../../Resources/Libraries/imgui/imgui_impl_opengl3.h"
 
+
+class Window;
+
 //Game scene or state 
 enum class GameState :unsigned __int8 {
 
@@ -26,6 +29,8 @@ enum class GameState :unsigned __int8 {
 
 class InmediateUI
 {
+protected:
+	Window* w;
 public:
 
 
@@ -39,6 +44,9 @@ public:
 	virtual void Update(const float deltaTime_) = 0;
 	virtual void ShutDown();
 	
+	virtual void SetWindow(Window* newWin) { w = newWin; }
+	virtual Window* GetWindow() { return w; }
+
 	bool firstTime;
 
 	//access to the engine ui state
@@ -48,7 +56,6 @@ public:
 	SDL_Window *window;
 	ImGuiIO io;
 	ImVec2* ActualResolution;
-	Window* w;
 private:
 
 	ImFont* font;

@@ -35,11 +35,10 @@ class Window : public EventSystem
 
 	bool InitSDL();
 	bool CloseSDL();
-
-	SDL_DisplayMode Default;
 public:
-
+	bool resizeCamera = false;
 	bool MouseShowCursor = true;
+
 	//Generic window will assume 800x600
 	Window(const char* name);
 	//Generic window based off resolution

@@ -3,10 +3,13 @@
 #include <iostream>
 #include<Engine/V3Engine.h>
 
+#include "../../../V3Engine/Engine/Core/Game/GameInterface.h"
+#include "../../ScoreManager.h"
 
 
-MainMenuUI::MainMenuUI()
+MainMenuUI::MainMenuUI(GameInterface* ref)
 {
+	gameRef = ref;
 }
 
 
@@ -16,12 +19,13 @@ MainMenuUI::~MainMenuUI()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+	gameRef = nullptr;
 
 }
 
 //Flags for the window
 static bool no_resize = true;
-static bool no_move = true;//this might cause issues when the window change w and h 
+static bool no_move = true;
 static bool no_collapse = true;
 static bool auto_resize = true;
 static bool no_menu = true;
@@ -30,8 +34,7 @@ static bool no_titlebar = true;
 
 void MainMenuUI::imGuiScene(const char * frame_name_)
 {
-	static float f = 0.0f;
-	static int counter = 10;
+
 	static bool showMouse = true;
 	
 		ImGui_ImplOpenGL3_NewFrame();
@@ -42,7 +45,7 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 		
 		
 		//UI FOR EDITIING
-		static float ue_slider = 0.0;
+		/*static float ue_slider = 0.0;
 		static float ue_Slider = 0.0f;
 		static bool ue_Bool = false;
 		static bool ue_Bool_2 = false;
@@ -54,46 +57,19 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 		ImGui::Checkbox("mybool", &ue_Bool);
 		ImGui::Checkbox("mybool_1", &ue_Bool_2);
 		ImGui::Checkbox("mybool_2", &ue_Bool_3);
-		ImGui::Checkbox("mybool_3", &ue_Bool_4);
+		ImGui::Checkbox("mybool_3", &ue_Bool_4);*/
 
 		
-		
-	//setting the size and position of our window//1280
-	ImVec2 defaultSize = ImVec2(1024, 576);
 	
 	ImVec2 size = ImVec2(w->GetCurrentResolution().w ,w->GetCurrentResolution().h);//window size later update this with the sidth and height of the window
-	if (size.x == 0 || size.y == 0) {
-		size = defaultSize;
-	}
-	if (ue_Bool_2) {
-		size.x = 1024;
-		size.y = 576;
-		ue_Bool_3 = false;
-		ue_Bool_4 = false;
-	}
-	if (ue_Bool_3) {
 
-		size.x = 1152;
-		size.y = 648;
-		ue_Bool_2 = false;
-		ue_Bool_4 = false;
-
-	}
-	if (ue_Bool_4) {
-
-		size.x = 1920;
-		size.y = 1040;
-		ue_Bool_3 = false;
-		ue_Bool_2 = false;
-
-
-	}
 	//calculate aspect ration in case display changes; 
 	//calculates the windows change so we can relate that number with all the elements exposed in the UI/// NOTE: I CAN CREATE AN ENUM WITH ALL THE RESOLUTIONS
-	float AspectRatio = CalculateDisplayChange(defaultSize.x, size.x);
-
+	ImVec2 AspectRatio = CalculateDisplayChange(800.0f, size.x, 600.0f, size.y);
+	std::cout << "size.x = " << size.x<< " size.y = "<< size.y <<" Aspect Ratio = "<< AspectRatio.x <<"& "<< AspectRatio.y << std::endl;
 	
-	ImVec2 buttonSize = ImVec2(150.0f * AspectRatio, 50 * AspectRatio);
+	
+	ImVec2 buttonSize = ImVec2(150.0f * AspectRatio.x, 50 * AspectRatio.y);
 	ImVec2 pos = ImVec2(0, 0);
 	ImVec2 widgetPos = ImVec2(0, 0);
 
@@ -130,31 +106,30 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 	ImTextureID Anim_Jump = (void*)(size_t)TextureHandler::GetTexture("JumpAnim");
 	ImTextureID Anim_Wiggle = (void*)(size_t)TextureHandler::GetTexture("WiggleAnim");
 
-	float my_file_w = TextureHandler::GetTextureData("LeakyLogo")->width * 0.6 * AspectRatio;
-	float my_file_h = TextureHandler::GetTextureData("LeakyLogo")->height * 0.6  * AspectRatio;
+	float my_file_w = TextureHandler::GetTextureData("LeakyLogo")->width/3 * AspectRatio.x;
+	float my_file_h = TextureHandler::GetTextureData("LeakyLogo")->height/3 * AspectRatio.x;
 
-	float my_EngineLogo_w = TextureHandler::GetTextureData("EngineLogo")->width/ 5 * (AspectRatio - 0.1);
-	float my_EngineLogo_h = TextureHandler::GetTextureData("EngineLogo")->height/ 5 * (AspectRatio - 0.1);
+	float my_EngineLogo_w = TextureHandler::GetTextureData("EngineLogo")->width/ 5 * (AspectRatio.x - 0.1);
+	float my_EngineLogo_h = TextureHandler::GetTextureData("EngineLogo")->height/ 5 * (AspectRatio.x - 0.1);
 
-	std::cout << AspectRatio << std::endl;
 	//std::cout <<"size.x = " << size.x << std::endl;
 
 	//font size
 	ImFontAtlas* atlas = ImGui::GetIO().Fonts;
 	ImFont* font = atlas->Fonts[0];
-	font->Scale = 1.0f * AspectRatio;
+	font->Scale = 1.0f * AspectRatio.x;
 
 
 
-	ImGui::Image(my_background, ImVec2(TextureHandler::GetTextureData("Background_4")->width/2 * AspectRatio, TextureHandler::GetTextureData("Background_4")->height/2 * AspectRatio), ImVec2(0, 0), ImVec2(1, 1), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
+	ImGui::Image(my_background, ImVec2(TextureHandler::GetTextureData("Background_4")->width/2 * AspectRatio.x, TextureHandler::GetTextureData("Background_4")->height/2 * AspectRatio.y), ImVec2(0, 0), ImVec2(1, 1), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
 
-	widgetPos = ImVec2(size.x * 2/5 - my_file_w/2, size.y * 1/2 - my_file_h/2);
+	widgetPos = ImVec2(size.x * 3/20, size.y * 1/2 - my_file_h/2);
 	ImGui::SetCursorPos(widgetPos);
-	ImGui::Image(my_LeakyLogo, ImVec2(my_file_w , my_file_h), ImVec2(0.25, 0.25), ImVec2(0.75, 0.75), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
+	ImGui::Image(my_LeakyLogo, ImVec2(my_file_w, my_file_h), ImVec2(0.25, 0.25), ImVec2(0.75, 0.75), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
 
 	widgetPos = ImVec2(size.x * 0.0f, size.y * 91/100 - my_EngineLogo_h/2 );//I know, weird fraction is just te be consistent
 	ImGui::SetCursorPos(widgetPos);
-	ImGui::Image(my_EngineLogo,ImVec2(my_EngineLogo_w, my_EngineLogo_h),ImVec2(0.2,0.2),ImVec2(0.8,0.8), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
+	ImGui::Image(my_EngineLogo,ImVec2(my_EngineLogo_w, my_EngineLogo_h ),ImVec2(0.2,0.2),ImVec2(0.8,0.8), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
 
 	widgetPos = ImVec2(size.x* 88/100, size.y * 93/100);
 	ImGui::SetCursorPos(widgetPos);
@@ -208,13 +183,15 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 
 	widgetPos = ImVec2(size.x * 7/10, size.y * 1/4 - buttonSize.y/2);
 	ImGui::SetCursorPos(widgetPos);
-	if (ImGui::Button("   Play", buttonSize))                           
-		counter++;
+	if (ImGui::Button("   Play", buttonSize)) {
+		gameRef->SetState(GameState::In_Game);
+		ScoreManager::GetInstance()->ResetTime();
+	}
 
 	widgetPos = ImVec2(size.x * 7 / 10, size.y * 1/2 - buttonSize.y/2);
 	ImGui::SetCursorPos(widgetPos);
 	if (ImGui::Button("Options", buttonSize))                            
-		UIstate = GameState::Options_Menu;
+		gameRef->SetState(GameState::Options_Menu);
 
 	widgetPos = ImVec2(size.x * 7 / 10, size.y * 3/4 - buttonSize.y/2);
 	ImGui::SetCursorPos(widgetPos);
@@ -246,7 +223,7 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 	//Set Position of widget
 	widgetPos = ImVec2(size.x * 7 / 10 , size.y * 1 / 4 - buttonSize.y / 2);
 	ImGui::SetCursorPos(widgetPos);
-	ImGui::Image(Anim_Dancing, ImVec2((190.0f / 4) * AspectRatio, (170.0f / 4) * AspectRatio), ImVec2((190.0f / w * AnimFrame[dancing_f].x), 0.0), ImVec2((190.0f / w) * AnimFrame[dancing_f].y, 170.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1)); ImGui::SameLine();
+	ImGui::Image(Anim_Dancing, ImVec2((190.0f / 4) * AspectRatio.x, (170.0f / 4) * AspectRatio.y), ImVec2((190.0f / w * AnimFrame[dancing_f].x), 0.0), ImVec2((190.0f / w) * AnimFrame[dancing_f].y, 170.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1)); ImGui::SameLine();
 	//update net size of sprites
 	w = TextureHandler::GetTextureData("KickAnim")->width;
 	h = TextureHandler::GetTextureData("KickAnim")->height;
@@ -254,7 +231,7 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 	if (kick_f == 4) { kick_f = 1; }
 	widgetPos = ImVec2(size.x * 7 / 10, size.y * 3 / 4 - buttonSize.y / 2);
 	ImGui::SetCursorPos(widgetPos);
-	ImGui::Image(Anim_kick, ImVec2((190.0f/4) * AspectRatio, (180.0f/4) * AspectRatio), ImVec2((190.0f / w * AnimFrame[kick_f].x), 0.0), ImVec2((190.0f / w) * AnimFrame[kick_f].y, 180.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1));
+	ImGui::Image(Anim_kick, ImVec2((190.0f/4) * AspectRatio.x, (180.0f/4) * AspectRatio.y), ImVec2((190.0f / w * AnimFrame[kick_f].x), 0.0), ImVec2((190.0f / w) * AnimFrame[kick_f].y, 180.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1));
 
 
 	w = TextureHandler::GetTextureData("WiggleAnim")->width;
@@ -262,7 +239,7 @@ void MainMenuUI::imGuiScene(const char * frame_name_)
 
 	widgetPos = ImVec2(size.x * 7 / 10, size.y * 1 / 2 - buttonSize.y / 2);
 	ImGui::SetCursorPos(widgetPos);
-	ImGui::Image(Anim_Wiggle, ImVec2(160.0f/4 * AspectRatio, 170.0f/4 * AspectRatio), ImVec2((160.0f / w * AnimFrame[dancing_f].x), 0.0), ImVec2((160.0f / w) * AnimFrame[dancing_f].y, 170.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1));
+	ImGui::Image(Anim_Wiggle, ImVec2(160.0f/4 * AspectRatio.x, 170.0f/4 * AspectRatio.y), ImVec2((160.0f / w * AnimFrame[dancing_f].x), 0.0), ImVec2((160.0f / w) * AnimFrame[dancing_f].y, 170.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1));
 
 
 
@@ -351,9 +328,10 @@ void MainMenuUI::WindowStyle(ImGuiStyle* ref) {
 
 }
 
-float MainMenuUI::CalculateDisplayChange(float initial_, float final_) {
-	float change;
-	
-	return change = initial_ / final_;
+ImVec2 MainMenuUI::CalculateDisplayChange(float initial_x, float final_x, float initial_y, float final_y) {
+	ImVec2 change;
+	change.x = final_x / initial_x;
+	change.y = final_y / initial_y;
+	return change;
 
 }

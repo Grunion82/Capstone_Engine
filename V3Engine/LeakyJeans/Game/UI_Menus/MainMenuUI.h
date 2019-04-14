@@ -7,9 +7,12 @@ class Window;
 
 class MainMenuUI : public InmediateUI
 {
-public:
+private:
+	class GameInterface* gameRef;
 
-	MainMenuUI();
+public:
+	MainMenuUI() {}
+	MainMenuUI(class GameInterface* ref);
 	~MainMenuUI();
 
 	void imGuiScene(const char* frame_name_);
@@ -17,7 +20,7 @@ public:
 	void MainMenuOptions();
 
 	void WindowStyle(ImGuiStyle* ref);
-	float CalculateDisplayChange(float initial_, float final_);
+	ImVec2 CalculateDisplayChange(float initial_x, float final_x,float initial_y, float final_y);
 private:
 	Window* win;
 };
