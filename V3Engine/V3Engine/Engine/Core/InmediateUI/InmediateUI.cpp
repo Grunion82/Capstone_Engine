@@ -1,6 +1,8 @@
 #include "InmediateUI.h"
 #include <iostream>
 #include"../../V3Engine.h"
+#include "../Systems/Window.h"
+
 
 InmediateUI::InmediateUI()
 {
@@ -54,15 +56,17 @@ bool InmediateUI::Initialize()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	io = ImGui::GetIO();//for fonts / io =  input output 
-	w = V3Engine::GetInstance()->GetEngineWindow();
-	
+	io = ImGui::GetIO();//for fonts / io =  input output
+	if (w == nullptr) {
+		w = V3Engine::GetInstance()->GetEngineWindow();
+	}
+
+	window = w->GetWindow();
+	context = w->GetContext();
 	//ImGui::StyleColorsDark(); 
 	
 
 	glsl_version = "#version 330";
-	window = w->GetWindow();
-	context = w->GetContext();
 
 	if (window == nullptr) std::cout << "issue in window  " << std::endl;
 	if(context == nullptr)std::cout << "issue in context" << std::endl;

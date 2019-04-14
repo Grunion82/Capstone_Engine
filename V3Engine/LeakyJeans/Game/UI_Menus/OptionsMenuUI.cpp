@@ -3,9 +3,12 @@
 #include <iostream>
 #include <string>
 
+#include "../../../V3Engine/Engine/Core/Game/GameInterface.h"
 
-OptionsMenuUI::OptionsMenuUI()
+
+OptionsMenuUI::OptionsMenuUI(GameInterface* ref)
 {
+	gameRef = ref;
 }
 
 
@@ -15,6 +18,7 @@ OptionsMenuUI::~OptionsMenuUI()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+	gameRef = nullptr;
 
 }
 
@@ -39,6 +43,7 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 		static bool BorderLess = w->GetIsBorderless();
 		static int ControllerSensitivity = 5.0;
 
+		static float hello = 0.0f;
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
@@ -82,9 +87,9 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 #pragma endregion 
 
 		
-			float AspectRatio = CalculateDisplayChange(800, size.x);
+		ImVec2 AspectRatio = CalculateDisplayChange(800.0f, size.x, 600.0f, size.y);
 			//std::cout << AspectRatio << std::endl;
-			ImVec2 buttonSize = ImVec2(150.0f * AspectRatio, 50 * AspectRatio);
+			ImVec2 buttonSize = ImVec2(150.0f * AspectRatio.x, 50 * AspectRatio.y);
 			ImVec2 pos = ImVec2(0, 0);
 			ImVec2 widgetPos = ImVec2(0, 0);
 
@@ -117,11 +122,11 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 			//font size
 			ImFontAtlas* atlas = ImGui::GetIO().Fonts;
 			ImFont* font = atlas->Fonts[0];
-			font->Scale = 1.0f * AspectRatio;
+			font->Scale = 1.0f * AspectRatio.x;
 
 
 
-			ImGui::Image(my_background, ImVec2(TextureHandler::GetTextureData("Background_1")->width / 2 * AspectRatio, TextureHandler::GetTextureData("Background_1")->height / 3 * AspectRatio), ImVec2(0, 0), ImVec2(1, 1), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
+			ImGui::Image(my_background, ImVec2(TextureHandler::GetTextureData("Background_1")->width / 2 * AspectRatio.x, TextureHandler::GetTextureData("Background_1")->height / 3 * AspectRatio.y), ImVec2(0, 0), ImVec2(1, 1), ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 0));
 
 
 
@@ -173,12 +178,12 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 			widgetPos = ImVec2(size.x / 3.3, size.y / 3);
 			ImGui::SetCursorPos(widgetPos);
 			ImGui::SliderInt("Controller Sensitivity", &ControllerSensitivity, 1, 10, "%d");
-
+			ImGui::SliderFloat("position", &hello, 0.0f, 1.0f);
 
 			widgetPos = ImVec2(size.x/1.3, size.y/1.27 );
 			ImGui::SetCursorPos(widgetPos);
 			if (ImGui::Button("Back", buttonSize))
-				UIstate = GameState::Main_Menu;
+				gameRef->SetState(GameState::Main_Menu);
 
 			static std::array<ImVec2, 16> AnimFrame = { ImVec2(0,1),ImVec2(1,2),ImVec2(2,3),ImVec2(3,4),ImVec2(4,5),ImVec2(5,6),ImVec2(6,7),ImVec2(7,8),ImVec2(8,9),ImVec2(9,10),ImVec2(10,11),ImVec2(11,12),ImVec2(12,13),ImVec2(13,14),ImVec2(14,15),ImVec2(15,16) };
 			static std::array<ImVec2, 8> AnimFrame_wiggle = { ImVec2(0,1),ImVec2(1,2),ImVec2(2,3),ImVec2(3,4),ImVec2(4,5),ImVec2(5,6),ImVec2(6,7),ImVec2(7,8) };
@@ -199,16 +204,16 @@ void OptionsMenuUI::imGuiScene(const char * frame_name_)
 			widgetPos = ImVec2(size.x / 1.15, size.y /1.15);
 			ImGui::SetCursorPos(widgetPos);
 			if (water_f == 15) { water_f = 1; }
-			ImGui::Image(Anim_Water, ImVec2(190.0f/4, 200.0f/4), ImVec2((190.0f / w * AnimFrame[water_f].x), 0.0), ImVec2((190.0f / w) * AnimFrame[water_f].y, 200.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1)); 
+			ImGui::Image(Anim_Water, ImVec2(190.0f/4 * AspectRatio.x, 200.0f/4 * AspectRatio.y), ImVec2((190.0f / w * AnimFrame[water_f].x), 0.0), ImVec2((190.0f / w) * AnimFrame[water_f].y, 200.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1)); 
 
 
 			
 			w = TextureHandler::GetTextureData("WiggleAnim")->width;
 			h = TextureHandler::GetTextureData("WiggleAnim")->height;
-			widgetPos = ImVec2(size.x / 3.9, size.y / 5.6);
+			widgetPos = ImVec2(size.x /4, size.y / 6);
 			ImGui::SetCursorPos(widgetPos);
 			if (wiggle_f == 7) { wiggle_f = 1; }
-			ImGui::Image(Anim_Wiggle, ImVec2(160.0f/4, 170.0f/4), ImVec2((160.0f / w * AnimFrame_wiggle[wiggle_f].x), 0.0), ImVec2((160.0f / w) * AnimFrame_wiggle[wiggle_f].y, 170.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1));
+			ImGui::Image(Anim_Wiggle, ImVec2(160.0f/4 * AspectRatio.x, 170.0f/4 * AspectRatio.y), ImVec2((160.0f / w * AnimFrame_wiggle[wiggle_f].x), 0.0), ImVec2((160.0f / w) * AnimFrame_wiggle[wiggle_f].y, 170.0 / h), ImColor(255, 255, 255, 255), ImColor(1, 1, 1, 1));
 
 
 			if (OldTime <= ImGui::GetTime()) {
@@ -269,11 +274,12 @@ void OptionsMenuUI::WindowStyle(ImGuiStyle* ref) {
 
 
 }
-
-float OptionsMenuUI::CalculateDisplayChange(float initial_, float final_) {
-	float change;
-
-	return change = final_ / initial_;
+//this function is not optimized note: we neet to add a math library
+ImVec2 OptionsMenuUI::CalculateDisplayChange(float initial_x, float final_x, float initial_y, float final_y) {
+	ImVec2 change;
+	change.x = final_x / initial_x;
+	change.y = final_y / initial_y;
+	return change;
 
 }
 

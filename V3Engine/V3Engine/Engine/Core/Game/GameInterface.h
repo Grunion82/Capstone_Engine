@@ -4,9 +4,11 @@
 #include <map>
 
 #include "Scene.h"
+#include "../InmediateUI/InmediateUI.h"
 
 class GameInterface {
 protected:
+	GameState type;
 	//Scenes container of the game, Currently active scene, Game Name
 	std::map<std::string, Scene*> scenes;
 	Scene* currentScene;
@@ -26,6 +28,9 @@ public:
 
 	void SetName(std::string name);
 	std::string GetName() const;
+
+	void SetState(GameState s) { type = s; }
+	GameState GetState() const { return type; }
 
 	void AddScene(Scene* scene);
 	void RemoveScene(std::string sceneName);

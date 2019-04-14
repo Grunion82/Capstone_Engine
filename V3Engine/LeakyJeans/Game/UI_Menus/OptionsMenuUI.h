@@ -7,14 +7,18 @@
 
 class OptionsMenuUI : public InmediateUI
 {
+private:
+	class GameInterface* gameRef;
+
 public:
-	OptionsMenuUI();
+	OptionsMenuUI(){};
+	OptionsMenuUI(class GameInterface* ref);
 	~OptionsMenuUI();
 
 	void imGuiScene(const char* frame_name_);
 	void Update(const float deltaTime_);
 	void WindowStyle(ImGuiStyle* ref);
-	float CalculateDisplayChange(float initial_, float final_);
+	ImVec2 CalculateDisplayChange(float initial_x, float final_x, float initial_y, float final_y);
 
 
 	std::vector<SDL_DisplayMode> windowRes;

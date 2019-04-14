@@ -4,6 +4,7 @@
 
 BoundingBox::BoundingBox(GameObject* refObj, glm::vec3 min, glm::vec3 max) {
 	type = ColliderType::BOX;
+	isTrigger = false;
 	referenceObject = refObj;
 	minVert = min;
 	maxVert = max;

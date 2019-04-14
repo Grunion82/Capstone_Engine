@@ -28,6 +28,8 @@ public:
 
 	glm::mat4 transform;
 
+	bool isTrigger;
+
 	virtual void Update(float deltaTime) {}
 
 	inline virtual ColliderType GetType() const {
@@ -48,6 +50,7 @@ public:
 
 	inline BoundingBox() {
 		type = ColliderType::BOX;
+		isTrigger = false;
 		minVert = glm::vec3(0.0f);
 		maxVert = glm::vec3(0.0f);
 		transform = glm::mat4(1.0f);

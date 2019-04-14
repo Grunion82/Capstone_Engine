@@ -3,9 +3,8 @@
 
 #include <vector>
 #include <map>
-//#include "../Systems/Window.h"
-#include "../../Rendering/2D/TextureHandler.h"
 #include "Skybox.h"
+#include "../InmediateUI/InmediateUI.h"
 
 class Scene {
 protected:
@@ -13,7 +12,6 @@ protected:
 	//Map of game objects within the scene
 	std::map<std::string, class GameObject*> gameObjects;
 	std::string Name;
-	
 
 public:
 	Scene();
@@ -32,6 +30,11 @@ public:
 	//Adds, removes, and finds game objects within our map
 	void AddGameObject(class GameObject* object);
 	void RemoveGameObject(const std::string name);
+	std::map<std::string, class GameObject*> GetGameObjects() { return gameObjects; }
+	void SetGameObjects(std::map<std::string, class GameObject*> newObjects) { gameObjects = newObjects; }
+
+	Camera* GetSceneCamera() { return sceneCamera; }
+	void SetSceneCamera(Camera* c) { sceneCamera = c; }
 
 	class GameObject* Find(const std::string name);
 	

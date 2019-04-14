@@ -217,7 +217,7 @@ bool Input::Shutdown() {
 
 int Input::GetJoystickAxis(unsigned int index, unsigned int axis)
 {
-	if (joysticks.size() > 0) {
+	if (joysticks.size() > 0 && index < joysticks.size()) {
 		if (joysticks[index]) {
 			return joysticks[index]->joyAxis[axis];
 		}
@@ -227,7 +227,7 @@ int Input::GetJoystickAxis(unsigned int index, unsigned int axis)
 
 int Input::GetJoystickAxisDir(unsigned int index, unsigned int axis)
 {
-	if (joysticks.size() > 0) {
+	if (joysticks.size() > 0 && index < joysticks.size()) {
 		if (joysticks[index]) {
 			return joysticks[index]->joyAxisDir[axis];
 		}
@@ -237,7 +237,7 @@ int Input::GetJoystickAxisDir(unsigned int index, unsigned int axis)
 
 int Input::GetJoystickButton(unsigned int index, unsigned int button)
 {
-	if (joysticks.size() > 0) {
+	if (joysticks.size() > 0 && index < joysticks.size()) {
 		if (joysticks[index]) {
 			return joysticks[index]->joyButtons[button];
 		}
@@ -722,15 +722,15 @@ void GameController::Update(SDL_Event& e)
 		case(SDL_CONTROLLERBUTTONUP):
 				for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
 					joyButtons[i] = SDL_GameControllerGetButton(gameController, (SDL_GameControllerButton)i);
-					if (joyButtons[i] == 1) {
-						SDL_GameControllerButtonBind b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)i);
-						if (b.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
-							std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.button << ")" << std::endl;
-						}
-						else if (b.bindType == SDL_CONTROLLER_BINDTYPE_HAT){
-							std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.hat.hat << "." << (int)b.value.hat.hat_mask << ")" << std::endl;
-						}
-					}
+					//if (joyButtons[i] == 1) {
+					//	SDL_GameControllerButtonBind b = SDL_GameControllerGetBindForButton(gameController, (SDL_GameControllerButton)i);
+					//	if (b.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) {
+					//		std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.button << ")" << std::endl;
+					//	}
+					//	else if (b.bindType == SDL_CONTROLLER_BINDTYPE_HAT){
+					//		std::cout << SDL_GameControllerGetStringForButton((SDL_GameControllerButton)i) << "(" << (int)b.value.hat.hat << "." << (int)b.value.hat.hat_mask << ")" << std::endl;
+					//	}
+					//}
 				}
 				break;
 		}

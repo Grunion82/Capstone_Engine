@@ -107,6 +107,11 @@ bool Window::Init()
 	eventFlags = SDL_WINDOWEVENT | SDL_WINDOWEVENT_SHOWN | SDL_WINDOWEVENT_EXPOSED | SDL_WINDOWEVENT_FOCUS_GAINED | SDL_WINDOWEVENT_ENTER | SDL_WINDOWEVENT_HIDDEN | SDL_WINDOWEVENT_FOCUS_LOST | SDL_WINDOWEVENT_LEAVE | SDL_WINDOWEVENT_SIZE_CHANGED | SDL_WINDOWEVENT_RESIZED | SDL_WINDOWEVENT_MAXIMIZED | SDL_WINDOWEVENT_RESTORED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_INPUT_GRABBED;
 	MouseShowCursor = true; 
 	SDL_Surface* surface = IMG_Load("Assets/Textures/Logos/pants.png");
+	if (!surface) {
+
+		printf("icon did not load.");
+
+	}
 	SDL_SetWindowIcon(window, surface);
 	return true;
 }
@@ -141,6 +146,8 @@ void Window::Update(SDL_Event& e)
 			windowHeight = e.window.data2;
 
 			glViewport(0, 0, windowWidth, windowHeight);
+
+			resizeCamera = true;
 			//screenSurface = SDL_GetWindowSurface(window);
 			break;
 		case(SDL_WINDOWEVENT_MAXIMIZED):

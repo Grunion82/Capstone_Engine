@@ -71,8 +71,26 @@ private:
 	//Checks for Collisions between Objects
 	void CheckCollisions();
 
+	//Detection between two Box Colliders
+	bool BoxBoxCollision(BoundingBox* object1, BoundingBox* object2);
+	//Detection between a Box and Sphere Collider
+	bool BoxSphereCollision(BoundingBox* object1, SphereCollider* object2);
+	//Detection between two Sphere Colliders
+	bool SphereSphereCollision(SphereCollider* object1, SphereCollider* object2);
+
+	//Determines the Vertices of a Bounding Box 
+	std::vector<glm::vec3> SetUpVertices(BoundingBox* box);
+
+	//Checks for new Collisions
+	void NewCollision(int object1Index, int object2Index);
+	//Checks if any collisions are no longer present
+	void CheckOldCollisions();
+
 	//Calculates the response of the Collision between Objects
 	void CalculateCollisionResponse(int object1Index, int object2Index);
+
+	//Corrects the position of overlapping objects
+	void PositionalCorrection(int object1Index, int object2Index);
 
 	//Instance of the PhysicsManager
 	static std::unique_ptr<PhysicsManager> physicsManagerInstance;
